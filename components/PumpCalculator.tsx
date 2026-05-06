@@ -271,7 +271,7 @@ export default function PumpCalculator() {
     // Collect only the attribute names needed for active filters
     const neededAttrs: string[] = []
     if (headVal !== null) neededAttrs.push('Tõstekõrgus maks.')
-    if (flowVal !== null) neededAttrs.push('Max voolukiirus')
+    if (flowVal !== null) { neededAttrs.push('Max voolukiirus'); neededAttrs.push('Nimijõudlus') }
     if (phase) neededAttrs.push('Nimipinge')
     if (tempVal !== null) neededAttrs.push('Vedeliku temperatuurivahemik')
     if (location === 'outdoor') neededAttrs.push('Kaitseklass (IEC 34-5)')
@@ -306,10 +306,9 @@ export default function PumpCalculator() {
             }
           }
 
-          // ── Max flow: "Max voolukiirus" ────────────────────────────────
-          // Values: "4.6 m³/h" — convert to m³/h, compare to user m³/h
+          // ── Max flow: "Max voolukiirus" / "Nimijõudlus" ──────────────
           if (flowVal !== null) {
-            const a = get(/max\s+voolukiirus/i)
+            const a = get(/max\s+voolukiirus/i) || get(/nimijõudlus/i)
             if (a) {
               const v = parseFlowM3h(a.value)
               if (v !== null && v < flowVal) return false
