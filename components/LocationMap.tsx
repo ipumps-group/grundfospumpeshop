@@ -1,110 +1,122 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import type { Map } from 'leaflet'
 import { COMPANY } from '@/lib/config'
-
-const DefaultIcon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
-const UserLocationIcon = L.divIcon({
-  className: '',
-  html: '<div style="width:16px;height:16px;background:#003366;border:3px solid white;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,.3)"></div>',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
-})
 
 export default function LocationMap() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<L.Map | null>(null)
+  const mapRef = useRef<Map | null>(null)
   const [locating, setLocating] = useState(true)
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
 
-    const map = L.map(containerRef.current, {
-      center: [COMPANY.shopLat, COMPANY.shopLng],
-      zoom: 13,
-      zoomControl: true,
-      scrollWheelZoom: false,
-    })
+    let cancelled = false
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(map)
+    import('leaflet').then(async (L) => {
+      if (cancelled) return
+      // @ts-expect-error - CSS import has no types
+      await import('leaflet/dist/leaflet.css')
 
-    L.marker([COMPANY.shopLat, COMPANY.shopLng], { icon: DefaultIcon })
-      .addTo(map)
-      .bindPopup(`<b>${COMPANY.legalName}</b><br>${COMPANY.shopAddress.street}, ${COMPANY.shopAddress.locality}`)
+      const DefaultIcon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41],
+      })
 
-    mapRef.current = map
+      const UserLocationIcon = L.divIcon({
+        className: '',
+        html: '<div style="width:16px;height:16px;background:#003366;border:3px solid white;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,.3)"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      })
 
-    const handlePosition = async (pos: GeolocationPosition) => {
-      const userLat = pos.coords.latitude
-      const userLng = pos.coords.longitude
+      if (cancelled || !containerRef.current) return
 
-      L.marker([userLat, userLng], { icon: UserLocationIcon }).addTo(map)
+      const map = L.map(containerRef.current, {
+        center: [COMPANY.shopLat, COMPANY.shopLng],
+        zoom: 13,
+        zoomControl: true,
+        scrollWheelZoom: false,
+      })
 
-      try {
-        const res = await fetch(
-          `https://router.project-osrm.org/route/v1/driving/${userLng},${userLat};${COMPANY.shopLng},${COMPANY.shopLat}?overview=full&geometries=geojson`
-        )
-        const data = await res.json()
-        if (data.code === 'Ok' && data.routes?.[0]) {
-          const route = data.routes[0]
-          const geo = L.geoJSON(route.geometry, {
-            style: { color: '#003366', weight: 4, opacity: 0.75 },
-          }).addTo(map)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map)
 
-          const distKm = (route.distance / 1000).toFixed(1)
-          const durMin = Math.round(route.duration / 60)
+      L.marker([COMPANY.shopLat, COMPANY.shopLng], { icon: DefaultIcon })
+        .addTo(map)
+        .bindPopup(`<b>${COMPANY.legalName}</b><br>${COMPANY.shopAddress.street}, ${COMPANY.shopAddress.locality}`)
 
-          map.fitBounds(geo.getBounds().pad(0.15))
+      mapRef.current = map
 
-          L.popup()
-            .setLatLng([userLat, userLng])
-            .setContent(
-              `<b>Teie asukoht</b><br>Kaugus: ${distKm} km<br>Sõiduaeg: ~${durMin} min<br><a href="https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${COMPANY.shopLat},${COMPANY.shopLng}" target="_blank" rel="noopener" style="color:#003366;text-decoration:underline">Ava Google Mapsis &nearr;</a>`
-            )
-            .openOn(map)
+      const handlePosition = async (pos: GeolocationPosition) => {
+        const userLat = pos.coords.latitude
+        const userLng = pos.coords.longitude
+
+        L.marker([userLat, userLng], { icon: UserLocationIcon }).addTo(map)
+
+        try {
+          const res = await fetch(
+            `https://router.project-osrm.org/route/v1/driving/${userLng},${userLat};${COMPANY.shopLng},${COMPANY.shopLat}?overview=full&geometries=geojson`
+          )
+          const data = await res.json()
+          if (data.code === 'Ok' && data.routes?.[0]) {
+            const route = data.routes[0]
+            const geo = L.geoJSON(route.geometry, {
+              style: { color: '#003366', weight: 4, opacity: 0.75 },
+            }).addTo(map)
+
+            const distKm = (route.distance / 1000).toFixed(1)
+            const durMin = Math.round(route.duration / 60)
+
+            map.fitBounds(geo.getBounds().pad(0.15))
+
+            L.popup()
+              .setLatLng([userLat, userLng])
+              .setContent(
+                `<b>Teie asukoht</b><br>Kaugus: ${distKm} km<br>Sõiduaeg: ~${durMin} min<br><a href="https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${COMPANY.shopLat},${COMPANY.shopLng}" target="_blank" rel="noopener" style="color:#003366;text-decoration:underline">Ava Google Mapsis &nearr;</a>`
+              )
+              .openOn(map)
+          }
+        } catch {
+          const bounds = L.latLngBounds(
+            [userLat, userLng],
+            [COMPANY.shopLat, COMPANY.shopLng]
+          )
+          map.fitBounds(bounds.pad(0.15))
         }
-      } catch {
-        const bounds = L.latLngBounds(
-          [userLat, userLng],
-          [COMPANY.shopLat, COMPANY.shopLng]
-        )
-        map.fitBounds(bounds.pad(0.15))
+
+        setLocating(false)
       }
 
-      setLocating(false)
-    }
+      const handleError = () => {
+        setLocating(false)
+      }
 
-    const handleError = () => {
-      setLocating(false)
-    }
-
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(handlePosition, handleError, {
-        enableHighAccuracy: false,
-        timeout: 8000,
-        maximumAge: 600000,
-      })
-    } else {
-      queueMicrotask(() => setLocating(false))
-    }
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(handlePosition, handleError, {
+          enableHighAccuracy: false,
+          timeout: 8000,
+          maximumAge: 600000,
+        })
+      } else {
+        queueMicrotask(() => setLocating(false))
+      }
+    })
 
     return () => {
-      map.remove()
-      mapRef.current = null
+      cancelled = true
+      if (mapRef.current) {
+        mapRef.current.remove()
+        mapRef.current = null
+      }
     }
   }, [])
 

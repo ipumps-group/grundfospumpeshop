@@ -8,6 +8,7 @@ interface CreateShipmentInput {
     recipientName: string;
     recipientEmail: string;
     address?: Record<string, string>;
+    parcelMachineId?: string;
     items: Array<{ name: string; qty: number }>;
   };
 }

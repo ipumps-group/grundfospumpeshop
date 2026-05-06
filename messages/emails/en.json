@@ -33,7 +33,8 @@
     "deliveryMethod": {
       "parcel_machine": "Parcel locker",
       "courier": "Courier",
-      "post_office": "Post office"
+      "post_office": "Post office",
+      "pickup": "Self pickup"
     }
   },
   "refundConfirmation": {

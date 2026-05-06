@@ -33,7 +33,8 @@
     "deliveryMethod": {
       "parcel_machine": "Pakiautomaat",
       "courier": "Kullerteenus",
-      "post_office": "Postkontor"
+      "post_office": "Postkontor",
+      "pickup": "Iseteenindus"
     }
   },
   "refundConfirmation": {

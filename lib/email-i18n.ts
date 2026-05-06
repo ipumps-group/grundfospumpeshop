@@ -44,6 +44,7 @@ export interface EmailMessages {
       parcel_machine: string;
       courier: string;
       post_office: string;
+      pickup: string;
     };
   };
   refundConfirmation: {
