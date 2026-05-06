@@ -31,6 +31,25 @@ interface CartItem {
 
 const VAT_RATE = 0.24
 
+// ─── PISIPILDID ──────────────────────────────────────────────────────────────
+
+function CartThumb({ src, alt }: { src: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState(src)
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 p-1">
+      <img
+        src={imgSrc}
+        alt={alt}
+        className={`h-9 object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => { setImgSrc('/placeholder.png'); setLoaded(true) }}
+      />
+    </div>
+  )
+}
+
 // ─── OSTUKORV ────────────────────────────────────────────────────────────────
 
 function getCart(): CartItem[] {
@@ -47,14 +66,6 @@ export default function CheckoutPage() {
   const tNav = useTranslations('nav')
   const { user } = useAuth()
 
-  const countries = [
-    { code: 'EE', name: t('countryEE') },
-    { code: 'LV', name: t('countryLV') },
-    { code: 'LT', name: t('countryLT') },
-    { code: 'PL', name: t('countryPL') },
-    { code: 'FI', name: t('countryFI') },
-  ]
-
   const [items, setItems]         = useState<CartItem[]>([])
   const [mounted, setMounted]     = useState(false)
 
@@ -65,16 +76,13 @@ export default function CheckoutPage() {
   const [company, setCompany]     = useState('')
   const [notes, setNotes]         = useState('')
 
-  const [countryCode, setCountryCode]   = useState('EE')
-  
   // Delivery method: 'pickup' (iseteenindus), 'courier' (kuller)
-  const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'courier'>('pickup')
+  const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'courier'>('courier')
   
   // Address fields for courier
   const [courierStreet, setCourierStreet] = useState('')
   const [courierCity, setCourierCity] = useState('')
   const [courierPostal, setCourierPostal] = useState('')
-  const [courierCountry, setCourierCountry] = useState('EE')
 
   const [coupon, setCoupon]     = useState<AppliedCoupon | null>(null)
 
@@ -86,10 +94,6 @@ export default function CheckoutPage() {
     setItems(getCart())
     setMounted(true)
   }, [])
-
-  const handleCountryChange = (code: string) => {
-    setCountryCode(code)
-  }
 
   const subtotal  = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount  = coupon ? coupon.discountAmount : 0
@@ -127,7 +131,7 @@ export default function CheckoutPage() {
     let shippingObj: Record<string, unknown> = {
       carrier: deliveryMethod === 'pickup' ? 'pickup' : 'courier',
       carrier_name: deliveryMethod === 'pickup' ? 'Iseteenindus' : 'Kuller',
-      country: countryCode,
+      country: 'EE',
     }
 
     if (deliveryMethod === 'pickup') {
@@ -144,7 +148,7 @@ export default function CheckoutPage() {
         street: courierStreet,
         city: courierCity,
         postal_code: courierPostal,
-        country: countryCode,
+        country: 'EE',
       }
     }
 
@@ -297,32 +301,9 @@ export default function CheckoutPage() {
 
               {/* Tarne */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="font-bold text-gray-900 text-[17px] mb-5">{t('shippingTitle')}</h2>
+                <h2 className="font-bold text-gray-900 text-[17px] mb-5">Tarneviis</h2>
 
                 <div className="space-y-4">
-
-                  {/* Riik */}
-                  <div>
-                    <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                      {t('country')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                      {countries.map(c => (
-                        <button
-                          key={c.code}
-                          type="button"
-                          onClick={() => handleCountryChange(c.code)}
-                          className={`py-2.5 rounded-xl border text-[15px] font-medium transition-colors ${
-                            countryCode === c.code
-                              ? 'bg-[#003366] text-white border-[#003366]'
-                              : 'bg-white text-gray-600 border-gray-200 hover:border-[#003366] hover:text-[#003366]'
-                          }`}
-                        >
-                          {c.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
 
                   {/* Tarneviis */}
                   <div>
@@ -452,14 +433,7 @@ export default function CheckoutPage() {
                 <div className="space-y-3 mb-5 max-h-64 overflow-y-auto">
                   {items.map(item => (
                     <div key={item.id} className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 p-1">
-                        <img
-                          src={item.image_url || '/placeholder.png'}
-                          alt={item.name}
-                          className="h-9 object-contain"
-                          onError={e => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
-                        />
-                      </div>
+                      <CartThumb src={item.image_url || '/placeholder.png'} alt={item.name} />
                       <div className="flex-1 min-w-0">
                         <div className="text-[13px] font-medium text-gray-700 line-clamp-1">{item.name}</div>
                         <div className="text-[13px] text-gray-400">

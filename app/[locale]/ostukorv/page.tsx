@@ -20,6 +20,23 @@ interface CartItem {
   qty: number
 }
 
+// ─── PISIPILDID ──────────────────────────────────────────────────────────────
+
+function CartThumb({ src, alt }: { src: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState(src)
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      className={`h-14 object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+      onLoad={() => setLoaded(true)}
+      onError={() => { setImgSrc('/placeholder.png'); setLoaded(true) }}
+    />
+  )
+}
+
 // ─── OSTUKORV UTILIIDID ────────────────────────────────────────────────────
 
 function getCart(): CartItem[] {
@@ -56,12 +73,7 @@ function CartRow({
       {/* Pilt */}
       <Link href={`/toode/${item.slug}`}
         className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 p-2 hover:bg-gray-100 transition-colors">
-        <img
-          src={item.image_url || '/placeholder.png'}
-          alt={item.name}
-          className="h-14 object-contain"
-          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
-        />
+        <CartThumb src={item.image_url || '/placeholder.png'} alt={item.name} />
       </Link>
 
       {/* Nimi + hind */}
