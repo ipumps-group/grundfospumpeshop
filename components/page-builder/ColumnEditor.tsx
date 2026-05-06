@@ -36,6 +36,7 @@ function newBlock(type: ContentBlock['type']): ContentBlock {
     case 'contact_form':  return { id, type }
     case 'search_bar':    return { id, type, bg_color: '#003366', btn_color: '#01a0dc', text_color: '#ffffff', max_width: null }
     case 'tegevusalad':   return { id, type, columns: 4, card_style: 'filled', icon_size: 'medium' }
+    default: throw new Error(`Unknown block type: ${type}`)
   }
 }
 
