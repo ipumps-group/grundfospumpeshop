@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "siteName": "iPumps",
+    "home": {
+      "title": "Grundfos siurbliai ir sprendimai – iPumps",
+      "description": "Pirkite Grundfos MAGNA3, Alpha, SCALA ir kitus siurblius. 321 modelis sandelyje. Ekspertines konsultacijos ir montavimo paslaugos."
+    },
+    "products": {
+      "title": "Visi produktai – iPumps",
+      "description": "Perziurekite visus Grundfos siurblius. 321 modelis, kainos su PVM, greitas pristatymas."
+    }
+  },
+  "tegevusalad": {
+    "kute": "Silumo siurbliai",
+    "jahutus": "Salinimo siurbliai",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karsto vandens siurbliai",
+    "puurkaevud": "Gilinimo siurbliai",
+    "drenaaz": "Drenazu siurbliai",
+    "salvkaevud": "Siurbliai šuliniams",
+    "rohutoste": "Slėgio kėlimo siurbliai",
+    "reovesi": "Nuotekų siurbliai"
+  },
+  "tegevusaladTitle": {
+    "kute": "Silumo siurbliai – {count} modeliai sandelyje | iPumps",
+    "jahutus": "Salinimo siurbliai – {count} modeliai sandelyje | iPumps",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karsto vandens siurbliai – {count} modeliai sandelyje | iPumps",
+    "puurkaevud": "Gilinimo siurbliai – {count} modeliai sandelyje | iPumps",
+    "drenaaz": "Drenazu siurbliai – {count} modeliai sandelyje | iPumps",
+    "salvkaevud": "Siurbliai šuliniams – {count} modeliai sandelyje | iPumps",
+    "rohutoste": "Slėgio kėlimo siurbliai – {count} modeliai sandelyje | iPumps",
+    "reovesi": "Nuotekų siurbliai – {count} modeliai sandelyje | iPumps"
+  },
+  "tegevusaladDesc": {
+    "kute": "Grundfos silumo siurbliai namams ir komerciniams pastatams. Aukštas efektyvumas, tylus darbas.",
+    "jahutus": "Grundfos salinimo siurbliai kondicionieriams. Efektyvus šaldymas.",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karsto vandens cirkuliacijos siurbliai katilams. Karštas vanduo iš karto.",
+    "puurkaevud": "Gilinimo siurbliai šuliniams. Kelia iš iki 200m gylio.",
+    "drenaaz": "Drenazu siurbliai rūsiams. Automatinis nutekėjimas.",
+    "salvkaevud": "Siurbliai seklųiams vandeniui. Patikimi ir ilgaamžiai.",
+    "rohutoste": "Slėgio kėlimo siurbliai vandens slėgiui. Pastovus vandens slėgis.",
+    "reovesi": "Nuotekų siurbliai kanalizacijai. Stiprus ir atsparus."
+  },
+  "staticPages": {
+    "kontakt": {
+      "title": "Kontaktai – iPumps",
+      "description": "Susisiekite su mumis. Padėsime pasirinkti siurblį. Telefonas: +372 503 3978"
+    },
+    "privaatsuspoliitika": {
+      "title": "Privatumo politika – iPumps",
+      "description": "Kaip naudojame ir saugome jūsų asmens duomenis."
+    },
+    "ostutingimused": {
+      "title": "Pirkimo salygos – iPumps",
+      "description": "Parduotuvės pirkimo salygos. Mokėjimo būdai, pristatymas, grąžinimas."
+    },
+    "tagastamine": {
+      "title": "Grąžinimas – iPumps",
+      "description": "Kaip grąžinti prekę. 14 dienų grąžinimo teisė, greitas pinigų grąžinimas."
+    }
+  }
+}

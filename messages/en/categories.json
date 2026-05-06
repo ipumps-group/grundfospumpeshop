@@ -1,0 +1,90 @@
+{
+  "kute": {
+    "title": "Küttpumpar — professionelt valg",
+    "intro": {
+      "h2": "Küttpump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English — Küttepump on keskküttesüsteemi süda, mis tagab soojuse ühtlase jaotuse kogu elamusse. Grundfos küttepumbad on tuntud oma töökindluse ja energiatõhususe poolest — seeriad MAGNA3 ja ALPHA3 on Eesti spetsialistide poolt korduvalt tunnistatud parimaks valikuks eramajadesse ja ärikutesse.",
+      "p2": "TODO: Translate to English — Eesti kliimas on küttepump asendamatu lahendus nii uute energiatõhusate majade kui ka renoveeritud elamute jaoks. MAGNA3 sobib suurematele süsteemidele koos tasakaalustatud süsteemiga, samas kui kompaktsem ALPHA3 on ideaalne väiksematele korteritele ja väikemajadele.",
+      "p3": "TODO: Translate to English — iPumps on Grundfose ametlik edasimüüja Eestis — see tähendab originaalgarantii, professionaalse nõustamise ja kiire tarne."
+    }
+  },
+  "jahutus": {
+    "title": "Jahutuspumbad — professionelt valg",
+    "intro": {
+      "h2": "Jahutuspump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "sooja-tarbevee-tsirkulatsioonipump": {
+    "title": "Tarbevee pumbad — professionelt valg",
+    "intro": {
+      "h2": "Tarbevee tsirkulatsioonipump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "puurkaevud": {
+    "title": "Puurkaevu pumbad — professionelt valg",
+    "intro": {
+      "h2": "Puurkaevu pump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "drenaaz": {
+    "title": "Drenaažipumbad — professionelt valg",
+    "intro": {
+      "h2": "Drenaažipump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "salvkaevud": {
+    "title": "Salvkaevu pumbad — professionelt valg",
+    "intro": {
+      "h2": "Salvkaevu pump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "rohutoste": {
+    "title": "Rõhutõsepumbad — professionelt valg",
+    "intro": {
+      "h2": "Rõhutõspump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "reovesi": {
+    "title": "Reoveepumbad — professionelt valg",
+    "intro": {
+      "h2": "Reoveepump Grundfos — professionelt valg",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English",
+      "p3": "TODO: Translate to English"
+    }
+  },
+  "homepage": {
+    "title": "Grundfos pumps in Estonia",
+    "intro": {
+      "h2": "Grundfos pumps in Estonia — over 40 years of reliability",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English"
+    }
+  },
+  "kontakt": {
+    "title": "Contact",
+    "intro": {
+      "h2": "Contact iPumps — Official Grundfos dealer in Estonia",
+      "p1": "TODO: Translate to English",
+      "p2": "TODO: Translate to English"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "common": {
+    "greeting": "Hi {name}!",
+    "thanks": "Thank you for choosing iPumps.",
+    "questions": "Questions? Reply to this email or write to {email}.",
+    "footer": "iPumps · {site}\nOfficial Grundfos dealer in Estonia",
+    "viewOrder": "View order",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "quantity": "pcs",
+    "orderNumber": "Order number"
+  },
+  "orderConfirmation": {
+    "preview": "Order {orderNumber} confirmed — {total}",
+    "subject": "Order {orderNumber} confirmed",
+    "heading": "Thanks for your order!",
+    "intro": "Your order <strong>{orderNumber}</strong> has been received and payment is confirmed. We'll start packing right away.",
+    "itemsHeading": "Items ordered",
+    "shippingHeading": "Shipping",
+    "shippingNote": "We'll email you again as soon as your package ships — with a tracking number.",
+    "paymentMethod": "Payment method"
+  },
+  "orderShipped": {
+    "preview": "Order {orderNumber} is on the way — tracking {trackingNumber}",
+    "subject": "📦 Order {orderNumber} is on the way",
+    "heading": "Your order is on the way!",
+    "intro": "Good news — your order <strong>{orderNumber}</strong> has been packed and handed to the courier. You should receive it within {eta}.",
+    "trackingLabel": "TRACKING NUMBER",
+    "trackingButton": "Track your package",
+    "itemsHeading": "In this shipment",
+    "etaDefault": "1–3 business days",
+    "deliveryMethod": {
+      "parcel_machine": "Parcel locker",
+      "courier": "Courier",
+      "post_office": "Post office"
+    }
+  },
+  "refundConfirmation": {
+    "preview": "Refund for order {orderNumber} — {amount}",
+    "subject": "Refund for order {orderNumber}",
+    "heading": "{name}, your refund has been processed",
+    "intro": "The amount for order <strong>{orderNumber}</strong> has been refunded to your payment method.",
+    "amountLabel": "Refunded amount",
+    "reasonLabel": "Reason for refund",
+    "timingNote": "The money typically arrives in your account within 5–10 business days, depending on your bank."
+  },
+  "abandonedCart": {
+    "preview": "Did you forget something in your cart?",
+    "subject": "Did you forget something in your cart?",
+    "heading": "You have an unfinished cart",
+    "intro": "We noticed you left a few items in your cart. They're still waiting for you — would you like to complete your order?",
+    "itemsHeading": "In your cart",
+    "returnButton": "Return to cart",
+    "footerNote": "If you've already completed your order, please ignore this email."
+  }
+}

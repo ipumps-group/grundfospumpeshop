@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "siteName": "iPumps",
+    "home": {
+      "title": "Grundfos pumps and solutions – iPumps",
+      "description": "Buy Grundfos MAGNA3, Alpha, SCALA and other pumps. 321 models in stock. Expert advice and installation service."
+    },
+    "products": {
+      "title": "All products – iPumps",
+      "description": "Browse all Grundfos pumps. 321 models, prices with VAT, fast delivery."
+    }
+  },
+  "tegevusalad": {
+    "kute": "Heating pumps",
+    "jahutus": "Cooling pumps",
+    "sooja-tarbevee-tsirkulatsioonipump": "Hot water pumps",
+    "puurkaevud": "Borewell pumps",
+    "drenaaz": "Drainage pumps",
+    "salvkaevud": "Well pumps",
+    "rohutoste": "Pressure boost pumps",
+    "reovesi": "Sewage pumps"
+  },
+  "tegevusaladTitle": {
+    "kute": "Heating pumps – {count} models in stock | iPumps",
+    "jahutus": "Cooling pumps – {count} models in stock | iPumps",
+    "sooja-tarbevee-tsirkulatsioonipump": "Hot water pumps – {count} models in stock | iPumps",
+    "puurkaevud": "Borewell pumps – {count} models in stock | iPumps",
+    "drenaaz": "Drainage pumps – {count} models in stock | iPumps",
+    "salvkaevud": "Well pumps – {count} models in stock | iPumps",
+    "rohutoste": "Pressure boost pumps – {count} models in stock | iPumps",
+    "reovesi": "Sewage pumps – {count} models in stock | iPumps"
+  },
+  "tegevusaladDesc": {
+    "kute": "Grundfos heating pumps for homes and commercial buildings. High efficiency, quiet operation, long lifespan.",
+    "jahutus": "Grundfos cooling pumps for AC and cooling circuits. Efficient cooling.",
+    "sooja-tarbevee-tsirkulatsioonipump": "Hot water circulation pumps for boilers. Hot water instantly at all taps.",
+    "puurkaevud": "Deep well pumps for borewells. Lifts from up to 200m depth.",
+    "drenaaz": "Drainage pumps for basements and foundations. Automatic outflow.",
+    "salvkaevud": "Shallow well pumps for groundwater. Reliable and durable.",
+    "rohutoste": "Pressure boost pumps for water pressure. Steady water pressure in your home.",
+    "reovesi": "Sewage pumps for sanitation. Strong and robust."
+  },
+  "staticPages": {
+    "kontakt": {
+      "title": "Contact – iPumps",
+      "description": "Contact us. We help you choose the right pump. Phone: +372 503 3978"
+    },
+    "privaatsuspoliitika": {
+      "title": "Privacy Policy – iPumps",
+      "description": "How we use and protect your personal data. Read more about our privacy policy."
+    },
+    "ostutingimused": {
+      "title": "Terms of Sale – iPumps",
+      "description": "Store terms of sale. Payment methods, delivery, returns. Everything you need to know."
+    },
+    "tagastamine": {
+      "title": "Returns – iPumps",
+      "description": "How to return products. 14-day return right, fast refund."
+    }
+  }
+}

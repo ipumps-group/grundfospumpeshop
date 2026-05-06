@@ -1,0 +1,33 @@
+import { Resend } from 'resend';
+
+if (!process.env.RESEND_API_KEY) {
+  throw new Error('RESEND_API_KEY is not set');
+}
+
+let _resend: Resend | null = null;
+export function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+
+/**
+ * "From" aadress kõigi mailide jaoks.
+ * Formaat: "Kuvatav nimi <aadress@domeen>"
+ * Domeen peab olema Resendis verifitseeritud.
+ */
+export const EMAIL_FROM = `iPumps <${
+  process.env.RESEND_FROM_EMAIL ?? 'noreply@grundfospump.ee'
+}>`;
+
+/**
+ * Reply-To aadress — kui klient vajutab mailis "Reply",
+ * siis vastus suunatakse sellele aadressile.
+ */
+export const EMAIL_REPLY_TO =
+  process.env.RESEND_REPLY_TO ?? 'info@grundfospump.ee';
+
+/**
+ * Saidi baas-URL — kasutatakse mailides linkide genereerimiseks.
+ */
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://grundfospump.ee';

@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "siteName": "iPumps",
+    "home": {
+      "title": "Grundfos sūkņi un risinājumi – iPumps",
+      "description": "Pērc Grundfos MAGNA3, Alpha, SCALA un citus sūkņus. 531 modelis noliktavā. Ekspertu konsultācijas un uzstādīšana."
+    },
+    "products": {
+      "title": "Visi produkti – iPumps",
+      "description": "Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN, ātra piegāde."
+    }
+  },
+  "tegevusalad": {
+    "kute": "Apkures sūkņi",
+    "jahutus": "Dzesēšanas sūkņi",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens sūkņi",
+    "puurkaevud": "Urbuma sūkņi",
+    "drenaaz": "Drenāžas sūkņi",
+    "salvkaevud": "Akas sūkņi",
+    "rohutoste": "Spiediena sūkņi",
+    "reovesi": "Notekūdeņu sūkņi"
+  },
+  "tegevusaladTitle": {
+    "kute": "Apkures sūkņi – {count} modeļi noliktavā | iPumps",
+    "jahutus": "Dzesēšanas sūkņi – {count} modeļi noliktavā | iPumps",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens sūkņi – {count} modeļi noliktavā | iPumps",
+    "puurkaevud": "Urbuma sūkņi – {count} modeļi noliktavā | iPumps",
+    "drenaaz": "Drenāžas sūkņi – {count} modeļi noliktavā | iPumps",
+    "salvkaevud": "Akas sūkņi – {count} modeļi noliktavā | iPumps",
+    "rohutoste": "Spiediena sūkņi – {count} modeļi noliktavā | iPumps",
+    "reovesi": "Notekūdeņu sūkņi – {count} modeļi noliktavā | iPumps"
+  },
+  "tegevusaladDesc": {
+    "kute": "Grundfos apkures sūkņi mājām un komercēkām. Augsta efektivitāte, klusa darbība.",
+    "jahutus": "Grundfos dzesēšanas sūkņi gaisa kondicionētājiem. Efektīva dzesēšana.",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācijas sūkņi katliem. Karsts ūdens uzreiz.",
+    "puurkaevud": "Dziļurbuma sūkņi urbumiem. Sūkšana līdz 200m dziļumā.",
+    "drenaaz": "Drenāžas sūkņi pagrabiem. Automātiska novadīšana.",
+    "salvkaevud": "Akas sūkņi gruntsūdenim. Uzticami un izturīgi.",
+    "rohutoste": "Spiediena paaugstināšanas sūkņi ūdens spiedienam. Stabils spiediens.",
+    "reovesi": "Notekūdeņu sūkņi kanalizācijai. Spēcīgi un izturīgi."
+  },
+  "staticPages": {
+    "kontakt": {
+      "title": "Kontakti – iPumps",
+      "description": "Sazinies ar mums. Palīdzēsim izvēlēties sūkni. Tālrunis: +372 503 3978"
+    },
+    "privaatsuspoliitika": {
+      "title": "Privātuma politika – iPumps",
+      "description": "Kā mēs izmantojam un aizsargājam jūsu personas datus."
+    },
+    "ostutingimused": {
+      "title": "Pirkuma nosacījumi – iPumps",
+      "description": "Veikala pirkuma nosacījumi. Maksāšanas veidi, piegāde, atgriešana."
+    },
+    "tagastamine": {
+      "title": "Atgriešana – iPumps",
+      "description": "Kā atgriezt preci. 14 dienu atgriešanas tiesības, ātra naudas atgriešana."
+    }
+  }
+}
