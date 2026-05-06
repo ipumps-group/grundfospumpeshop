@@ -263,13 +263,26 @@ export default function PumpCalculator() {
 
     let productIds = [...new Set(catLinks.map(r => r.product_id as number))]
 
-    // 2 ── Technical spec filtering via product_attributes (best-effort)
-    const needsAttrs = !!(minHead || effectiveFlow || phase || tempClass !== null || location === 'outdoor')
-    if (needsAttrs && productIds.length > 0) {
+    // 2 ── Technical spec filtering via product_attributes
+    const headVal = minHead ? parseFloat(minHead) : null
+    const flowVal = effectiveFlow ?? null
+    const tempVal = tempClass
+
+    // Collect only the attribute names needed for active filters
+    const neededAttrs: string[] = []
+    if (headVal !== null) neededAttrs.push('Tõstekõrgus maks.')
+    if (flowVal !== null) neededAttrs.push('Max voolukiirus')
+    if (phase) neededAttrs.push('Nimipinge')
+    if (tempVal !== null) neededAttrs.push('Vedeliku temperatuurivahemik')
+    if (location === 'outdoor') neededAttrs.push('Kaitseklass (IEC 34-5)')
+
+    if (neededAttrs.length > 0 && productIds.length > 0) {
+      // Fetch only relevant attributes — each type is well under Supabase 1000-row default limit
       const { data: allAttrs } = await supabase
         .from('product_attributes')
         .select('product_id, attribute_name, attribute_value')
         .in('product_id', productIds)
+        .in('attribute_name', neededAttrs)
 
       if (allAttrs && allAttrs.length > 0) {
         // Build product_id → attrs map
@@ -278,10 +291,6 @@ export default function PumpCalculator() {
           if (!attrMap.has(row.product_id)) attrMap.set(row.product_id, [])
           attrMap.get(row.product_id)!.push({ name: row.attribute_name, value: row.attribute_value })
         }
-
-        const headVal = minHead ? parseFloat(minHead) : null
-        const flowVal = effectiveFlow ?? null
-        const tempVal = tempClass
 
         productIds = productIds.filter(id => {
           const attrs = attrMap.get(id) ?? []

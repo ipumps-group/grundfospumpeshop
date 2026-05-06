@@ -529,7 +529,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                     onClick={() => setMegaOpen(false)}
                     className="flex items-center justify-center gap-1.5 w-full bg-[#003366] hover:bg-[#004080] text-white px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors"
                   >
-                    <ArrowRight size={14} /> Kassasse
+                    <ArrowRight size={14} /> Kassa
                   </Link>
                 </div>
               </div>
