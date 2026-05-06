@@ -51,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (productsError) console.error('Error fetching products:', productsError)
     if (pagesError) console.error('Error fetching pages:', pagesError)
 
-    // 1. Homepage for each locale — PRIORITY 1.0
+    // 1. Homepage for each locale - PRIORITY 1.0
     LOCALES.forEach((locale) => {
       entries.push({
         url: `${SITE_URL}/${locale}`,
@@ -70,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     })
 
-    // 2. Products page (/tooted) for each locale — PRIORITY 0.9
+    // 2. Products page (/tooted) for each locale - PRIORITY 0.9
     LOCALES.forEach((locale) => {
       entries.push({
         url: `${SITE_URL}/${locale}/tooted`,
@@ -89,7 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     })
 
-    // 3. Category pages (/tooted/{tegevusala}) for each locale — PRIORITY 0.9
+    // 3. Category pages (/tooted/{tegevusala}) for each locale - PRIORITY 0.9
     TEGEVUSALA_VALUES.forEach((tegevusala) => {
       LOCALES.forEach((locale) => {
         entries.push({
@@ -110,7 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     })
 
-    // 4. Individual products — PRIORITY 0.8
+    // 4. Individual products - PRIORITY 0.8
     if (!productsError && products && products.length > 0) {
       products.forEach((product) => {
         LOCALES.forEach((locale) => {
@@ -133,7 +133,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     }
 
-    // 5. Static pages — PRIORITY 0.5
+    // 5. Static pages - PRIORITY 0.5
     STATIC_PAGES.forEach((pageSlug) => {
       LOCALES.forEach((locale) => {
         entries.push({
@@ -154,8 +154,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     }
 
-    // 6. Dynamic pages from database — PRIORITY 0.5
-    if (!pagesError && pages && pages.length > 0) {
+    // 6. Dynamic pages from database - PRIORITY 0.5
+    if (pages && pages.length > 0) {
       pages.forEach((page) => {
         LOCALES.forEach((locale) => {
           entries.push({
