@@ -5,18 +5,19 @@ import {
   Flame, Thermometer, Drill, Waves, Droplet,
   ArrowUpCircle, Filter, CircleDot,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { TegevusaladBlock } from './types'
 
 const CATEGORIES = [
-  { label: 'Kütte',         icon: Flame,        slug: 'kuttepumbad' },
-  { label: 'Tsirkulatsioon',icon: Thermometer,   slug: 'tsirkulatsioonipumbad-soe-tarbevesi' },
-  { label: 'Puurkaev',      icon: Drill,         slug: 'puurkaevupumbad' },
-  { label: 'Salvkaev',      icon: CircleDot,     slug: 'salvkaevupumbad' },
-  { label: 'Veeautomaat',   icon: Droplet,       slug: 'veeautomaadid' },
-  { label: 'Rõhutõste',     icon: ArrowUpCircle, slug: 'rohutostepumbad' },
-  { label: 'Drenaaz',       icon: Waves,         slug: 'drenaazipumbad' },
-  { label: 'Reovesi',       icon: Filter,        slug: 'reoveepumbad' },
+  { nameKey: 'heating',           icon: Flame,        slug: 'kuttepumbad' },
+  { nameKey: 'circulation',       icon: Thermometer,   slug: 'tsirkulatsioonipumbad-soe-tarbevesi' },
+  { nameKey: 'borewell',          icon: Drill,         slug: 'puurkaevupumbad' },
+  { nameKey: 'wells',             icon: CircleDot,     slug: 'salvkaevupumbad' },
+  { nameKey: 'jpWaterAutomatics', icon: Droplet,       slug: 'veeautomaadid' },
+  { nameKey: 'pressure',          icon: ArrowUpCircle, slug: 'rohutostepumbad' },
+  { nameKey: 'drainage',          icon: Waves,         slug: 'drenaazipumbad' },
+  { nameKey: 'sewage',            icon: Filter,        slug: 'reoveepumbad' },
 ]
 
 const ICON_PX: Record<TegevusaladBlock['icon_size'], number> = {
@@ -76,6 +77,7 @@ function CategoryCard({ cat, block, iconPx }: {
   block: TegevusaladBlock
   iconPx: number
 }) {
+  const tCat = useTranslations('categories')
   const [hovered, setHovered] = useState(false)
   const style = buildCardStyle(block, hovered)
 
@@ -92,7 +94,7 @@ function CategoryCard({ cat, block, iconPx }: {
         className="flex-shrink-0 text-[#003366] group-hover:text-[#01a0dc] transition-colors"
       />
       <span className="text-[14px] font-medium text-gray-800 group-hover:text-[#003366] transition-colors text-center leading-tight">
-        {cat.label}
+        {tCat(cat.nameKey)}
       </span>
     </Link>
   )

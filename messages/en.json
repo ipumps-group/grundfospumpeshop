@@ -42,12 +42,13 @@
     "heating": "Heating",
     "cooling": "Cooling",
     "hotWater": "Hot water",
-    "borewell": "Boreholes",
+    "circulation": "Circulation",
+    "borewell": "Borewell",
     "drainage": "Drainage",
-    "wells": "Wells",
+    "wells": "Well",
     "pressure": "Pressure boosting",
     "sewage": "Sewage",
-    "jpWaterAutomatics": "JP Water Automatics"
+    "jpWaterAutomatics": "Water automatics"
   },
   "featured": {
     "popular": "Popular",

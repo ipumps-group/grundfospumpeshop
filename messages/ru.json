@@ -42,12 +42,13 @@
     "heating": "Отопление",
     "cooling": "Охлаждение",
     "hotWater": "Горячее водоснабжение",
-    "borewell": "Скважины",
+    "circulation": "Циркуляция",
+    "borewell": "Скважина",
     "drainage": "Дренаж",
-    "wells": "Колодцы",
+    "wells": "Колодец",
     "pressure": "Повышение давления",
     "sewage": "Сточные воды",
-    "jpWaterAutomatics": "JP Водоавтоматика"
+    "jpWaterAutomatics": "Водоавтоматика"
   },
   "featured": {
     "popular": "Популярные",

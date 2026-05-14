@@ -42,12 +42,13 @@
     "heating": "Apkure",
     "cooling": "Dzesēšana",
     "hotWater": "Karstais ūdens",
-    "borewell": "Urbumi",
+    "circulation": "Cirkulācija",
+    "borewell": "Urbums",
     "drainage": "Drenāža",
-    "wells": "Ūdens akas",
+    "wells": "Aka",
     "pressure": "Spiediena paaugstināšana",
     "sewage": "Notekūdeņi",
-    "jpWaterAutomatics": "JP Ūdens automātika"
+    "jpWaterAutomatics": "Ūdens automātika"
   },
   "featured": {
     "popular": "Populāri",

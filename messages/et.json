@@ -39,15 +39,16 @@
     "title": "Elamud ja Ärihooned",
     "allCategories": "Kõik kategooriad →",
     "products": "toodet",
-    "heating": "Küte",
+    "heating": "Kütte",
     "cooling": "Jahutus",
     "hotWater": "Soe tarbevesi",
-    "borewell": "Puurkaevud",
-    "drainage": "Drenaaž",
-    "wells": "Salvkaevud",
+    "circulation": "Tsirkulatsioon",
+    "borewell": "Puurkaev",
+    "drainage": "Drenaaz",
+    "wells": "Salvkaev",
     "pressure": "Rõhutõste",
     "sewage": "Reovesi",
-    "jpWaterAutomatics": "JP Veeautomaat"
+    "jpWaterAutomatics": "Veeautomaat"
   },
   "featured": {
     "popular": "Populaarsed",

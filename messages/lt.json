@@ -42,12 +42,13 @@
     "heating": "Šildymas",
     "cooling": "Aušinimas",
     "hotWater": "Karštas buitinis vanduo",
-    "borewell": "Gręžiniai",
+    "circulation": "Cirkuliacija",
+    "borewell": "Gręžinys",
     "drainage": "Drenažas",
-    "wells": "Šuliniai",
+    "wells": "Šulinys",
     "pressure": "Slėgio padidėjimas",
     "sewage": "Buitinės nuotekos",
-    "jpWaterAutomatics": "JP Vandens automatika"
+    "jpWaterAutomatics": "Vandens automatika"
   },
   "featured": {
     "popular": "Populiarūs",
