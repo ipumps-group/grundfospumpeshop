@@ -5,6 +5,7 @@ import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../ProductsGrid'
+import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 
 export const dynamic = 'force-dynamic'
 
@@ -116,7 +117,8 @@ export default async function CategoryPage({
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
+          <ProductsLayoutWithSidebar>
+            <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
             <Link href="/" className="hover:text-[#003366] transition-colors">Avaleht</Link>
             <span>/</span>
             <Link href="/tooted" className="hover:text-[#003366] transition-colors">Tooted</Link>
@@ -153,6 +155,7 @@ export default async function CategoryPage({
           ) : (
             <ProductsGrid products={products} title={pageTitle} />
           )}
+          </ProductsLayoutWithSidebar>
         </div>
       </div>
     )
