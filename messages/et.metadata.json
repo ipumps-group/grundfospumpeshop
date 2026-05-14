@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "siteName": "iPumps",
+    "home": {
+      "title": "Grundfos pumbad ja lahendused – iPumps",
+      "description": "Ostu Grundfos MAGNA3, Alpha, scALA ja teisi pumbad. 321 mudelit laos kohe tarniks. Ekspertnõustamine ja paigaldusteenus."
+    },
+    "products": {
+      "title": "Kõik tooted – iPumps",
+      "description": "Vaata kõiki Grundfos pumbad. 321 mudelit, hinnad koos käibemaksuga, kiire tarnimine."
+    }
+  },
+  "tegevusalad": {
+    "kute": "Küttepumbad",
+    "jahutus": "Jahutuspumbad",
+    "sooja-tarbevee-tsirkulatsioonipump": "Sooja tarbevee pumbad",
+    "puurkaevud": "Puurkaevu pumbad",
+    "drenaaz": "Drenaaži pumbad",
+    "salvkaevud": "Salvkaevu pumbad",
+    "rohutoste": "Rõhutõste pumbad",
+    "reovesi": "Reovee pumbad"
+  },
+  "tegevusaladTitle": {
+    "kute": "Küttepumbad – {count} mudelit laos | iPumps",
+    "jahutus": "Jahutuspumbad – {count} mudelit laos | iPumps",
+    "sooja-tarbevee-tsirkulatsioonipump": "Sooja tarbevee pumbad – {count} mudelit laos | iPumps",
+    "puurkaevud": "Puurkaevu pumbad – {count} mudelit laos | iPumps",
+    "drenaaz": "Drenaaži pumbad – {count} mudelit laos | iPumps",
+    "salvkaevud": "Salvkaevu pumbad – {count} mudelit laos | iPumps",
+    "rohutoste": "Rõhutõste pumbad – {count} mudelit laos | iPumps",
+    "reovesi": "Reovee pumbad – {count} mudelit laos | iPumps"
+  },
+  "tegevusaladDesc": {
+    "kute": "Grundfos küttepumbad majadele ja ärihoonetele. Kõrge efektiivsus, vaikne töö, pikk eluiga.",
+    "jahutus": "Grundfos jahutuspumbad kliimaseadmetele ja jahutusringlusse. Tõhus jahutus.",
+    "sooja-tarbevee-tsirkulatsioonipump": "Sooja tarbevee tsirkulatsioonipumbad boileritele. Kiisalt soe vesi kõikides kraanites.",
+    "puurkaevud": "Sügavpumbad puurkaevudele. Tõsted kuni 200m sügavuselt.",
+    "drenaaz": "Drenaaži pumbad keldritele ja alusele. Automaatne äravool.",
+    "salvkaevud": "Salvkaevu pumbad pinnaveele. Tõuline ja töökindel.",
+    "rohutoste": "Rõhutõstja pumbad vee rõhuks. Tasane veesurve majas.",
+    "reovesi": "Reovee pumbad kanalisatsioonile. Tugev ja vastupidav."
+  },
+  "staticPages": {
+    "kontakt": {
+      "title": "Kontakt – iPumps",
+      "description": "Võta meiega ühendust. Nõustame sulle sobiva pumba valimisel. Telefon: +372 503 3978"
+    },
+    "privaatsuspoliitika": {
+      "title": "Privaatsuspoliitika – iPumps",
+      "description": "Kuidas me kasutame ja kaitstame sinu isikuandmeid. Loe lähemalt meie privaatsuspoliitikast."
+    },
+    "ostutingimused": {
+      "title": "Ostutingimused – iPumps",
+      "description": "Poodi ostutingimused. Makseviisid, tarnimine, tagastusõigus. Kõik, mida pead teadma."
+    },
+    "tagastamine": {
+      "title": "Tagastamine – iPumps",
+      "description": "Kuidas toodet tagastada. 14-päevane tagastusõigus, kiire raha tagastus."
+    }
+  }
+}

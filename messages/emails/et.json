@@ -1,0 +1,58 @@
+{
+  "common": {
+    "greeting": "Tere, {name}!",
+    "thanks": "Aitäh iPumpsi valimise eest.",
+    "questions": "Küsimused? Vastake sellele e-mailile või kirjutage aadressil {email}.",
+    "footer": "iPumps · {site}\nGrundfosi ametlik edasimüüja Eestis",
+    "viewOrder": "Vaata tellimust",
+    "total": "Kokku",
+    "subtotal": "Vahesumma",
+    "discount": "Allahindlus",
+    "quantity": "tk",
+    "orderNumber": "Tellimuse number"
+  },
+  "orderConfirmation": {
+    "preview": "Tellimus {orderNumber} kinnitatud — {total}",
+    "subject": "Tellimus {orderNumber} kinnitatud",
+    "heading": "Aitäh tellimuse eest!",
+    "intro": "Teie tellimus <strong>{orderNumber}</strong> on saadud ja makse edukalt kinnitatud. Asume kohe pakkimise kallale.",
+    "itemsHeading": "Tellitud tooted",
+    "shippingHeading": "Kohaletoimetamine",
+    "shippingNote": "Saadame teile uue e-kirja kohe, kui pakk on teel — koos jälgimisnumbriga.",
+    "paymentMethod": "Makseviis"
+  },
+  "orderShipped": {
+    "preview": "Tellimus {orderNumber} on teel — jälgimisnumber {trackingNumber}",
+    "subject": "📦 Tellimus {orderNumber} on teel",
+    "heading": "Tellimus on teel!",
+    "intro": "Hea uudis — teie tellimus <strong>{orderNumber}</strong> on pakitud ja üle antud kullerile. Saate selle kätte umbes {eta} jooksul.",
+    "trackingLabel": "JÄLGIMISNUMBER",
+    "trackingButton": "Jälgi paki liikumist",
+    "itemsHeading": "Saadetises",
+    "etaDefault": "1–3 tööpäeva",
+    "deliveryMethod": {
+      "parcel_machine": "Pakiautomaat",
+      "courier": "Kullerteenus",
+      "post_office": "Postkontor",
+      "pickup": "Iseteenindus"
+    }
+  },
+  "refundConfirmation": {
+    "preview": "Tellimuse {orderNumber} raha on tagastatud — {amount}",
+    "subject": "Tellimuse {orderNumber} raha on tagastatud",
+    "heading": "{name}, teie raha on tagastatud",
+    "intro": "Tellimuse <strong>{orderNumber}</strong> summa on tagastatud teie makseviisi.",
+    "amountLabel": "Tagastatud summa",
+    "reasonLabel": "Tagastamise põhjus",
+    "timingNote": "Raha jõuab teie kontole tavaliselt 5–10 tööpäeva jooksul, sõltuvalt teie pangast."
+  },
+  "abandonedCart": {
+    "preview": "Unustasid midagi ostukorvi?",
+    "subject": "Unustasid midagi ostukorvi?",
+    "heading": "Teil on ostukorv pooleli",
+    "intro": "Märkasime, et jätsite mõned tooted ostukorvi. Need ootavad teid ikka veel — kas soovite tellimuse lõpuni viia?",
+    "itemsHeading": "Teie ostukorvis",
+    "returnButton": "Jätka ostukorvi",
+    "footerNote": "Kui olete juba tellimuse sooritanud, võite selle kirja ignoreerida."
+  }
+}

@@ -1,0 +1,128 @@
+name: Database & Storage Backup
+
+on:
+  schedule:
+    # Andmebaas: iga päev kell 03:00 UTC
+    - cron: '0 3 * * *'
+    # Pildid: iga esmaspäev kell 04:00 UTC
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  backup-database:
+    name: Backup Supabase Database
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Dump database
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          mkdir -p backups
+          pg_dump "$DATABASE_URL" \
+            --no-owner \
+            --no-acl \
+            --format=plain \
+            --file=backups/db_$(date +%Y%m%d_%H%M%S).sql
+
+      - name: Compress backup
+        run: gzip backups/*.sql
+
+      - name: Upload to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}
+          path: backups/
+          retention-days: 30
+
+      - name: Send success email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.BACKUP_EMAIL }}
+          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
+          subject: "✅ ipumps.ee DB backup õnnestus - ${{ github.run_number }}"
+          body: "Andmebaasi backup on salvestatud. Kuupäev: $(date +%Y-%m-%d)"
+          to: ${{ secrets.BACKUP_EMAIL }}
+          from: ${{ secrets.BACKUP_EMAIL }}
+
+      - name: Send failure email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.BACKUP_EMAIL }}
+          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
+          subject: "❌ ipumps.ee DB backup EBAÕNNESTUS - ${{ github.run_number }}"
+          body: "Andmebaasi backup ebaõnnestus! Kontrolli GitHub Actions logi."
+          to: ${{ secrets.BACKUP_EMAIL }}
+          from: ${{ secrets.BACKUP_EMAIL }}
+
+  backup-images:
+    name: Backup Supabase Storage Images
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 4 * * 1' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Download images from Supabase Storage
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          mkdir -p images
+          curl -s "${SUPABASE_URL}/storage/v1/object/list/products" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"prefix": "", "limit": 1000}' \
+            | jq -r '.[].name' \
+            | while read -r file; do
+                mkdir -p "images/$(dirname "$file")"
+                curl -s -o "images/$file" \
+                  "${SUPABASE_URL}/storage/v1/object/products/$file" \
+                  -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
+              done
+
+      - name: Compress images
+        run: tar -czf images_$(date +%Y%m%d).tar.gz images/
+
+      - name: Upload to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: images-backup-${{ github.run_number }}
+          path: images_*.tar.gz
+          retention-days: 30
+
+      - name: Send success email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.BACKUP_EMAIL }}
+          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
+          subject: "✅ ipumps.ee piltide backup õnnestus"
+          body: "Piltide backup GitHub Artifacts'i õnnestus. Kuupäev: $(date +%Y-%m-%d)"
+          to: ${{ secrets.BACKUP_EMAIL }}
+          from: ${{ secrets.BACKUP_EMAIL }}
+
+      - name: Send failure email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.BACKUP_EMAIL }}
+          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
+          subject: "❌ ipumps.ee piltide backup EBAÕNNESTUS"
+          body: "Piltide backup ebaõnnestus! Kontrolli GitHub Actions logi."
+          to: ${{ secrets.BACKUP_EMAIL }}
+          from: ${{ secrets.BACKUP_EMAIL }}

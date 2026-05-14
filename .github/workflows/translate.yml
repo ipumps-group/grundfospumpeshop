@@ -1,0 +1,31 @@
+name: Auto Translate
+
+on:
+  push:
+    paths:
+      - 'messages/et.json'
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Run translation
+        run: npm run translate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Commit translated files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add messages/
+          git diff --staged --quiet || git commit -m "chore: auto-translate"
+          git push
