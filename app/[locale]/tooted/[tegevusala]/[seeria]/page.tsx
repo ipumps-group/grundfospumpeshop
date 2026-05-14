@@ -5,6 +5,9 @@ import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../../ProductsGrid'
+
+export const dynamic = 'force-dynamic'
+
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
 export async function generateMetadata(
