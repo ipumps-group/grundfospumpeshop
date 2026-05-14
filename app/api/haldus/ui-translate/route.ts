@@ -128,7 +128,7 @@ ${JSON.stringify(missing, null, 2)}`
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-haiku-latest',
       max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }],
     }),

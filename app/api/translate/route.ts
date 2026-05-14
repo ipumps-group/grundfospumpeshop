@@ -18,7 +18,7 @@ async function translateText(text: string, targetLang: string): Promise<string |
   if (!text?.trim()) return null
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
+      model: 'claude-3-5-haiku-latest',
       max_tokens: 4096,
       messages: [{
         role: 'user',

@@ -45,7 +45,7 @@ async function translateText(text, targetLang) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-haiku-latest',
       max_tokens: 1024,
       messages: [{
         role: 'user',

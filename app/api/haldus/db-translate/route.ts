@@ -51,7 +51,7 @@ async function claudeTranslate(text: string, locale: string): Promise<string | n
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-haiku-latest',
       max_tokens: 4096,
       messages: [{
         role: 'user',
@@ -82,7 +82,7 @@ async function claudeTranslateBatch(
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-haiku-latest',
       max_tokens: 8192,
       messages: [{
         role: 'user',
