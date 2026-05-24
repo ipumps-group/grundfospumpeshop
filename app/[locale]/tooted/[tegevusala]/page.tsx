@@ -7,7 +7,7 @@ import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
@@ -153,30 +153,7 @@ export default async function CategoryPage({
               <p className="text-gray-500 text-lg">Selles kategoorias ei ole veel tooteid.</p>
             </div>
           ) : (
-            <>
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                  __html: JSON.stringify({
-                    '@context': 'https://schema.org',
-                    '@type': 'ItemList',
-                    itemListElement: (products as any[]).map((p, i) => ({
-                      '@type': 'ListItem',
-                      position: i + 1,
-                      item: {
-                        '@type': 'Product',
-                        name: p.name,
-                        url: `${SITE_URL}/toode/${p.slug}`,
-                        ...(p.image_url ? { image: p.image_url } : {}),
-                        ...(p.sku ? { sku: p.sku } : {}),
-                      },
-                    })),
-                    numberOfItems: (products as any[]).length,
-                  }),
-                }}
-              />
-              <ProductsGrid products={products} title={pageTitle} />
-            </>
+            <ProductsGrid products={products} title={pageTitle} />
           )}
           </ProductsLayoutWithSidebar>
         </div>
@@ -187,7 +164,7 @@ export default async function CategoryPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center max-w-md">
-          <div className="text-red-500 text-lg font-semibold mb-2">Error</div>
+          <div className="text-red-500 text-lg font-semibold mb-2">Viga lehe laadimisel</div>
           <p className="text-gray-500 text-sm">{(e as Error).message}</p>
         </div>
       </div>

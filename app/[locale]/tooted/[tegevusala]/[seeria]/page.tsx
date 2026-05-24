@@ -7,7 +7,7 @@ import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
@@ -159,29 +159,6 @@ export default async function SeriesPage({
           )}
 
           <ProductsGrid products={products || []} title={pageTitle} />
-          {products && products.length > 0 && (
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify({
-                  '@context': 'https://schema.org',
-                  '@type': 'ItemList',
-                  itemListElement: (products as any[]).map((p, i) => ({
-                    '@type': 'ListItem',
-                    position: i + 1,
-                    item: {
-                      '@type': 'Product',
-                      name: p.name,
-                      url: `${SITE_URL}/toode/${p.slug}`,
-                      ...(p.image_url ? { image: p.image_url } : {}),
-                      ...(p.sku ? { sku: p.sku } : {}),
-                    },
-                  })),
-                  numberOfItems: (products as any[]).length,
-                }),
-              }}
-            />
-          )}
           </ProductsLayoutWithSidebar>
         </div>
       </div>
