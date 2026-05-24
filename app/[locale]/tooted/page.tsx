@@ -19,6 +19,10 @@ interface Product {
   name: string
   sku: string | null
   short_description_et: string | null
+  short_description_en?: string | null
+  short_description_ru?: string | null
+  short_description_lv?: string | null
+  short_description_lt?: string | null
   price: number
   sale_price: number | null
   image_url: string | null
@@ -480,7 +484,7 @@ function TootedPageContent({
 
     let q = supabase
       .from('products')
-      .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock', { count: 'exact' })
+      .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock', { count: 'exact' })
       .eq('published', true)
 
     if (query.trim()) {

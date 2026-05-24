@@ -89,7 +89,7 @@ export default async function CategoryPage({
 
     const { data: products } = await supabaseAdmin
       .from('products')
-      .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock')
+      .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock')
       .eq('primary_activity_area_slug', tegevusala)
       .eq('published', true)
       .order('name', { ascending: true })
@@ -114,6 +114,18 @@ export default async function CategoryPage({
 
     const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
     const tNav = await getTranslations('nav')
+    const tCat = await getTranslations('categories')
+
+    // Translated category name for breadcrumb
+    const SLUG_TO_TITLE: Record<string, string> = {
+      'kuttepumbad': 'heatingTitle', 'puurkaevupumbad': 'borewellTitle',
+      'salvkaevupumbad': 'wellsTitle', 'drenaazipumbad': 'drainageTitle',
+      'rohutostepumbad': 'pressureTitle', 'reoveepumbad': 'sewageTitle',
+      'veeautomaadid': 'jpWaterAutomaticsTitle',
+      'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWaterTitle',
+    }
+    const titleKey = SLUG_TO_TITLE[tegevusala]
+    const catDisplayName = titleKey ? tCat(titleKey as any) : (area as any)?.name_et || tegevusala
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -124,7 +136,7 @@ export default async function CategoryPage({
             <span>/</span>
             <Link href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</Link>
             <span>/</span>
-            <span className="text-[#003366] font-medium">{(area as any)?.name_et || tegevusala}</span>
+            <span className="text-[#003366] font-medium">{catDisplayName}</span>
           </nav>
 
           <h1 className="text-3xl font-bold text-[#003366] mb-2">{pageTitle}</h1>

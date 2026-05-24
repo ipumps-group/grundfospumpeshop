@@ -126,13 +126,23 @@ export default async function SeriesPage({
 
     const { data: products } = await supabaseAdmin
       .from('products')
-      .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock')
+      .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock')
       .eq('series_slug', seeria)
       .eq('published', true)
       .order('name', { ascending: true })
 
     const pageTitle = series?.name || seeria
     const tNav = await getTranslations('nav')
+    const tCat = await getTranslations('categories')
+    const TITLE_KEY: Record<string, string> = {
+      'kuttepumbad': 'heatingTitle', 'puurkaevupumbad': 'borewellTitle',
+      'salvkaevupumbad': 'wellsTitle', 'drenaazipumbad': 'drainageTitle',
+      'rohutostepumbad': 'pressureTitle', 'reoveepumbad': 'sewageTitle',
+      'veeautomaadid': 'jpWaterAutomaticsTitle',
+      'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWaterTitle',
+    }
+    const areaTitleKey = TITLE_KEY[tegevusala]
+    const areaDisplayName = areaTitleKey ? tCat(areaTitleKey as any) : (area?.name_et || tegevusala)
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -146,7 +156,7 @@ export default async function SeriesPage({
               <>
                 <span>/</span>
                 <Link href={`/tooted/${area.slug}`} className="hover:text-[#003366] transition-colors">
-                  {area.name_et}
+                  {areaDisplayName}
                 </Link>
               </>
             )}
