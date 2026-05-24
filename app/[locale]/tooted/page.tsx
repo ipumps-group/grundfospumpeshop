@@ -520,10 +520,10 @@ function TootedPageContent({
         let name = ''
         if (data.categoryType === 'tegevusala') {
           const area = tegevusalad.find(a => (DB_TO_URL[a.slug] ?? a.slug) === data.categorySlug)
-          name = area ? (SLUG_TO_CAT_KEY[area.slug] ? tCat(SLUG_TO_CAT_KEY[area.slug]) : area.name_et) : data.categorySlug
+          name = area ? (SLUG_TO_CAT_KEY[area.slug] ? tCat(SLUG_TO_CAT_KEY[area.slug] as CatNameKey) : area.name_et) : data.categorySlug
         } else {
           const series = seeriad.find(s => s.slug === data.categorySlug)
-          name = series ? (SLUG_TO_CAT_KEY[series.slug] ? tCat(SLUG_TO_CAT_KEY[series.slug]) : series.name_et) : data.categorySlug
+          name = series ? (SLUG_TO_CAT_KEY[series.slug] ? tCat(SLUG_TO_CAT_KEY[series.slug] as CatNameKey) : series.name_et) : data.categorySlug
         }
         if (!cancelled) setAiSuggestion({ slug: data.categorySlug, type: data.categoryType, name })
       })
