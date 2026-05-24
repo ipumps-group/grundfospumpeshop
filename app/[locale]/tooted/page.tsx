@@ -358,16 +358,22 @@ function FiltersPanel({
 
 // ─── PEAKOMPONENT ──────────────────────────────────────────────────────────
 
-export default function TootedPage() {
-  return <Suspense><TootedPageOuter /></Suspense>
+import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
+
+// eslint-disable-next-line @next/next/no-async-client-component -- page exports are server-rendered by Next.js App Router
+export default async function TootedPage() {
+  const sidebarData = await fetchSidebarData()
+  return <Suspense><TootedPageOuter initCategories={sidebarData.categories} initSeries={sidebarData.series} /></Suspense>
 }
 
-function TootedPageOuter() {
+function TootedPageOuter({ initCategories, initSeries }: { initCategories: Category[]; initSeries: Category[] }) {
   const searchParams = useSearchParams()
   const tegevusala = searchParams.get('tegevusala') || ''
   return (
     <TootedPageContent
       key={tegevusala}
+      initCategories={initCategories}
+      initSeries={initSeries}
       initAla={tegevusala}
       initQ={searchParams.get('q') || ''}
       initSeeria={searchParams.get('seeria') || ''}
@@ -382,9 +388,11 @@ function TootedPageOuter() {
 
 function TootedPageContent({
   initAla, initQ, initSeeria, initLaos, initMin, initMax, initSort, initPage,
+  initCategories, initSeries,
 }: {
   initAla: string; initQ: string; initSeeria: string; initLaos: boolean
   initMin: string; initMax: string; initSort: string; initPage: number
+  initCategories?: Category[]; initSeries?: Category[]
 }) {
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
@@ -422,11 +430,12 @@ function TootedPageContent({
   const [products, setProducts]             = useState<Product[]>([])
   const [total, setTotal]                   = useState(0)
   const [loading, setLoading]               = useState(true)
-  const [tegevusalad, setTegevusalad]       = useState<Category[]>([])
-  const [seeriad, setSeeriad]               = useState<Category[]>([])
+  const [tegevusalad, setTegevusalad]       = useState<Category[]>(initCategories || [])
+  const [seeriad, setSeeriad]               = useState<Category[]>(initSeries || [])
   const [aiSuggestion, setAiSuggestion]     = useState<{ slug: string; type: string; name: string } | null>(null)
 
   useEffect(() => {
+    if (initCategories && initSeries) return // already prefetched server-side
     async function loadCategories() {
       const { data: areas } = await supabase
         .from('activity_areas')
@@ -444,7 +453,7 @@ function TootedPageContent({
       if (allSeries) setSeeriad(allSeries.map(s => ({ slug: s.slug, name_et: s.name, parent_slug: null })))
     }
     loadCategories()
-  }, [])
+  }, [initCategories, initSeries])
 
   useEffect(() => {
     const timer = setTimeout(() => { setQuery(inputQuery); setPage(1) }, 350)
