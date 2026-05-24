@@ -447,7 +447,7 @@ function TootedPageContent({
   const [aiSuggestion, setAiSuggestion]     = useState<{ slug: string; type: string; name: string } | null>(null)
 
   useEffect(() => {
-    if (initCategories && initSeries) return // already prefetched server-side
+    if (initCategories && initCategories.length > 0 && initSeries && initSeries.length > 0) return // already prefetched server-side
     async function loadCategories() {
       const { data: areas } = await supabase
         .from('activity_areas')
