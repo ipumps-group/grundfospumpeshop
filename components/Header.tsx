@@ -47,7 +47,6 @@ const languageOptions = [
 
 const categories = [
   { nameKey: 'heating',  icon: Flame,         count: 155, slug: 'kuttepumbad' },
-  { nameKey: 'cooling',  icon: Snowflake,      count: 155, slug: 'kuttepumbad' },
   { nameKey: 'hotWater', icon: Thermometer,    count: 48,  slug: 'tsirkulatsioonipumbad-soe-tarbevesi' },
   { nameKey: 'borewell', icon: Drill,          count: 43,  slug: 'puurkaevupumbad' },
   { nameKey: 'drainage', icon: Waves,          count: 31,  slug: 'drenaazipumbad' },
