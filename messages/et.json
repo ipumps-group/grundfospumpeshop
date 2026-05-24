@@ -342,7 +342,22 @@
     "couponNotYetValid": "See kupong ei ole veel kehtiv",
     "couponExpired": "See kupong on aegunud",
     "couponLimitReached": "Kupongi kasutuslimiit on täis",
-    "couponMinOrder": "Minimaalne ostusumma on {amount} €"
+    "couponMinOrder": "Minimaalne ostusumma on {amount} €",
+    "deliveryMethod": "Tarneviis",
+    "deliveryMethodLabel": "Tarneviis",
+    "pickup": "Iseteenindus",
+    "pickupButton": "Tulen ise järgi",
+    "pickupAddress": "Vana-Narva mnt 3, uks 5/6, Tallinn",
+    "pickupPhone": "Tel: +372 503 3978",
+    "courier": "Kuller",
+    "courierButton": "Kulleriga",
+    "streetLabel": "Tänav + maja/korter",
+    "streetPlaceholder": "Tänav, majanumber, korter",
+    "cityLabel": "Linn",
+    "cityPlaceholder": "Linn",
+    "postalCodeLabel": "Postiindeks",
+    "enterAddress": "Palun sisestage aadress",
+    "enterCity": "Palun sisestage linn"
   },
   "account": {
     "login": "Logi sisse",

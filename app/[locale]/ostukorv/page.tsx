@@ -30,7 +30,7 @@ function CartThumb({ src, alt }: { src: string; alt: string }) {
     <img
       src={imgSrc}
       alt={alt}
-      className={`h-14 object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+      className={`h-14 w-14 object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
       onLoad={() => setLoaded(true)}
       onError={() => { setImgSrc('/placeholder.png'); setLoaded(true) }}
     />

@@ -340,7 +340,22 @@
     "couponNotYetValid": "Šis kupons vēl nav derīgs",
     "couponExpired": "Šī kupona derīguma termiņš ir beidzies",
     "couponLimitReached": "Kupona izmantošanas limits sasniegts",
-    "couponMinOrder": "Minimālā pasūtījuma summa ir {amount} €"
+    "couponMinOrder": "Minimālā pasūtījuma summa ir {amount} €",
+    "deliveryMethod": "Piegādes veids",
+    "deliveryMethodLabel": "Piegādes veids",
+    "pickup": "Pašapkalpošanās",
+    "pickupButton": "Paņemšu pats",
+    "pickupAddress": "Vana-Narva mnt 3, durvis 5/6, Tallina",
+    "pickupPhone": "Tel: +372 503 3978",
+    "courier": "Kurjers",
+    "courierButton": "Ar kurjeru",
+    "streetLabel": "Iela + māja/dzīvoklis",
+    "streetPlaceholder": "Iela, mājas numurs, dzīvoklis",
+    "cityLabel": "Pilsēta",
+    "cityPlaceholder": "Pilsēta",
+    "postalCodeLabel": "Pasta indekss",
+    "enterAddress": "Lūdzu, ievadiet adresi",
+    "enterCity": "Lūdzu, ievadiet pilsētu"
   },
   "account": {
     "login": "Pierakstīties",

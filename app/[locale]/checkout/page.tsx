@@ -42,7 +42,7 @@ function CartThumb({ src, alt }: { src: string; alt: string }) {
       <img
         src={imgSrc}
         alt={alt}
-        className={`h-9 object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`h-9 w-9 object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         onLoad={() => setLoaded(true)}
         onError={() => { setImgSrc('/placeholder.png'); setLoaded(true) }}
       />
@@ -301,14 +301,14 @@ export default function CheckoutPage() {
 
               {/* Tarne */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="font-bold text-gray-900 text-[17px] mb-5">Tarneviis</h2>
+                <h2 className="font-bold text-gray-900 text-[17px] mb-5">{t('deliveryMethod')}</h2>
 
                 <div className="space-y-4">
 
                   {/* Tarneviis */}
                   <div>
                     <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                      Tarneviis <span className="text-red-500">*</span>
+                      {t('deliveryMethodLabel')} <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <button
@@ -321,7 +321,7 @@ export default function CheckoutPage() {
                         }`}
                       >
                         <Package size={16} className="inline mr-1.5 -mt0.5" />
-                        Tulen ise järgi
+                        {t('pickupButton')}
                       </button>
                       <button
                         type="button"
@@ -333,7 +333,7 @@ export default function CheckoutPage() {
                         }`}
                       >
                         <Truck size={16} className="inline mr-1.5 -mt0.5" />
-                        Kulleriga
+                        {t('courierButton')}
                       </button>
                     </div>
                   </div>
@@ -344,12 +344,12 @@ export default function CheckoutPage() {
                       <div className="flex items-start gap-3">
                         <Package size={20} className="text-green-600 mt-0.5" />
                         <div>
-                          <div className="font-semibold text-gray-900">Iseteenindus</div>
+                          <div className="font-semibold text-gray-900">{t('pickup')}</div>
                           <div className="text-[14px] text-gray-600 mt-1">
-                            Vana-Narva mnt 3, uks 5/6, Tallinn
+                            {t('pickupAddress')}
                           </div>
                           <div className="text-[14px] text-gray-500">
-                            Tel: +372 503 3978
+                            {t('pickupPhone')}
                           </div>
                         </div>
                       </div>
@@ -361,32 +361,32 @@ export default function CheckoutPage() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                          Tänav + maja/korter <span className="text-red-500">*</span>
+                          {t('streetLabel')} <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={courierStreet}
                           onChange={e => setCourierStreet(e.target.value)}
-                          placeholder="Tänav, majanumber, korter"
+                          placeholder={t('streetPlaceholder')}
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                            Linn <span className="text-red-500">*</span>
+                            {t('cityLabel')} <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
                             value={courierCity}
                             onChange={e => setCourierCity(e.target.value)}
-                            placeholder="Linn"
+                            placeholder={t('cityPlaceholder')}
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
                           />
                         </div>
                         <div>
                           <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                            Postiindeks
+                            {t('postalCodeLabel')}
                           </label>
                           <input
                             type="text"

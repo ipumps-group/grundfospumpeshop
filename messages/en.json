@@ -340,7 +340,22 @@
     "couponNotYetValid": "This coupon is not valid yet",
     "couponExpired": "This coupon has expired",
     "couponLimitReached": "Coupon usage limit reached",
-    "couponMinOrder": "Minimum order amount is {amount} €"
+    "couponMinOrder": "Minimum order amount is {amount} €",
+    "deliveryMethod": "Delivery method",
+    "deliveryMethodLabel": "Delivery method",
+    "pickup": "Self pickup",
+    "pickupButton": "I'll pick it up",
+    "pickupAddress": "Vana-Narva mnt 3, door 5/6, Tallinn",
+    "pickupPhone": "Tel: +372 503 3978",
+    "courier": "Courier",
+    "courierButton": "By courier",
+    "streetLabel": "Street + house/apartment",
+    "streetPlaceholder": "Street, house number, apartment",
+    "cityLabel": "City",
+    "cityPlaceholder": "City",
+    "postalCodeLabel": "Postal code",
+    "enterAddress": "Please enter an address",
+    "enterCity": "Please enter a city"
   },
   "account": {
     "login": "Log in",

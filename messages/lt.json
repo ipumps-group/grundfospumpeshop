@@ -340,7 +340,22 @@
     "couponNotYetValid": "Šis kuponas dar negalioja",
     "couponExpired": "Šio kupono galiojimas pasibaigė",
     "couponLimitReached": "Kupono naudojimo limitas pasiektas",
-    "couponMinOrder": "Minimali užsakymo suma yra {amount} €"
+    "couponMinOrder": "Minimali užsakymo suma yra {amount} €",
+    "deliveryMethod": "Pristatymo būdas",
+    "deliveryMethodLabel": "Pristatymo būdas",
+    "pickup": "Atsiėmimas",
+    "pickupButton": "Atsiimsiu pats",
+    "pickupAddress": "Vana-Narva mnt 3, durys 5/6, Talinas",
+    "pickupPhone": "Tel: +372 503 3978",
+    "courier": "Kurjeris",
+    "courierButton": "Su kurjeriu",
+    "streetLabel": "Gatvė + namas/butas",
+    "streetPlaceholder": "Gatvė, namo numeris, butas",
+    "cityLabel": "Miestas",
+    "cityPlaceholder": "Miestas",
+    "postalCodeLabel": "Pašto kodas",
+    "enterAddress": "Prašome įvesti adresą",
+    "enterCity": "Prašome įvesti miestą"
   },
   "account": {
     "login": "Prisijungti",

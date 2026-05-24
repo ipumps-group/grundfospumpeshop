@@ -340,7 +340,22 @@
     "couponNotYetValid": "Этот купон ещё не действителен",
     "couponExpired": "Срок действия купона истёк",
     "couponLimitReached": "Лимит использования купона исчерпан",
-    "couponMinOrder": "Минимальная сумма заказа {amount} €"
+    "couponMinOrder": "Минимальная сумма заказа {amount} €",
+    "deliveryMethod": "Способ доставки",
+    "deliveryMethodLabel": "Способ доставки",
+    "pickup": "Самовывоз",
+    "pickupButton": "Заберу сам",
+    "pickupAddress": "Vana-Narva mnt 3, дверь 5/6, Таллинн",
+    "pickupPhone": "Тел: +372 503 3978",
+    "courier": "Курьер",
+    "courierButton": "Курьером",
+    "streetLabel": "Улица + дом/квартира",
+    "streetPlaceholder": "Улица, номер дома, квартира",
+    "cityLabel": "Город",
+    "cityPlaceholder": "Город",
+    "postalCodeLabel": "Почтовый индекс",
+    "enterAddress": "Пожалуйста, введите адрес",
+    "enterCity": "Пожалуйста, введите город"
   },
   "account": {
     "login": "Вход",

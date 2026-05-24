@@ -8,6 +8,8 @@ import { getLocale } from 'next-intl/server'
 import type { Section } from '@/components/page-builder/types'
 import { SITE_URL } from '@/lib/config'
 
+export const revalidate = 3600
+
 function optimizeUrl(url: string | null, maxWidth = 1920): string | null {
   if (!url) return null
   if (url.includes('supabase.co/storage/v1/object/public')) {
