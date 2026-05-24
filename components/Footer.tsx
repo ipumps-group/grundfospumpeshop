@@ -79,24 +79,12 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
 
   const team = [
     { 
-      name: settings?.footer_team_1_name || 'Rivo',  
-      eUser: settings?.footer_team_1_email || 'rivo',  
-      phone: settings?.footer_team_1_phone || '+372 510 2376', 
-      tel: settings?.footer_team_1_phone?.replace(/\s/g, '') || '+3725102376' 
+      name: settings?.footer_team_1_name || '',  
+      eUser: settings?.footer_team_1_email || 'info',  
+      phone: settings?.footer_team_1_phone || '', 
+      tel: settings?.footer_team_1_phone?.replace(/\s/g, '') || '' 
     },
-    { 
-      name: settings?.footer_team_2_name || 'Karol', 
-      eUser: settings?.footer_team_2_email || 'karol', 
-      phone: settings?.footer_team_2_phone || '+372 503 3978', 
-      tel: settings?.footer_team_2_phone?.replace(/\s/g, '') || '+3725033978' 
-    },
-    { 
-      name: settings?.footer_team_3_name || 'Jüri',  
-      eUser: settings?.footer_team_3_email || 'juri',  
-      phone: settings?.footer_team_3_phone || null,            
-      tel: settings?.footer_team_3_phone?.replace(/\s/g, '') || null 
-    },
-  ]
+  ].filter(t => t.name || t.phone)
 
   return (
     <footer className="bg-[#001f40] text-white/70">
