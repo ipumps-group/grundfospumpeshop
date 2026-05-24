@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getLocale, getTranslations } from 'next-intl/server'
+import { getLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
-import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
 
 export const revalidate = 3600
 
@@ -132,22 +131,16 @@ export default async function SeriesPage({
       .eq('published', true)
       .order('name', { ascending: true })
 
-    // Pre-fetched sidebar data
-    const { categories: prefetchedCategories, series: prefetchedSeries } = await fetchSidebarData()
-
     const pageTitle = series?.name || seeria
-    const locale = await getLocale()
-    const tNav = await getTranslations('nav')
-    const tProducts = await getTranslations('products')
 
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <ProductsLayoutWithSidebar prefetchedCategories={prefetchedCategories} prefetchedSeries={prefetchedSeries}>
+          <ProductsLayoutWithSidebar>
             <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
-            <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
+            <Link href="/" className="hover:text-[#003366] transition-colors">Avaleht</Link>
             <span>/</span>
-            <Link href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</Link>
+            <Link href="/tooted" className="hover:text-[#003366] transition-colors">Tooted</Link>
             {area && (
               <>
                 <span>/</span>

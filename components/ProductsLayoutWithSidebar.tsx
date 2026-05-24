@@ -5,15 +5,9 @@ import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { FiltersPanel, type Category } from '@/components/ProductFiltersSidebar'
 
-interface Props {
-  children: React.ReactNode
-  prefetchedCategories?: Category[]
-  prefetchedSeries?: Category[]
-}
-
-export default function ProductsLayoutWithSidebar({ children, prefetchedCategories, prefetchedSeries }: Props) {
-  const [tegevusalad, setTegevusalad] = useState<Category[]>(prefetchedCategories || [])
-  const [seeriad, setSeeriad] = useState<Category[]>(prefetchedSeries || [])
+export default function ProductsLayoutWithSidebar({ children }: { children: React.ReactNode }) {
+  const [tegevusalad, setTegevusalad] = useState<Category[]>([])
+  const [seeriad, setSeeriad] = useState<Category[]>([])
   const [selectedAla, setSelectedAla] = useState('')
   const [selectedSeeria, setSelectedSeeria] = useState('')
   const [inStockOnly, setInStockOnly] = useState(false)
@@ -30,7 +24,6 @@ export default function ProductsLayoutWithSidebar({ children, prefetchedCategori
   }, [currentTegevusala])
 
   useEffect(() => {
-    if (prefetchedCategories || prefetchedSeries) return
     async function load() {
       const { data: areas } = await supabase
         .from('activity_areas')
@@ -48,7 +41,7 @@ export default function ProductsLayoutWithSidebar({ children, prefetchedCategori
       if (allSeries) setSeeriad(allSeries.map(s => ({ slug: s.slug, name_et: s.name.replace(/Grundfos\s*/g, ''), parent_slug: null })))
     }
     load()
-  }, [prefetchedCategories, prefetchedSeries])
+  }, [])
 
   const handleSetAla = (v: string) => {
     if (v) router.push(`/tooted/${v}`)

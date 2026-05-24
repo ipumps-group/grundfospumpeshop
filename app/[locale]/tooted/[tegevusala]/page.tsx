@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getLocale, getTranslations } from 'next-intl/server'
+import { getLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
-import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
 
 export const revalidate = 3600
 
@@ -95,9 +94,6 @@ export default async function CategoryPage({
       .eq('published', true)
       .order('name', { ascending: true })
 
-    // Server-fetch sidebar data (parallel with the above, not blocking)
-    const sidebarData = await fetchSidebarData()
-
     let seriesLinks: any[] | null = null
     if (area) {
       const { data: saa } = await supabaseAdmin
@@ -117,17 +113,15 @@ export default async function CategoryPage({
     }
 
     const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
-    const tNav = await getTranslations('nav')
-    const tProducts = await getTranslations('products')
 
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <ProductsLayoutWithSidebar prefetchedCategories={sidebarData.categories} prefetchedSeries={sidebarData.series}>
+          <ProductsLayoutWithSidebar>
             <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
-            <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
+            <Link href="/" className="hover:text-[#003366] transition-colors">Avaleht</Link>
             <span>/</span>
-            <Link href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</Link>
+            <Link href="/tooted" className="hover:text-[#003366] transition-colors">Tooted</Link>
             <span>/</span>
             <span className="text-[#003366] font-medium">{(area as any)?.name_et || tegevusala}</span>
           </nav>
@@ -139,7 +133,7 @@ export default async function CategoryPage({
 
           {seriesLinks && seriesLinks.length > 0 && (
             <div className="mb-8">
-              <div className="text-[15px] font-semibold text-gray-700 mb-3">{tNav('productSeries')}</div>
+              <div className="text-[15px] font-semibold text-gray-700 mb-3">Tooteseeriad</div>
               <div className="flex flex-wrap gap-2">
                 {seriesLinks.map((sl: any) => (
                   <Link
@@ -156,7 +150,7 @@ export default async function CategoryPage({
 
           {(!products || products.length === 0) ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-              <p className="text-gray-500 text-lg">{tProducts('noProducts')}</p>
+              <p className="text-gray-500 text-lg">Selles kategoorias ei ole veel tooteid.</p>
             </div>
           ) : (
             <>
