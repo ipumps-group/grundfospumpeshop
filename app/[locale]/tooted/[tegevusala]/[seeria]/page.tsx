@@ -6,6 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
+import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
 
 export const revalidate = 3600
 
@@ -132,24 +133,7 @@ export default async function SeriesPage({
       .order('name', { ascending: true })
 
     // Pre-fetched sidebar data
-    const { data: allAreas } = await supabaseAdmin
-      .from('activity_areas')
-      .select('slug, name_et, sort_order')
-      .eq('is_active', true)
-      .order('sort_order')
-
-    const { data: allSeries } = await supabaseAdmin
-      .from('product_series')
-      .select('slug, name, sort_order')
-      .eq('is_active', true)
-      .order('sort_order')
-
-    const prefetchedCategories = (allAreas || []).map(a => ({
-      slug: a.slug, name_et: a.name_et, parent_slug: null as string | null,
-    }))
-    const prefetchedSeries = (allSeries || []).map(s => ({
-      slug: s.slug, name_et: s.name.replace(/Grundfos\s*/g, ''), parent_slug: null as string | null,
-    }))
+    const { categories: prefetchedCategories, series: prefetchedSeries } = await fetchSidebarData()
 
     const pageTitle = series?.name || seeria
     const locale = await getLocale()

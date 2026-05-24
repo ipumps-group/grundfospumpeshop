@@ -6,6 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
+import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
 
 export const revalidate = 3600
 
@@ -81,40 +82,21 @@ export default async function CategoryPage({
   const { tegevusala } = await params
 
   try {
-    const [areaRes, productsRes, areasRes, seriesRes] = await Promise.all([
-      supabaseAdmin
-        .from('activity_areas')
-        .select('id, name_et, slug, h1, description')
-        .eq('slug', tegevusala)
-        .single(),
-      supabaseAdmin
-        .from('products')
-        .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock')
-        .eq('primary_activity_area_slug', tegevusala)
-        .eq('published', true)
-        .order('name', { ascending: true }),
-      supabaseAdmin
-        .from('activity_areas')
-        .select('slug, name_et, sort_order')
-        .eq('is_active', true)
-        .order('sort_order'),
-      supabaseAdmin
-        .from('product_series')
-        .select('slug, name, sort_order')
-        .eq('is_active', true)
-        .order('sort_order'),
-    ])
+    const { data: area } = await supabaseAdmin
+      .from('activity_areas')
+      .select('id, name_et, slug, h1, description')
+      .eq('slug', tegevusala)
+      .single()
 
-    const area = areaRes.data
-    const products = productsRes.data
+    const { data: products } = await supabaseAdmin
+      .from('products')
+      .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock')
+      .eq('primary_activity_area_slug', tegevusala)
+      .eq('published', true)
+      .order('name', { ascending: true })
 
-    // Pre-fetched sidebar data
-    const prefetchedCategories = (areasRes.data || []).map(a => ({
-      slug: a.slug, name_et: a.name_et, parent_slug: null as string | null,
-    }))
-    const prefetchedSeries = (seriesRes.data || []).map(s => ({
-      slug: s.slug, name_et: s.name.replace(/Grundfos\s*/g, ''), parent_slug: null as string | null,
-    }))
+    // Server-fetch sidebar data (parallel with the above, not blocking)
+    const sidebarData = await fetchSidebarData()
 
     let seriesLinks: any[] | null = null
     if (area) {
@@ -134,14 +116,14 @@ export default async function CategoryPage({
       }
     }
 
-        const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
+    const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
     const tNav = await getTranslations('nav')
     const tProducts = await getTranslations('products')
 
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <ProductsLayoutWithSidebar prefetchedCategories={prefetchedCategories} prefetchedSeries={prefetchedSeries}>
+          <ProductsLayoutWithSidebar prefetchedCategories={sidebarData.categories} prefetchedSeries={sidebarData.series}>
             <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
             <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
             <span>/</span>
