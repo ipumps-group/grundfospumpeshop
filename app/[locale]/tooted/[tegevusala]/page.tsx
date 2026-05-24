@@ -211,7 +211,7 @@ export default async function CategoryPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center max-w-md">
-          <div className="text-red-500 text-lg font-semibold mb-2">{tCommon ? tCommon('error') : 'Error'}</div>
+          <div className="text-red-500 text-lg font-semibold mb-2">Error</div>
           <p className="text-gray-500 text-sm">{(e as Error).message}</p>
         </div>
       </div>
