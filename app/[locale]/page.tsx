@@ -8,6 +8,15 @@ import { getLocale } from 'next-intl/server'
 import type { Section } from '@/components/page-builder/types'
 import { SITE_URL } from '@/lib/config'
 
+function optimizeUrl(url: string | null, maxWidth = 1920): string | null {
+  if (!url) return null
+  if (url.includes('supabase.co/storage/v1/object/public')) {
+    const sep = url.includes('?') ? '&' : '?'
+    return `${url}${sep}width=${maxWidth}&quality=80`
+  }
+  return url
+}
+
 // The CMS page slug that serves as the homepage
 const HOME_SLUG = 'esilehtx'
 
@@ -138,9 +147,23 @@ export default async function HomePage() {
 
   const titleVisible = page.show_title !== false
 
+  // Collect background image URLs for preload hints
+  const bgImages: string[] = []
+  if (hasBlocks) {
+    for (const s of (page.blocks as Section[])) {
+      if (s.settings?.background_image_url) {
+        bgImages.push(s.settings.background_image_url)
+      }
+    }
+  }
+
   if (hasBlocks) {
     return (
       <div className="min-h-screen">
+        {bgImages.length > 0 && bgImages.map(url => {
+          const optUrl = optimizeUrl(url) || url
+          return <link key={url} rel="preload" as="image" href={optUrl} fetchPriority="high" />
+        })}
         {titleVisible && (
           <div className="max-w-[1200px] mx-auto px-4 md:px-6 pt-10 pb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h1>

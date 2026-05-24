@@ -42,6 +42,8 @@ export interface ImageBlock {
   link_url: string | null
   link_target: '_self' | '_blank'
   object_fit: 'cover' | 'contain'
+  image_width?: number
+  image_height?: number
 }
 
 export interface ButtonBlock {

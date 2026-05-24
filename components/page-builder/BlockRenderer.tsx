@@ -5,6 +5,7 @@ import LocationMap from '@/components/LocationMap'
 import ShortcodeRenderer from '@/components/ShortcodeRenderer'
 import SearchBarBlockRenderer from './SearchBarBlockRenderer'
 import TegevusaladBlockRenderer from './TegevusaladBlockRenderer'
+import Image from 'next/image'
 import type { Section, ContentBlock, HeadingBlock, TextBlock, ImageBlock, ButtonBlock, VideoBlock, DividerBlock, SpacerBlock, SliderBlock } from './types'
 
 // ─── Video URL parser ──────────────────────────────────────────────────────
@@ -16,6 +17,18 @@ function getEmbedUrl(url: string): string | null {
   if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`
   if (/google\.com\/maps|maps\.google\.com/.test(url)) return url
   return null
+}
+
+// ─── Image URL optimizer ───────────────────────────────────────────────────
+
+function optimizeUrl(url: string | null, maxWidth = 1920): string | null {
+  if (!url) return null
+  // Supabase storage URLs — append transformation params for on-the-fly resize
+  if (url.includes('supabase.co/storage/v1/object/public')) {
+    const sep = url.includes('?') ? '&' : '?'
+    return `${url}${sep}width=${maxWidth}&quality=80`
+  }
+  return url
 }
 
 // ─── Padding helper ────────────────────────────────────────────────────────
@@ -112,11 +125,38 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
     }
     case 'image': {
       const b = block as ImageBlock
-      const img = (
+      const src = optimizeUrl(b.url) || b.url
+      const isSupabase = b.url.includes('supabase.co') || b.url.includes('sdqnzyfmanflslsjhytf')
+      const hasDimensions = b.image_width && b.image_height
+
+      const img = hasDimensions ? (
+        <Image
+          src={src}
+          alt={b.alt}
+          width={b.image_width!}
+          height={b.image_height!}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="w-full h-auto rounded"
+          style={{ objectFit: b.object_fit }}
+        />
+      ) : isSupabase ? (
+        <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+          <Image
+            src={src}
+            alt={b.alt}
+            fill
+            sizes="100vw"
+            className="rounded"
+            style={{ objectFit: b.object_fit }}
+          />
+        </div>
+      ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={b.url}
           alt={b.alt}
+          loading="lazy"
+          decoding="async"
           className="w-full h-auto rounded"
           style={{ objectFit: b.object_fit }}
         />
@@ -217,7 +257,7 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
     const c2 = settings.background_gradient_color2 ?? '#01a0dc'
     bgStyle.backgroundImage = `linear-gradient(${dir}, ${c1}, ${c2})`
   } else if (settings.background_image_url) {
-    bgStyle.backgroundImage = `url(${settings.background_image_url})`
+    bgStyle.backgroundImage = `url(${optimizeUrl(settings.background_image_url)})`
     bgStyle.backgroundSize = 'cover'
     bgStyle.backgroundPosition = 'center'
   }
