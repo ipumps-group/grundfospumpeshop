@@ -468,7 +468,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                 >
                   <div>
                     <div className="text-[14px] font-semibold text-gray-800 group-hover:text-[#003366] transition-colors">{t('contact')}</div>
-                    <div className="text-[12px] text-gray-400 mt-0.5">info@pumbapood.ee</div>
+                    <div className="text-[12px] text-gray-400 mt-0.5">info@ipumps.ee</div>
                   </div>
                   <ArrowRight size={13} className="ml-auto text-gray-300 group-hover:text-[#003366] transition-colors" />
                 </Link>

@@ -11,7 +11,7 @@ interface BreadcrumbsProps {
   siteUrl?: string
 }
 
-export default function Breadcrumbs({ items, locale = 'et', siteUrl = 'https://pumbapood.ee' }: BreadcrumbsProps) {
+export default function Breadcrumbs({ items, locale = 'et', siteUrl = 'https://ipumps.ee' }: BreadcrumbsProps) {
   // JSON-LD for structured data
   const jsonLd = {
     '@context': 'https://schema.org',
