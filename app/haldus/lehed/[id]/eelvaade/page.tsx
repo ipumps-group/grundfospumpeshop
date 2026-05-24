@@ -52,7 +52,7 @@ export default async function EelvaadePage(
               <p className="text-[17px] text-gray-600 mt-3 leading-relaxed">{shortDesc}</p>
             )}
           </div>
-          <BlockRenderer sections={page.blocks as Section[]} />
+          <BlockRenderer sections={page.blocks as Section[]} locale="et" />
         </div>
       ) : (
         <div className="bg-gray-50 min-h-screen">

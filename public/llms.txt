@@ -1,0 +1,24 @@
+# iPumps — Grundfos pumbad Eestis
+> Grundfos pumpade ametlik edasimüüja Eestis. 321 toodet laos — küte, jahutus, puurkaevud, drenaaž ja palju muud.
+
+## Peamised lehed / Main pages
+
+- [Avaleht / Home](https://pumbapood.ee/): Grundfos pumps and solutions, search, categories
+- [Kõik tooted / All Products](https://pumbapood.ee/tooted): Complete product catalog with filters and search (321+ products)
+- [Küttepumbad / Heating Pumps](https://pumbapood.ee/tooted/kute): Grundfos heating pumps for residential and commercial buildings
+- [Jahutuspumbad / Cooling Pumps](https://pumbapood.ee/tooted/jahutus): Cooling pumps for climate systems
+- [Sooja tarbevee pumbad / Hot Water Pumps](https://pumbapood.ee/tooted/sooja-tarbevee-tsirkulatsioonipump): Circulation pumps for boilers
+- [Puurkaevu pumbad / Borewell Pumps](https://pumbapood.ee/tooted/puurkaevud): Deep well pumps up to 200m depth
+- [Drenaaži pumbad / Drainage Pumps](https://pumbapood.ee/tooted/drenaaz): Drainage pumps for basements
+- [Salvkaevu pumbad / Well Pumps](https://pumbapood.ee/tooted/salvkaevud): Surface water well pumps
+- [Rõhutõste pumbad / Pressure Pumps](https://pumbapood.ee/tooted/rohutoste): Pressure boosters for water pressure
+- [Reovee pumbad / Sewage Pumps](https://pumbapood.ee/tooted/reovesi): Sewage pumps for drainage systems
+- [Kontakt / Contact](https://pumbapood.ee/leht/kontakt): Contact info and location
+
+## Keeleversioonid / Language versions
+
+- [Eesti (ET)](https://pumbapood.ee/) — Default
+- [English (EN)](https://pumbapood.ee/en)
+- [Русский (RU)](https://pumbapood.ee/ru)
+- [Latviešu (LV)](https://pumbapood.ee/lv)
+- [Lietuvių (LT)](https://pumbapood.ee/lt)

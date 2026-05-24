@@ -19,7 +19,14 @@
     "cart": "Iepirkumu grozs",
     "workingHours": "P-P 8:00–17:00",
     "home": "Sākums",
-    "language": "Valoda"
+    "language": "Valoda",
+    "menu": "Izvēlne",
+    "close": "Aizvērt",
+    "cartEmpty": "Grozs ir tukšs",
+    "pcs": "gab",
+    "moreProducts": "vēl produkti",
+    "total": "Kopā",
+    "checkout": "Noformēt"
   },
   "hero": {
     "title": "Grundfos sūkņi un risinājumi",
@@ -103,7 +110,9 @@
     "showingOf": "Rādu {shown} / {total} piemērotu produktu",
     "viewAll": "Skatīt visus",
     "viewAllSuitable": "Skatīt visus {total} piemērotus produktus",
-    "addToCart": "Pievienot grozam"
+    "addToCart": "Pievienot grozam",
+    "inStock": "Noliktavā",
+    "outOfStock": "Izpārdots"
   },
   "installation": {
     "label": "Pakalpojums",
@@ -233,7 +242,15 @@
     "tabDrawing": "Rasējumi",
     "tabCurves": "Līknes",
     "tabDocuments": "Dokumenti",
-    "noDocuments": "Dokumenti nav pieejami."
+    "noDocuments": "Dokumenti nav pieejami.",
+    "specTehniline": "Tehniskie",
+    "specElektri": "Elektriskie dati",
+    "specMaterjalid": "Materiāli",
+    "specPaigaldamine": "Uzstādīšana",
+    "specVedelik": "Šķidrums",
+    "specJuhtimine": "Vadība",
+    "specPaak": "Tvertne",
+    "specMuu": "Cits"
   },
   "cart": {
     "title": "Iepirkumu grozs",
@@ -447,6 +464,32 @@
     "vortex": "Vortex",
     "vaike": "Kompakts",
     "vaike_reoveepump": "Mazais notekūdeņu sūknis"
+  },
+  "contactForm": {
+    "name": "Vārds",
+    "namePlaceholder": "Jānis Bērziņš",
+    "email": "E-pasts",
+    "emailPlaceholder": "janis@email.lv",
+    "phone": "Telefons",
+    "phonePlaceholder": "+371 2222 1234",
+    "address": "Adrese",
+    "addressPlaceholder": "Brīvības iela 3, Rīga",
+    "message": "Ziņojums",
+    "messagePlaceholder": "Uzrakstiet savu jautājumu...",
+    "optional": "pēc izvēles",
+    "send": "Sūtīt ziņojumu",
+    "sending": "Sūtīšana...",
+    "error": "Sūtīšana neizdevās. Lūdzu, mēģiniet vēlreiz.",
+    "successTitle": "Ziņojums nosūtīts!",
+    "successMessage": "Mēs ar jums sazināsimies pie pirmās iespējas."
+  },
+  "locationMap": {
+    "locating": "Nosaka atrašanās vietu...",
+    "yourLocation": "Jūsu atrašanās vieta",
+    "distance": "Attālums",
+    "driveTime": "Braukšanas laiks",
+    "min": "min",
+    "openInGoogleMaps": "Atvērt Google Maps"
   },
   "metadata": {
     "siteName": "iPumps",

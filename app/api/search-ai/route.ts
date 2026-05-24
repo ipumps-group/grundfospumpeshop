@@ -7,15 +7,14 @@ const client = new Anthropic()
 // type: 'tegevusala' maps to ?tegevusala= in URL
 //       'seeria'     maps to ?seeria= in URL
 const CATEGORIES = [
-  { label: 'Küte / küttepump / radiaatoriküte / kütteringlus',                       slug: 'kute',                              type: 'tegevusala' },
-  { label: 'Jahutus / jahutuspump / kliimaseade',                                    slug: 'jahutus',                           type: 'tegevusala' },
-  { label: 'Soe tarbevesi / boiler tsirkulatsioon / kuumavesi',                      slug: 'sooja-tarbevee-tsirkulatsioonipump', type: 'tegevusala' },
-  { label: 'Puurkaev / puurkaevupump / sügavpump / kaevupump',                       slug: 'puurkaevud',                        type: 'tegevusala' },
-  { label: 'Drenaaž / drenaažipump / veepump keldrist / üleujutus',                  slug: 'drenaaz',                           type: 'tegevusala' },
-  { label: 'Salvkaev / salvkaevupump / pinnaveepump',                                 slug: 'salvkaevud',                        type: 'tegevusala' },
-  { label: 'Rõhutõste / survetõstja / madal veetrõhk / vesi majja',                  slug: 'rohutoste',                         type: 'tegevusala' },
-  { label: 'Reovesi / kanalisatsioon / fekaalipump / reovee pump',                    slug: 'reovesi',                           type: 'tegevusala' },
-  { label: 'JP Veeautomaat / aiapump / aiapumbad / aia niisutus / kastmispump / pinnavesi / aiaveepump / välikastmine', slug: 'jp-veeautomaat', type: 'seeria' },
+  { label: 'Küte / küttepump / radiaatoriküte / kütteringlus',                       slug: 'kuttepumbad',                              type: 'tegevusala' },
+  { label: 'Soe tarbevesi / boiler tsirkulatsioon / kuumavesi',                      slug: 'tsirkulatsioonipumbad-soe-tarbevesi',       type: 'tegevusala' },
+  { label: 'Puurkaev / puurkaevupump / sügavpump / kaevupump',                       slug: 'puurkaevupumbad',                          type: 'tegevusala' },
+  { label: 'Drenaaž / drenaažipump / veepump keldrist / üleujutus',                  slug: 'drenaazipumbad',                           type: 'tegevusala' },
+  { label: 'Salvkaev / salvkaevupump / pinnaveepump',                                 slug: 'salvkaevupumbad',                          type: 'tegevusala' },
+  { label: 'Veeautomaat / hüdrofoor / aiapump / aiapumbad / aia niisutus / kastmispump', slug: 'veeautomaadid',                       type: 'tegevusala' },
+  { label: 'Rõhutõste / survetõstja / madal veetrõhk / vesi majja',                  slug: 'rohutostepumbad',                          type: 'tegevusala' },
+  { label: 'Reovesi / kanalisatsioon / fekaalipump / reovee pump',                    slug: 'reoveepumbad',                             type: 'tegevusala' },
 ] as const
 
 type CategoryType = typeof CATEGORIES[number]['type']
@@ -60,7 +59,7 @@ export async function POST(req: NextRequest) {
   let categorySlug: string | null = null
   try {
     const response = await client.messages.create({
-      model: 'claude-3-5-haiku-latest',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 20,
       messages: [{
         role: 'user',

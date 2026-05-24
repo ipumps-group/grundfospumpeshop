@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getLocale } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
@@ -81,18 +81,40 @@ export default async function CategoryPage({
   const { tegevusala } = await params
 
   try {
-    const { data: area } = await supabaseAdmin
-      .from('activity_areas')
-      .select('id, name_et, slug, h1, description')
-      .eq('slug', tegevusala)
-      .single()
+    const [areaRes, productsRes, areasRes, seriesRes] = await Promise.all([
+      supabaseAdmin
+        .from('activity_areas')
+        .select('id, name_et, slug, h1, description')
+        .eq('slug', tegevusala)
+        .single(),
+      supabaseAdmin
+        .from('products')
+        .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock')
+        .eq('primary_activity_area_slug', tegevusala)
+        .eq('published', true)
+        .order('name', { ascending: true }),
+      supabaseAdmin
+        .from('activity_areas')
+        .select('slug, name_et, sort_order')
+        .eq('is_active', true)
+        .order('sort_order'),
+      supabaseAdmin
+        .from('product_series')
+        .select('slug, name, sort_order')
+        .eq('is_active', true)
+        .order('sort_order'),
+    ])
 
-    const { data: products } = await supabaseAdmin
-      .from('products')
-      .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock')
-      .eq('primary_activity_area_slug', tegevusala)
-      .eq('published', true)
-      .order('name', { ascending: true })
+    const area = areaRes.data
+    const products = productsRes.data
+
+    // Pre-fetched sidebar data
+    const prefetchedCategories = (areasRes.data || []).map(a => ({
+      slug: a.slug, name_et: a.name_et, parent_slug: null as string | null,
+    }))
+    const prefetchedSeries = (seriesRes.data || []).map(s => ({
+      slug: s.slug, name_et: s.name.replace(/Grundfos\s*/g, ''), parent_slug: null as string | null,
+    }))
 
     let seriesLinks: any[] | null = null
     if (area) {
@@ -112,16 +134,18 @@ export default async function CategoryPage({
       }
     }
 
-    const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
+        const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
+    const tNav = await getTranslations('nav')
+    const tProducts = await getTranslations('products')
 
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <ProductsLayoutWithSidebar>
+          <ProductsLayoutWithSidebar prefetchedCategories={prefetchedCategories} prefetchedSeries={prefetchedSeries}>
             <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
-            <Link href="/" className="hover:text-[#003366] transition-colors">Avaleht</Link>
+            <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
             <span>/</span>
-            <Link href="/tooted" className="hover:text-[#003366] transition-colors">Tooted</Link>
+            <Link href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</Link>
             <span>/</span>
             <span className="text-[#003366] font-medium">{(area as any)?.name_et || tegevusala}</span>
           </nav>
@@ -133,7 +157,7 @@ export default async function CategoryPage({
 
           {seriesLinks && seriesLinks.length > 0 && (
             <div className="mb-8">
-              <div className="text-[15px] font-semibold text-gray-700 mb-3">Tooteseeriad</div>
+              <div className="text-[15px] font-semibold text-gray-700 mb-3">{tNav('productSeries')}</div>
               <div className="flex flex-wrap gap-2">
                 {seriesLinks.map((sl: any) => (
                   <Link
@@ -150,10 +174,33 @@ export default async function CategoryPage({
 
           {(!products || products.length === 0) ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-              <p className="text-gray-500 text-lg">Selles kategoorias ei ole veel tooteid.</p>
+              <p className="text-gray-500 text-lg">{tProducts('noProducts')}</p>
             </div>
           ) : (
-            <ProductsGrid products={products} title={pageTitle} />
+            <>
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'ItemList',
+                    itemListElement: (products as any[]).map((p, i) => ({
+                      '@type': 'ListItem',
+                      position: i + 1,
+                      item: {
+                        '@type': 'Product',
+                        name: p.name,
+                        url: `${SITE_URL}/toode/${p.slug}`,
+                        ...(p.image_url ? { image: p.image_url } : {}),
+                        ...(p.sku ? { sku: p.sku } : {}),
+                      },
+                    })),
+                    numberOfItems: (products as any[]).length,
+                  }),
+                }}
+              />
+              <ProductsGrid products={products} title={pageTitle} />
+            </>
           )}
           </ProductsLayoutWithSidebar>
         </div>
@@ -164,7 +211,7 @@ export default async function CategoryPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center max-w-md">
-          <div className="text-red-500 text-lg font-semibold mb-2">Viga lehe laadimisel</div>
+          <div className="text-red-500 text-lg font-semibold mb-2">{tCommon ? tCommon('error') : 'Error'}</div>
           <p className="text-gray-500 text-sm">{(e as Error).message}</p>
         </div>
       </div>

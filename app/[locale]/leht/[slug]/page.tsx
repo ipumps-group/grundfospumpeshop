@@ -236,7 +236,7 @@ export default async function PublicPage(
             )}
           </div>
         )}
-        <BlockRenderer sections={page.blocks as Section[]} />
+        <BlockRenderer sections={page.blocks as Section[]} locale={locale} />
       </div>
     )
   }

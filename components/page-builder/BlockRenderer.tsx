@@ -42,11 +42,21 @@ const PAD_X: Record<string, string> = {
 
 // ─── Single block renderer ─────────────────────────────────────────────────
 
-function RenderBlock({ block }: { block: ContentBlock }) {
+function textByLocale(block: Record<string, unknown>, field: string, locale: string): string {
+  if (locale !== 'et') {
+    const localeField = `${field}_${locale}`
+    const val = block[localeField]
+    if (typeof val === 'string' && val) return val
+  }
+  return typeof block[field] === 'string' ? block[field] as string : ''
+}
+
+function RenderBlock({ block, locale }: { block: ContentBlock; locale: string }) {
   switch (block.type) {
     case 'heading': {
       const b = block as HeadingBlock
       const Tag = b.level as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+      const resolved = textByLocale(b as unknown as Record<string, unknown>, 'text', locale)
       const alignClass = b.alignment === 'center' ? 'text-center' : b.alignment === 'right' ? 'text-right' : 'text-left'
       const weightClass = ['h1','h2'].includes(b.level) ? 'font-bold' : 'font-semibold'
       const sizeClass = b.custom_size ? '' : {
@@ -61,21 +71,22 @@ function RenderBlock({ block }: { block: ContentBlock }) {
       if (b.custom_size) style.fontSize = `${b.custom_size}${b.custom_unit ?? 'px'}`
       return (
         <Tag className={`${sizeClass} ${weightClass} leading-tight ${alignClass}`} style={style}>
-          {b.text}
+          {resolved}
         </Tag>
       )
     }
     case 'text': {
       const b = block as TextBlock
+      const resolvedContent = textByLocale(b as unknown as Record<string, unknown>, 'content', locale)
       const alignClass = b.alignment === 'center' ? 'text-center' : b.alignment === 'right' ? 'text-right' : 'text-left'
       const textStyle: React.CSSProperties = { color: b.color }
       if (b.font_size) textStyle.fontSize = `${b.font_size}${b.font_size_unit ?? 'px'}`
-      const isHtml = /<[a-z][\s\S]*>/i.test(b.content)
-      const hasShortcode = /\[[a-z_]+\]/.test(b.content)
+      const isHtml = /<[a-z][\s\S]*>/i.test(resolvedContent)
+      const hasShortcode = /\[[a-z_]+\]/.test(resolvedContent)
       if (isHtml || hasShortcode) {
         return (
           <ShortcodeRenderer
-            html={b.content}
+            html={resolvedContent}
             className={`leading-relaxed ${b.font_size ? '' : 'text-[16px]'} ${alignClass}
               [&_b]:font-bold [&_strong]:font-bold
               [&_i]:italic [&_em]:italic
@@ -95,7 +106,7 @@ function RenderBlock({ block }: { block: ContentBlock }) {
       }
       return (
         <p className={`${b.font_size ? '' : 'text-[16px]'} leading-relaxed whitespace-pre-line ${alignClass}`} style={textStyle}>
-          {b.content}
+          {resolvedContent}
         </p>
       )
     }
@@ -121,6 +132,7 @@ function RenderBlock({ block }: { block: ContentBlock }) {
     }
     case 'button': {
       const b = block as ButtonBlock
+      const resolvedText = textByLocale(b as unknown as Record<string, unknown>, 'text', locale)
       const alignClass = b.alignment === 'center' ? 'text-center' : b.alignment === 'right' ? 'text-right' : 'text-left'
       const btnFontSize = b.font_size ? `${b.font_size}px` : undefined
       let btnCls = `inline-block px-6 py-3 rounded-xl font-semibold ${b.font_size ? '' : 'text-[15px]'} transition-opacity hover:opacity-80`
@@ -141,7 +153,7 @@ function RenderBlock({ block }: { block: ContentBlock }) {
         <div className={alignClass}>
           <a href={b.url} target={b.target} rel={b.target === '_blank' ? 'noopener noreferrer' : undefined}
              className={btnCls} style={btnStyle}>
-            {b.text}
+            {resolvedText}
           </a>
         </div>
       )
@@ -191,7 +203,7 @@ function RenderBlock({ block }: { block: ContentBlock }) {
 
 // ─── Section renderer ──────────────────────────────────────────────────────
 
-function RenderSection({ section }: { section: Section }) {
+function RenderSection({ section, locale }: { section: Section; locale: string }) {
   const { settings, columns } = section
   const isBoxed = settings.width === 'boxed'
   const isCustom = settings.width === 'custom'
@@ -270,7 +282,7 @@ function RenderSection({ section }: { section: Section }) {
           style={colStyle}
         >
           {col.blocks.map(block => (
-            <RenderBlock key={block.id} block={block} />
+            <RenderBlock key={block.id} block={block} locale={locale} />
           ))}
         </div>
         )
@@ -316,11 +328,11 @@ function RenderSection({ section }: { section: Section }) {
 
 // ─── Public export ─────────────────────────────────────────────────────────
 
-export default function BlockRenderer({ sections }: { sections: Section[] }) {
+export default function BlockRenderer({ sections, locale }: { sections: Section[]; locale: string }) {
   return (
     <>
       {sections.map(section => (
-        <RenderSection key={section.id} section={section} />
+        <RenderSection key={section.id} section={section} locale={locale} />
       ))}
     </>
   )

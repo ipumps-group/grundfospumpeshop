@@ -17,9 +17,16 @@
     "adminPanel": "Haldus paneel",
     "logout": "Logi välja",
     "cart": "Ostukorv",
+    "cartEmpty": "Ostukorv on tühi",
+    "pcs": "tk",
+    "moreProducts": "toodet veel",
+    "total": "Kokku",
+    "checkout": "Kassa",
     "workingHours": "E-R 8:00–17:00",
     "home": "Avaleht",
-    "language": "Keel"
+    "language": "Keel",
+    "menu": "Menüü",
+    "close": "Sulge"
   },
   "hero": {
     "title": "Grundfos pumbad ja lahendused",
@@ -62,7 +69,7 @@
     "badge": "🌱 Hooaegne pakkumine",
     "title": "Alusta varakult\naiatoimetustega",
     "description": "Varusta end enne hooaega — JP veeautomaadid, aiasprinklerid ja põhjavee lahendused on laos ja koheselt saadavad.",
-    "bullet1": "31 mudelit laos koheselt",
+    "bullet1": "Laotoodetel tarne kuni 5 tööpäeva",
     "bullet2": "Tarne 1–2 tööpäevaga",
     "bullet3": "Tasuta tehniline nõustamine",
     "cta": "Vaata meie aialahenduste tooteid"
@@ -237,7 +244,15 @@
     "tabDrawing": "Joonised",
     "tabCurves": "Kõverad",
     "tabDocuments": "Dokumendid",
-    "noDocuments": "Dokumendid puuduvad."
+    "noDocuments": "Dokumendid puuduvad.",
+    "specTehniline": "Tehnilised",
+    "specElektri": "Elektriandmed",
+    "specMaterjalid": "Materjalid",
+    "specPaigaldamine": "Paigaldamine",
+    "specVedelik": "Vedelik",
+    "specJuhtimine": "Juhtimine",
+    "specPaak": "Paak",
+    "specMuu": "Muu"
   },
   "cart": {
     "title": "Ostukorv",
@@ -492,5 +507,31 @@
     "salvkaevud": "Salvkaevu pumbad pinnaveele. Tõuline ja töökindel.",
     "rohutoste": "Rõhutõstja pumbad vee rõhuks. Tasane veesurve majas.",
     "reovesi": "Reovee pumbad kanalisatsioonile. Tugev ja vastupidav."
+  },
+  "contactForm": {
+    "name": "Nimi",
+    "namePlaceholder": "Mari Mets",
+    "email": "E-post",
+    "emailPlaceholder": "mari@email.ee",
+    "phone": "Telefon",
+    "phonePlaceholder": "+372 5555 1234",
+    "address": "Aadress",
+    "addressPlaceholder": "Narva mnt 3, Tallinn",
+    "message": "Sõnum",
+    "messagePlaceholder": "Kirjuta oma küsimus...",
+    "optional": "valikuline",
+    "send": "Saada sõnum",
+    "sending": "Saatmine...",
+    "error": "Saatmine ebaõnnestus. Palun proovi uuesti.",
+    "successTitle": "Sõnum saadetud!",
+    "successMessage": "Võtame sinuga ühendust esimesel võimalusel."
+  },
+  "locationMap": {
+    "locating": "Määran asukohta...",
+    "yourLocation": "Teie asukoht",
+    "distance": "Kaugus",
+    "driveTime": "Sõiduaeg",
+    "min": "min",
+    "openInGoogleMaps": "Ava Google Mapsis"
   }
 }

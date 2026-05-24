@@ -10,12 +10,12 @@ import { supabase } from '@/lib/supabase'
 
 const categoryKeys = [
   { nameKey: 'heating',  slug: 'kuttepumbad' },
-  { nameKey: 'cooling',  slug: 'kuttepumbad' },
   { nameKey: 'hotWater', slug: 'tsirkulatsioonipumbad-soe-tarbevesi' },
   { nameKey: 'borewell', slug: 'puurkaevupumbad' },
-  { nameKey: 'drainage', slug: 'drenaazipumbad' },
   { nameKey: 'wells',    slug: 'salvkaevupumbad' },
+  { nameKey: 'jpWaterAutomatics', slug: 'veeautomaadid' },
   { nameKey: 'pressure', slug: 'rohutostepumbad' },
+  { nameKey: 'drainage', slug: 'drenaazipumbad' },
   { nameKey: 'sewage',   slug: 'reoveepumbad' },
 ]
 

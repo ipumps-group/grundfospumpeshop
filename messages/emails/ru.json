@@ -1,0 +1,58 @@
+{
+  "common": {
+    "greeting": "Здравствуйте, {name}!",
+    "thanks": "Спасибо, что выбрали iPumps.",
+    "questions": "Вопросы? Ответьте на это письмо или напишите на {email}.",
+    "footer": "iPumps · {site}\nОфициальный дилер Grundfos в Эстонии",
+    "viewOrder": "Посмотреть заказ",
+    "total": "Итого",
+    "subtotal": "Промежуточный итог",
+    "discount": "Скидка",
+    "quantity": "шт",
+    "orderNumber": "Номер заказа"
+  },
+  "orderConfirmation": {
+    "preview": "Заказ {orderNumber} подтверждён — {total}",
+    "subject": "Заказ {orderNumber} подтверждён",
+    "heading": "Спасибо за заказ!",
+    "intro": "Ваш заказ <strong>{orderNumber}</strong> получен и оплата успешно подтверждена. Мы немедленно приступаем к упаковке.",
+    "itemsHeading": "Заказанные товары",
+    "shippingHeading": "Доставка",
+    "shippingNote": "Мы отправим вам новое письмо, как только посылка будет отправлена — с номером отслеживания.",
+    "paymentMethod": "Способ оплаты"
+  },
+  "orderShipped": {
+    "preview": "Заказ {orderNumber} в пути — отслеживание {trackingNumber}",
+    "subject": "📦 Заказ {orderNumber} в пути",
+    "heading": "Ваш заказ в пути!",
+    "intro": "Хорошие новости — ваш заказ <strong>{orderNumber}</strong> упакован и передан курьеру. Вы должны получить его в течение {eta}.",
+    "trackingLabel": "НОМЕР ОТСЛЕЖИВАНИЯ",
+    "trackingButton": "Отследить посылку",
+    "itemsHeading": "В посылке",
+    "etaDefault": "1–3 рабочих дня",
+    "deliveryMethod": {
+      "parcel_machine": "Постамат",
+      "courier": "Курьерская служба",
+      "post_office": "Почтовое отделение",
+      "pickup": "Самовывоз"
+    }
+  },
+  "refundConfirmation": {
+    "preview": "Возврат по заказу {orderNumber} — {amount}",
+    "subject": "Возврат по заказу {orderNumber}",
+    "heading": "{name}, возврат средств выполнен",
+    "intro": "Сумма по заказу <strong>{orderNumber}</strong> возвращена на ваш способ оплаты.",
+    "amountLabel": "Возвращённая сумма",
+    "reasonLabel": "Причина возврата",
+    "timingNote": "Деньги обычно поступают на ваш счёт в течение 5–10 рабочих дней, в зависимости от вашего банка."
+  },
+  "abandonedCart": {
+    "preview": "Вы что-то забыли в корзине?",
+    "subject": "Вы что-то забыли в корзине?",
+    "heading": "У вас незавершённая корзина",
+    "intro": "Мы заметили, что вы оставили несколько товаров в корзине. Они всё ещё ждут вас — хотите завершить заказ?",
+    "itemsHeading": "В вашей корзине",
+    "returnButton": "Вернуться в корзину",
+    "footerNote": "Если вы уже оформили заказ, проигнорируйте это письмо."
+  }
+}

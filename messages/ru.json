@@ -19,7 +19,14 @@
     "cart": "Корзина",
     "workingHours": "Пн-Пт 8:00–17:00",
     "home": "Главная",
-    "language": "Язык"
+    "language": "Язык",
+    "menu": "Меню",
+    "close": "Закрыть",
+    "cartEmpty": "Корзина пуста",
+    "pcs": "шт",
+    "moreProducts": "товаров ещё",
+    "total": "Всего",
+    "checkout": "Оформить"
   },
   "hero": {
     "title": "Насосы и решения Grundfos",
@@ -103,7 +110,9 @@
     "showingOf": "Показываю {shown} / {total} подходящих продуктов",
     "viewAll": "Просмотреть все",
     "viewAllSuitable": "Просмотреть все {total} подходящих продуктов",
-    "addToCart": "Добавить в корзину"
+    "addToCart": "Добавить в корзину",
+    "inStock": "В наличии",
+    "outOfStock": "Нет в наличии"
   },
   "installation": {
     "label": "Услуга",
@@ -233,7 +242,15 @@
     "tabDrawing": "Чертежи",
     "tabCurves": "Кривые",
     "tabDocuments": "Документы",
-    "noDocuments": "Документы отсутствуют."
+    "noDocuments": "Документы отсутствуют.",
+    "specTehniline": "Технические",
+    "specElektri": "Электрические данные",
+    "specMaterjalid": "Материалы",
+    "specPaigaldamine": "Монтаж",
+    "specVedelik": "Жидкость",
+    "specJuhtimine": "Управление",
+    "specPaak": "Бак",
+    "specMuu": "Прочее"
   },
   "cart": {
     "title": "Корзина",
@@ -447,6 +464,32 @@
     "vortex": "Vortex",
     "vaike": "Компактный",
     "vaike_reoveepump": "Малый канализационный насос"
+  },
+  "contactForm": {
+    "name": "Имя",
+    "namePlaceholder": "Иван Иванов",
+    "email": "E-mail",
+    "emailPlaceholder": "ivan@email.ee",
+    "phone": "Телефон",
+    "phonePlaceholder": "+372 5555 1234",
+    "address": "Адрес",
+    "addressPlaceholder": "Narva mnt 3, Таллинн",
+    "message": "Сообщение",
+    "messagePlaceholder": "Напишите ваш вопрос...",
+    "optional": "необязательно",
+    "send": "Отправить сообщение",
+    "sending": "Отправка...",
+    "error": "Отправка не удалась. Пожалуйста, попробуйте снова.",
+    "successTitle": "Сообщение отправлено!",
+    "successMessage": "Мы свяжемся с вами при первой возможности."
+  },
+  "locationMap": {
+    "locating": "Определение местоположения...",
+    "yourLocation": "Ваше местоположение",
+    "distance": "Расстояние",
+    "driveTime": "Время в пути",
+    "min": "мин",
+    "openInGoogleMaps": "Открыть в Google Maps"
   },
   "metadata": {
     "siteName": "iPumps",

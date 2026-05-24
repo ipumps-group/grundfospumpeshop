@@ -58,6 +58,8 @@ function ProductCard({ product }: { product: Product }) {
           {product.in_stock ? t('inStock') : t('outOfStock')}
         </span>
         <img src={product.image_url || '/placeholder.png'} alt={product.name}
+          width={112}
+          height={112}
           className="h-28 object-contain group-hover:scale-105 transition-transform duration-300"
           onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }} />
       </div>
@@ -81,6 +83,7 @@ function ProductCard({ product }: { product: Product }) {
             )}
           </div>
           <button onClick={handleAdd} disabled={!product.in_stock}
+            aria-label={t('addToCart')}
             className={`p-2.5 rounded-xl transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
             {added ? <Check size={16} /> : <ShoppingCart size={16} />}
           </button>

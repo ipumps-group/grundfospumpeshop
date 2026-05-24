@@ -204,6 +204,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
               <button
                 onClick={() => setLangOpen(!langOpen)}
                 className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors font-medium"
+                aria-label={t('language')}
               >
                 <span>{currentLang.flag}</span>
                 <span>{currentLang.label}</span>
@@ -239,7 +240,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
           <div className="flex items-center gap-4 h-16">
 
             {/* Logo */}
-            <Link href="/et" className="flex items-center flex-shrink-0" aria-label="iPumps home">
+            <Link href="/" className="flex items-center flex-shrink-0" aria-label="iPumps home">
               <Image 
                 src="/ipumps-logo-white.svg" 
                 alt="iPumps" 
@@ -295,7 +296,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                     placeholder={t('searchPlaceholder')}
                     className="bg-transparent text-white placeholder-white/40 text-[15px] px-3 py-2 w-64 outline-none"
                   />
-                  <button onClick={() => setSearchOpen(false)} className="p-2 text-white/60 hover:text-white transition-colors">
+                  <button onClick={() => setSearchOpen(false)} className="p-2 text-white/60 hover:text-white transition-colors" aria-label={t('close')}>
                     <X size={16} />
                   </button>
                 </div>
@@ -303,6 +304,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                 <button
                   onClick={() => setSearchOpen(true)}
                   className="flex items-center gap-2 text-white/80 hover:text-white px-3 py-2 rounded-lg text-[15px] transition-colors hover:bg-white/10"
+                  aria-label={t('search')}
                 >
                   <Search size={16} />
                   <span className="text-white/40">{t('search')}</span>
@@ -316,6 +318,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-1.5 px-3 py-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-[15px] font-medium transition-colors"
+                  aria-label={t('account')}
                 >
                   <User size={16} />
                   <span className="hidden sm:inline max-w-[120px] truncate">
@@ -358,6 +361,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
               <Link
                 href="/konto/sisselogimine"
                 className="flex items-center gap-1.5 px-3 py-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-[15px] font-medium transition-colors"
+                aria-label={t('login')}
               >
                 <User size={16} />
                 <span className="hidden sm:inline">{t('login')}</span>
@@ -365,7 +369,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
             )}
 
             {/* Ostukorv */}
-            <Link href="/ostukorv" className="relative p-2.5 text-white/80 hover:text-white transition-colors hover:bg-white/10 rounded-lg">
+            <Link href="/ostukorv" className="relative p-2.5 text-white/80 hover:text-white transition-colors hover:bg-white/10 rounded-lg" aria-label={t('cart')}>
               <ShoppingCart size={18} />
               {cartCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-[#01a0dc] text-white text-[11px] w-5 h-5 rounded-full flex items-center justify-center font-bold leading-none">
@@ -378,6 +382,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="lg:hidden p-2.5 text-white/80 hover:text-white transition-colors hover:bg-white/10 rounded-lg"
+              aria-label={menuOpen ? t('close') : t('menu')}
             >
               {menuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -473,12 +478,12 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
               {/* 4 — Ostukorv */}
               <div className="flex-[2] bg-blue-50 p-5">
                 <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">
-                  {t('cart') ?? 'Ostukorv'} {cartCount > 0 && <span className="text-[#01a0dc]">({cartCount})</span>}
+                  {t('cart')} {cartCount > 0 && <span className="text-[#01a0dc]">({cartCount})</span>}
                 </div>
                 {cartItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-4 text-gray-400 gap-2">
                     <Package size={28} className="opacity-40" />
-                    <span className="text-[13px]">Ostukorv on tühi</span>
+                    <span className="text-[13px]">{t('cartEmpty')}</span>
                   </div>
                 ) : (
                   <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
@@ -492,7 +497,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                         {item.image_url ? (
                           <Image 
                             src={item.image_url} 
-                            alt={`${item.name} Grundfos pump`}
+                            alt={item.name}
                             width={36}
                             height={36}
                             className="w-9 h-9 object-contain rounded bg-white border border-gray-100 flex-shrink-0"
@@ -504,19 +509,19 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="text-[12px] font-medium text-gray-800 truncate leading-tight">{item.name}</div>
-                          <div className="text-[11px] text-gray-500">{item.qty} tk · {(item.price * item.qty).toFixed(2)} €</div>
+                          <div className="text-[11px] text-gray-500">{item.qty} {t('pcs')} · {(item.price * item.qty).toFixed(2)} €</div>
                         </div>
                       </Link>
                     ))}
                     {cartItems.length > 5 && (
-                      <div className="text-[12px] text-gray-400 px-2">+{cartItems.length - 5} toodet veel</div>
+                      <div className="text-[12px] text-gray-400 px-2">+{cartItems.length - 5} {t('moreProducts')}</div>
                     )}
                   </div>
                 )}
                 <div className="space-y-2 mt-3">
                   {cartItems.length > 0 && (
                     <div className="text-[13px] font-semibold text-gray-700 px-1 mb-1">
-                      Kokku: {cartItems.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2)} €
+                      {t('total')}: {cartItems.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2)} €
                     </div>
                   )}
                   <Link
@@ -524,14 +529,14 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                     onClick={() => setMegaOpen(false)}
                     className="flex items-center justify-center gap-1.5 w-full border border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors"
                   >
-                    <ShoppingCart size={14} /> Ostukorv
+                    <ShoppingCart size={14} /> {t('cart')}
                   </Link>
                   <Link
                     href="/checkout"
                     onClick={() => setMegaOpen(false)}
                     className="flex items-center justify-center gap-1.5 w-full bg-[#003366] hover:bg-[#004080] text-white px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors"
                   >
-                    <ArrowRight size={14} /> Kassa
+                    <ArrowRight size={14} /> {t('checkout')}
                   </Link>
                 </div>
               </div>

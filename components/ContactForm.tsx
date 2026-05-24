@@ -3,8 +3,10 @@
 import { useState, FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Send, CheckCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export default function ContactForm({ pageId }: { pageId?: string }) {
+  const t = useTranslations('contactForm')
   const [name, setName]       = useState('')
   const [email, setEmail]     = useState('')
   const [phone, setPhone]     = useState('')
@@ -31,7 +33,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
     })
 
     if (err) {
-      setError('Saatmine ebaõnnestus. Palun proovi uuesti.')
+      setError(t('error'))
       setSending(false)
       return
     }
@@ -45,8 +47,8 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
           <CheckCircle size={32} className="text-green-600" />
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Sõnum saadetud!</h3>
-        <p className="text-[15px] text-gray-500">Võtame sinuga ühendust esimesel võimalusel.</p>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('successTitle')}</h3>
+        <p className="text-[15px] text-gray-500">{t('successMessage')}</p>
       </div>
     )
   }
@@ -55,17 +57,17 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[13px] font-medium text-gray-700 mb-1">Nimi *</label>
+          <label className="block text-[13px] font-medium text-gray-700 mb-1">{t('name')} *</label>
           <input
             type="text" required value={name} onChange={e => setName(e.target.value)}
-            className={inputCls} placeholder="Mari Mets"
+            className={inputCls} placeholder={t('namePlaceholder')}
           />
         </div>
         <div>
-          <label className="block text-[13px] font-medium text-gray-700 mb-1">E-post *</label>
+          <label className="block text-[13px] font-medium text-gray-700 mb-1">{t('email')} *</label>
           <input
             type="email" required value={email} onChange={e => setEmail(e.target.value)}
-            className={inputCls} placeholder="mari@email.ee"
+            className={inputCls} placeholder={t('emailPlaceholder')}
           />
         </div>
       </div>
@@ -73,30 +75,30 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[13px] font-medium text-gray-700 mb-1">
-            Telefon <span className="font-normal text-gray-400">(valikuline)</span>
+            {t('phone')} <span className="font-normal text-gray-400">({t('optional')})</span>
           </label>
           <input
             type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-            className={inputCls} placeholder="+372 5555 1234"
+            className={inputCls} placeholder={t('phonePlaceholder')}
           />
         </div>
         <div>
           <label className="block text-[13px] font-medium text-gray-700 mb-1">
-            Aadress <span className="font-normal text-gray-400">(valikuline)</span>
+            {t('address')} <span className="font-normal text-gray-400">({t('optional')})</span>
           </label>
           <input
             type="text" value={address} onChange={e => setAddress(e.target.value)}
-            className={inputCls} placeholder="Narva mnt 3, Tallinn"
+            className={inputCls} placeholder={t('addressPlaceholder')}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-[13px] font-medium text-gray-700 mb-1">Sõnum *</label>
+        <label className="block text-[13px] font-medium text-gray-700 mb-1">{t('message')} *</label>
         <textarea
           required value={message} onChange={e => setMessage(e.target.value)}
           className={`${inputCls} min-h-[140px] resize-y`}
-          placeholder="Kirjuta oma küsimus..."
+          placeholder={t('messagePlaceholder')}
         />
       </div>
 
@@ -111,7 +113,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
         className="w-full flex items-center justify-center gap-2 bg-[#003366] hover:bg-[#004080] text-white px-6 py-3 rounded-xl font-semibold text-[15px] transition-colors disabled:opacity-60"
       >
         <Send size={16} />
-        {sending ? 'Saatmine...' : 'Saada sõnum'}
+        {sending ? t('sending') : t('send')}
       </button>
     </form>
   )

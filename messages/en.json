@@ -17,9 +17,16 @@
     "adminPanel": "Admin Panel",
     "logout": "Log out",
     "cart": "Shopping Cart",
+    "cartEmpty": "Cart is empty",
+    "pcs": "pcs",
+    "moreProducts": "more products",
+    "total": "Total",
+    "checkout": "Checkout",
     "workingHours": "Mon-Fri 8:00–17:00",
     "home": "Home",
-    "language": "Language"
+    "language": "Language",
+    "menu": "Menu",
+    "close": "Close"
   },
   "hero": {
     "title": "Grundfos pumps and solutions",
@@ -103,7 +110,9 @@
     "showingOf": "Showing {shown} / {total} suitable products",
     "viewAll": "View all",
     "viewAllSuitable": "View all {total} suitable products",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock"
   },
   "installation": {
     "label": "Service",
@@ -233,7 +242,15 @@
     "tabDrawing": "Drawings",
     "tabCurves": "Curves",
     "tabDocuments": "Documents",
-    "noDocuments": "No documents available."
+    "noDocuments": "No documents available.",
+    "specTehniline": "Technical",
+    "specElektri": "Electrical data",
+    "specMaterjalid": "Materials",
+    "specPaigaldamine": "Installation",
+    "specVedelik": "Liquid",
+    "specJuhtimine": "Control",
+    "specPaak": "Tank",
+    "specMuu": "Other"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -447,6 +464,32 @@
     "vortex": "Vortex",
     "vaike": "Compact",
     "vaike_reoveepump": "Small sewage pump"
+  },
+  "contactForm": {
+    "name": "Name",
+    "namePlaceholder": "John Smith",
+    "email": "Email",
+    "emailPlaceholder": "john@email.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+372 5555 1234",
+    "address": "Address",
+    "addressPlaceholder": "Narva mnt 3, Tallinn",
+    "message": "Message",
+    "messagePlaceholder": "Write your question...",
+    "optional": "optional",
+    "send": "Send message",
+    "sending": "Sending...",
+    "error": "Sending failed. Please try again.",
+    "successTitle": "Message sent!",
+    "successMessage": "We will contact you at the earliest opportunity."
+  },
+  "locationMap": {
+    "locating": "Finding location...",
+    "yourLocation": "Your location",
+    "distance": "Distance",
+    "driveTime": "Drive time",
+    "min": "min",
+    "openInGoogleMaps": "Open in Google Maps"
   },
   "metadata": {
     "siteName": "iPumps",

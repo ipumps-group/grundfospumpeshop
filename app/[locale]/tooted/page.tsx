@@ -37,22 +37,21 @@ interface Category {
 const PAGE_SIZE = 48
 
 // ─── SLUG ALIASES ───────────────────────────────────────────────────────────
-const DB_TO_URL: Record<string, string> = { 'drenaa': 'drenaaz' }
-const URL_TO_DB: Record<string, string> = { 'drenaaz': 'drenaa' }
+const DB_TO_URL: Record<string, string> = {}
+const URL_TO_DB: Record<string, string> = {}
 
 // ─── SLUG → TRANSLATION KEY ────────────────────────────────────────────────
 type CatNameKey = 'heating' | 'cooling' | 'hotWater' | 'borewell' | 'drainage' | 'wells' | 'pressure' | 'sewage' | 'title' | 'jpWaterAutomatics'
 const SLUG_TO_CAT_KEY: Partial<Record<string, CatNameKey>> = {
   'elamud-ja-arihooned': 'title',
-  'kute': 'heating',
-  'jahutus': 'cooling',
-  'puurkaevud': 'borewell',
-  'drenaa': 'drainage',
-  'salvkaevud': 'wells',
-  'rohutoste': 'pressure',
-  'sooja-tarbevee-tsirkulatsioonipump': 'hotWater',
-  'reovesi': 'sewage',
-  'jp-veeautomaat': 'jpWaterAutomatics',
+  'kuttepumbad': 'heating',
+  'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWater',
+  'puurkaevupumbad': 'borewell',
+  'salvkaevupumbad': 'wells',
+  'veeautomaadid': 'jpWaterAutomatics',
+  'rohutostepumbad': 'pressure',
+  'drenaazipumbad': 'drainage',
+  'reoveepumbad': 'sewage',
 }
 
 // ─── KATEGOORIA HIERARHIA ──────────────────────────────────────────────────
@@ -119,6 +118,8 @@ function ProductCard({ product }: { product: Product }) {
           {product.in_stock ? t('inStock') : t('outOfStock')}
         </span>
         <img src={product.image_url || '/placeholder.png'} alt={product.name}
+          width={112}
+          height={112}
           className="h-28 object-contain group-hover:scale-105 transition-transform duration-300"
           onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }} />
       </div>
@@ -142,6 +143,7 @@ function ProductCard({ product }: { product: Product }) {
             )}
           </div>
           <button onClick={handleAdd} disabled={!product.in_stock}
+            aria-label={t('addToCart')}
             className={`p-2.5 rounded-xl transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
             {added ? <Check size={16} /> : <ShoppingCart size={16} />}
           </button>
@@ -169,6 +171,8 @@ function ProductRow({ product }: { product: Product }) {
       className="group bg-white rounded-2xl border border-gray-100 hover:border-[#003366]/20 hover:shadow-md transition-all duration-200 flex items-center gap-4 p-4">
       <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 p-2">
         <img src={product.image_url || '/placeholder.png'} alt={product.name}
+          width={56}
+          height={56}
           className="h-14 object-contain"
           onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }} />
       </div>
@@ -199,10 +203,12 @@ function ProductRow({ product }: { product: Product }) {
           )}
         </div>
         <button onClick={handleAdd} disabled={!product.in_stock}
+          aria-label={t('addToCart')}
           className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
           {added ? <><Check size={15} /> {t('added')}</> : <><ShoppingCart size={15} /> {t('add')}</>}
         </button>
         <button onClick={handleAdd} disabled={!product.in_stock}
+          aria-label={t('addToCart')}
           className={`sm:hidden p-2.5 rounded-xl transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
           {added ? <Check size={16} /> : <ShoppingCart size={16} />}
         </button>
@@ -489,6 +495,33 @@ function TootedPageContent({
   }, [query, inStockOnly, priceMin, priceMax, sortBy, page])
 
   useEffect(() => { loadProducts() }, [loadProducts])
+
+  // AI fallback: kui DB otsing ei leidnud midagi ja otsingusõna on olemas
+  useEffect(() => {
+    if (loading || products.length > 0 || !query.trim()) return
+    let cancelled = false
+    fetch('/api/search-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query.trim() }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled || !data.categorySlug) return
+        let name = ''
+        if (data.categoryType === 'tegevusala') {
+          const area = tegevusalad.find(a => (DB_TO_URL[a.slug] ?? a.slug) === data.categorySlug)
+          name = area ? (SLUG_TO_CAT_KEY[area.slug] ? tCat(SLUG_TO_CAT_KEY[area.slug]) : area.name_et) : data.categorySlug
+        } else {
+          const series = seeriad.find(s => s.slug === data.categorySlug)
+          name = series ? (SLUG_TO_CAT_KEY[series.slug] ? tCat(SLUG_TO_CAT_KEY[series.slug]) : series.name_et) : data.categorySlug
+        }
+        if (!cancelled) setAiSuggestion({ slug: data.categorySlug, type: data.categoryType, name })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, products.length, query, tegevusalad, seeriad])
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 

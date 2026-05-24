@@ -179,8 +179,14 @@ export default async function LocaleLayout({
       {/* Detects system language on first visit via navigator.language */}
       <LocaleDetector />
       <AuthProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#003366] focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003366] focus:ring-offset-2"
+        >
+          Skip to content
+        </a>
         <Header siteSettings={siteSettings} />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <Footer siteSettings={siteSettings} />
       </AuthProvider>
     </NextIntlClientProvider>

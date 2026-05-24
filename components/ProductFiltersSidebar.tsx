@@ -13,19 +13,18 @@ interface Category {
 
 const SLUG_TO_CAT_KEY: Partial<Record<string, string>> = {
   'elamud-ja-arihooned': 'title',
-  'kute': 'heating',
-  'jahutus': 'cooling',
-  'puurkaevud': 'borewell',
-  'drenaa': 'drainage',
-  'salvkaevud': 'wells',
-  'rohutoste': 'pressure',
-  'sooja-tarbevee-tsirkulatsioonipump': 'hotWater',
-  'reovesi': 'sewage',
-  'jp-veeautomaat': 'jpWaterAutomatics',
+  'kuttepumbad': 'heating',
+  'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWater',
+  'puurkaevupumbad': 'borewell',
+  'salvkaevupumbad': 'wells',
+  'veeautomaadid': 'jpWaterAutomatics',
+  'rohutostepumbad': 'pressure',
+  'drenaazipumbad': 'drainage',
+  'reoveepumbad': 'sewage',
 }
 
-const DB_TO_URL: Record<string, string> = { 'drenaa': 'drenaaz' }
-const URL_TO_DB: Record<string, string> = { 'drenaaz': 'drenaa' }
+const DB_TO_URL: Record<string, string> = {}
+const URL_TO_DB: Record<string, string> = {}
 
 function CategoryTree({ categories, selected, onSelect, title }: {
   categories: Category[]

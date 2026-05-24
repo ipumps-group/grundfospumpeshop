@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { cookies } from 'next/headers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
@@ -19,6 +20,22 @@ export const metadata: Metadata = {
   },
   description:
     'Grundfos pumpade ametlik edasimüüja Eestis. 321 toodet laos — küte, jahutus, puurkaevud, drenaaž ja palju muud.',
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '48x48' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    other: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  other: {
+    'theme-color': '#003366',
+  },
   openGraph: {
     siteName: 'iPumps',
     locale: 'et_EE',
@@ -33,12 +50,15 @@ export const metadata: Metadata = {
   },
 }
 
-// Root layout owns <html> and <body> — required by Next.js / Vercel.
-// All locale-specific providers, Header and Footer are in app/[locale]/layout.tsx.
-// The actual html lang attribute is set dynamically by SetHtmlLang (client component).
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'et'
+
   return (
-    <html lang="et" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://sdqnzyfmanflslsjhytf.supabase.co" />
+      </head>
       <body className={inter.className}>
         {children}
         <SpeedInsights />

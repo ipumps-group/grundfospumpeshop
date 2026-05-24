@@ -19,7 +19,14 @@
     "cart": "Pirkinių krepšelis",
     "workingHours": "P-P 8:00–17:00",
     "home": "Pradžia",
-    "language": "Kalba"
+    "language": "Kalba",
+    "menu": "Meniu",
+    "close": "Uždaryti",
+    "cartEmpty": "Krepšelis tuščias",
+    "pcs": "vnt",
+    "moreProducts": "dar produktų",
+    "total": "Iš viso",
+    "checkout": "Apmokėti"
   },
   "hero": {
     "title": "Grundfos siurbliai ir sprendimai",
@@ -103,7 +110,9 @@
     "showingOf": "Rodau {shown} / {total} tinkamų produktų",
     "viewAll": "Peržiūrėti visus",
     "viewAllSuitable": "Peržiūrėkite visus {total} tinkamus produktus",
-    "addToCart": "Pridėti į krepšelį"
+    "addToCart": "Pridėti į krepšelį",
+    "inStock": "Sandėlyje",
+    "outOfStock": "Nėra"
   },
   "installation": {
     "label": "Paslauga",
@@ -233,7 +242,15 @@
     "tabDrawing": "Brėžiniai",
     "tabCurves": "Kreivės",
     "tabDocuments": "Dokumentai",
-    "noDocuments": "Dokumentų nėra."
+    "noDocuments": "Dokumentų nėra.",
+    "specTehniline": "Techniniai",
+    "specElektri": "Elektriniai duomenys",
+    "specMaterjalid": "Medžiagos",
+    "specPaigaldamine": "Montavimas",
+    "specVedelik": "Skystis",
+    "specJuhtimine": "Valdymas",
+    "specPaak": "Bakas",
+    "specMuu": "Kita"
   },
   "cart": {
     "title": "Pirkinių krepšelis",
@@ -447,6 +464,32 @@
     "vortex": "Vortex",
     "vaike": "Kompaktiškas",
     "vaike_reoveepump": "Mažas nuotekų siurblys"
+  },
+  "contactForm": {
+    "name": "Vardas",
+    "namePlaceholder": "Jonas Jonaitis",
+    "email": "El. paštas",
+    "emailPlaceholder": "jonas@email.lt",
+    "phone": "Telefonas",
+    "phonePlaceholder": "+370 6111 1234",
+    "address": "Adresas",
+    "addressPlaceholder": "Gedimino pr. 3, Vilnius",
+    "message": "Žinutė",
+    "messagePlaceholder": "Parašykite savo klausimą...",
+    "optional": "neprivaloma",
+    "send": "Siųsti žinutę",
+    "sending": "Siunčiama...",
+    "error": "Siuntimas nepavyko. Bandykite dar kartą.",
+    "successTitle": "Žinutė išsiųsta!",
+    "successMessage": "Su jumis susisieksime pirmai progai pasitaikius."
+  },
+  "locationMap": {
+    "locating": "Nustatoma vieta...",
+    "yourLocation": "Jūsų vieta",
+    "distance": "Atstumas",
+    "driveTime": "Kelionės laikas",
+    "min": "min",
+    "openInGoogleMaps": "Atidaryti Google Maps"
   },
   "metadata": {
     "siteName": "iPumps",

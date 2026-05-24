@@ -5,17 +5,6 @@ import { SITE_URL } from '@/lib/config'
 
 const LOCALES = [...routing.locales] as string[]
 
-const TEGEVUSALA_VALUES = [
-  'kute',
-  'jahutus',
-  'sooja-tarbevee-tsirkulatsioonipump',
-  'puurkaevud',
-  'drenaaz',
-  'salvkaevud',
-  'rohutoste',
-  'reovesi',
-]
-
 const STATIC_PAGES = ['kontakt', 'privaatsuspoliitika', 'ostutingimused', 'tagastamine']
 
 type SitemapEntry = {
@@ -147,26 +136,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
       }
     } catch {
-      // Fallback to old hardcoded tegevusala values
-      for (const tegevusala of TEGEVUSALA_VALUES) {
-        for (const locale of LOCALES) {
-          entries.push({
-            url: `${SITE_URL}/${locale}/tooted/${tegevusala}`,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 0.9,
-            alternates: {
-              languages: {
-                et: `${SITE_URL}/et/tooted/${tegevusala}`,
-                en: `${SITE_URL}/en/tooted/${tegevusala}`,
-                ru: `${SITE_URL}/ru/tooted/${tegevusala}`,
-                lv: `${SITE_URL}/lv/tooted/${tegevusala}`,
-                lt: `${SITE_URL}/lt/tooted/${tegevusala}`,
-              },
-            },
-          })
-        }
-      }
+      // Log but don't fail - activity areas will be missing from sitemap this cycle
+      console.error('Failed to fetch activity areas for sitemap')
     }
 
     // 4. Individual products - PRIORITY 0.8

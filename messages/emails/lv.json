@@ -1,0 +1,58 @@
+{
+  "common": {
+    "greeting": "Sveiki, {name}!",
+    "thanks": "Paldies, ka izvēlējāties iPumps.",
+    "questions": "Jautājumi? Atbildiet uz šo e-pastu vai rakstiet uz {email}.",
+    "footer": "iPumps · {site}\nOficiālais Grundfos izplatītājs Igaunijā",
+    "viewOrder": "Skatīt pasūtījumu",
+    "total": "Kopā",
+    "subtotal": "Starpsumma",
+    "discount": "Atlaide",
+    "quantity": "gab",
+    "orderNumber": "Pasūtījuma numurs"
+  },
+  "orderConfirmation": {
+    "preview": "Pasūtījums {orderNumber} apstiprināts — {total}",
+    "subject": "Pasūtījums {orderNumber} apstiprināts",
+    "heading": "Paldies par pasūtījumu!",
+    "intro": "Jūsu pasūtījums <strong>{orderNumber}</strong> ir saņemts un maksājums veiksmīgi apstiprināts. Mēs nekavējoties sākam pakot.",
+    "itemsHeading": "Pasūtītie produkti",
+    "shippingHeading": "Piegāde",
+    "shippingNote": "Mēs jums nosūtīsim jaunu e-pastu, tiklīdz paka būs ceļā — ar izsekošanas numuru.",
+    "paymentMethod": "Maksājuma veids"
+  },
+  "orderShipped": {
+    "preview": "Pasūtījums {orderNumber} ir ceļā — izsekošana {trackingNumber}",
+    "subject": "📦 Pasūtījums {orderNumber} ir ceļā",
+    "heading": "Jūsu pasūtījums ir ceļā!",
+    "intro": "Labas ziņas — jūsu pasūtījums <strong>{orderNumber}</strong> ir sapakots un nodots kurjeram. Jums tas būtu jāsaņem {eta} laikā.",
+    "trackingLabel": "IZSEKOŠANAS NUMURS",
+    "trackingButton": "Izsekot paku",
+    "itemsHeading": "Sūtījumā",
+    "etaDefault": "1–3 darbdienas",
+    "deliveryMethod": {
+      "parcel_machine": "Pakomāts",
+      "courier": "Kurjerpakalpojums",
+      "post_office": "Pasta nodaļa",
+      "pickup": "Pašapkalpošanās"
+    }
+  },
+  "refundConfirmation": {
+    "preview": "Atmaksa par pasūtījumu {orderNumber} — {amount}",
+    "subject": "Atmaksa par pasūtījumu {orderNumber}",
+    "heading": "{name}, jūsu nauda ir atmaksāta",
+    "intro": "Summa par pasūtījumu <strong>{orderNumber}</strong> ir atmaksāta jūsu maksājuma veidam.",
+    "amountLabel": "Atmaksātā summa",
+    "reasonLabel": "Atmaksas iemesls",
+    "timingNote": "Nauda parasti nonāk jūsu kontā 5–10 darbdienu laikā atkarībā no jūsu bankas."
+  },
+  "abandonedCart": {
+    "preview": "Vai jūs kaut ko aizmirsāt grozā?",
+    "subject": "Vai jūs kaut ko aizmirsāt grozā?",
+    "heading": "Jums ir nepabeigts grozs",
+    "intro": "Mēs pamanījām, ka jūs atstājāt dažus produktus grozā. Tie joprojām jūs gaida — vai vēlaties pabeigt pasūtījumu?",
+    "itemsHeading": "Jūsu grozā",
+    "returnButton": "Atgriezties grozā",
+    "footerNote": "Ja jūs jau esat veicis pasūtījumu, lūdzu ignorējiet šo e-pastu."
+  }
+}

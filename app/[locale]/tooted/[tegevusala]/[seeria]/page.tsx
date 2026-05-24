@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getLocale } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL } from '@/lib/config'
 import ProductsGrid from '../../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
@@ -131,16 +131,39 @@ export default async function SeriesPage({
       .eq('published', true)
       .order('name', { ascending: true })
 
+    // Pre-fetched sidebar data
+    const { data: allAreas } = await supabaseAdmin
+      .from('activity_areas')
+      .select('slug, name_et, sort_order')
+      .eq('is_active', true)
+      .order('sort_order')
+
+    const { data: allSeries } = await supabaseAdmin
+      .from('product_series')
+      .select('slug, name, sort_order')
+      .eq('is_active', true)
+      .order('sort_order')
+
+    const prefetchedCategories = (allAreas || []).map(a => ({
+      slug: a.slug, name_et: a.name_et, parent_slug: null as string | null,
+    }))
+    const prefetchedSeries = (allSeries || []).map(s => ({
+      slug: s.slug, name_et: s.name.replace(/Grundfos\s*/g, ''), parent_slug: null as string | null,
+    }))
+
     const pageTitle = series?.name || seeria
+    const locale = await getLocale()
+    const tNav = await getTranslations('nav')
+    const tProducts = await getTranslations('products')
 
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <ProductsLayoutWithSidebar>
+          <ProductsLayoutWithSidebar prefetchedCategories={prefetchedCategories} prefetchedSeries={prefetchedSeries}>
             <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
-            <Link href="/" className="hover:text-[#003366] transition-colors">Avaleht</Link>
+            <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
             <span>/</span>
-            <Link href="/tooted" className="hover:text-[#003366] transition-colors">Tooted</Link>
+            <Link href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</Link>
             {area && (
               <>
                 <span>/</span>
@@ -159,6 +182,29 @@ export default async function SeriesPage({
           )}
 
           <ProductsGrid products={products || []} title={pageTitle} />
+          {products && products.length > 0 && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'ItemList',
+                  itemListElement: (products as any[]).map((p, i) => ({
+                    '@type': 'ListItem',
+                    position: i + 1,
+                    item: {
+                      '@type': 'Product',
+                      name: p.name,
+                      url: `${SITE_URL}/toode/${p.slug}`,
+                      ...(p.image_url ? { image: p.image_url } : {}),
+                      ...(p.sku ? { sku: p.sku } : {}),
+                    },
+                  })),
+                  numberOfItems: (products as any[]).length,
+                }),
+              }}
+            />
+          )}
           </ProductsLayoutWithSidebar>
         </div>
       </div>

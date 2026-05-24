@@ -135,7 +135,7 @@ export default function FeaturedProductsSlider() {
         {/* Section header */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <div className="text-[13px] font-semibold text-[#01a0dc] uppercase tracking-widest mb-1">{t('popular')}</div>
+            <div className="text-[13px] font-semibold text-[#0077a3] uppercase tracking-widest mb-1">{t('popular')}</div>
             <h2 className="text-2xl font-bold text-gray-900">{t('title')}</h2>
           </div>
           <div className="flex items-center gap-3">
@@ -144,12 +144,14 @@ export default function FeaturedProductsSlider() {
               <button
                 onClick={prev}
                 className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-400 hover:border-[#003366] hover:text-[#003366] transition-colors shadow-sm"
+                aria-label="Previous slide"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={next}
                 className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-400 hover:border-[#003366] hover:text-[#003366] transition-colors shadow-sm"
+                aria-label="Next slide"
               >
                 <ChevronRight size={16} />
               </button>
@@ -214,7 +216,7 @@ export default function FeaturedProductsSlider() {
                             width={112}
                             height={112}
                             className="h-28 object-contain group-hover:scale-105 transition-transform duration-300"
-                            sizes="(max-width: 640px) 50vw, 25vw"
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                           />
                         </div>
 
@@ -237,7 +239,7 @@ export default function FeaturedProductsSlider() {
                                 </div>
                               )}
                             </div>
-                            <span className="text-[13px] text-[#01a0dc] font-semibold group-hover:underline flex-shrink-0">
+                            <span className="text-[13px] text-[#0077a3] font-semibold group-hover:underline flex-shrink-0">
                               {t('view')}
                             </span>
                           </div>
@@ -255,8 +257,9 @@ export default function FeaturedProductsSlider() {
                 <button
                   key={i}
                   onClick={() => { setAnimate(true); setPage(i) }}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    dotActive === i ? 'bg-[#003366] w-6' : 'bg-gray-300 w-2 hover:bg-gray-400'
+                  aria-label={`Go to slide ${i + 1}`}
+                  className={`rounded-full transition-all duration-300 ${
+                    dotActive === i ? 'bg-[#003366] w-6 h-3' : 'bg-gray-300 w-3 h-3 hover:bg-gray-400'
                   }`}
                 />
               ))}

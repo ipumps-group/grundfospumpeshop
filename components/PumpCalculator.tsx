@@ -141,6 +141,8 @@ function MiniProductCard({ product }: { product: Product }) {
         <img
           src={product.image_url || '/placeholder.png'}
           alt={product.name}
+          width={80}
+          height={80}
           className="h-20 object-contain group-hover:scale-105 transition-transform duration-200"
           onError={e => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
         />
@@ -164,6 +166,7 @@ function MiniProductCard({ product }: { product: Product }) {
           <button
             onClick={handleAdd}
             disabled={!product.in_stock}
+            aria-label={t('addToCart')}
             className={`p-2 rounded-lg transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}
           >
             {added ? <Check size={14} /> : <ShoppingCart size={14} />}
@@ -193,8 +196,8 @@ function ToggleBtn({ active, onClick, children }: { active: boolean; onClick: ()
 
 // ─── Separator label ─────────────────────────────────────────────────────────
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <div className="text-[13px] font-semibold text-gray-500 uppercase tracking-wider mb-3">{children}</div>
+function FieldLabel({ children, as: Tag = 'div', ...props }: { children: React.ReactNode; as?: 'div' | 'label'; htmlFor?: string }) {
+  return <Tag className="text-[13px] font-semibold text-gray-500 uppercase tracking-wider mb-3" {...props}>{children}</Tag>
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -387,7 +390,7 @@ export default function PumpCalculator() {
 
         {/* Heading */}
         <div className="mb-8">
-          <div className="text-[13px] font-semibold text-[#01a0dc] uppercase tracking-widest mb-1">{t('label')}</div>
+          <div className="text-[13px] font-semibold text-[#0077a3] uppercase tracking-widest mb-1">{t('label')}</div>
           <h2 className="text-2xl font-bold text-gray-900">{t('title')}</h2>
           <p className="text-[15px] text-gray-500 mt-1">{t('description')}</p>
         </div>
@@ -410,11 +413,13 @@ export default function PumpCalculator() {
 
               {/* 1 · Tegevusala */}
               <div>
-                <FieldLabel>{t('field1')}</FieldLabel>
+                <FieldLabel as="label" htmlFor="calc-category">{t('field1')}</FieldLabel>
                 <select
+                  id="calc-category"
                   value={tegevusala}
                   onChange={e => setTegevusala(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[15px] text-gray-800 bg-white outline-none focus:border-[#003366] transition-colors"
+                  aria-label={t('selectArea')}
                 >
                   <option value="" disabled>{t('selectArea')}</option>
                   {TEGEVUSALAD.map(a => (

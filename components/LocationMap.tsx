@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Map } from 'leaflet'
 import { COMPANY } from '@/lib/config'
+import { useTranslations } from 'next-intl'
 
 export default function LocationMap() {
+  const t = useTranslations('locationMap')
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map | null>(null)
   const [locating, setLocating] = useState(true)
@@ -81,7 +83,7 @@ export default function LocationMap() {
             L.popup()
               .setLatLng([userLat, userLng])
               .setContent(
-                `<b>Teie asukoht</b><br>Kaugus: ${distKm} km<br>Sõiduaeg: ~${durMin} min<br><a href="https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${COMPANY.shopLat},${COMPANY.shopLng}" target="_blank" rel="noopener" style="color:#003366;text-decoration:underline">Ava Google Mapsis &nearr;</a>`
+                `<b>${t('yourLocation')}</b><br>${t('distance')}: ${distKm} km<br>${t('driveTime')}: ~${durMin} ${t('min')}<br><a href="https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${COMPANY.shopLat},${COMPANY.shopLng}" target="_blank" rel="noopener" style="color:#003366;text-decoration:underline">${t('openInGoogleMaps')} &nearr;</a>`
               )
               .openOn(map)
           }
@@ -125,7 +127,7 @@ export default function LocationMap() {
       {locating && (
         <div className="absolute bottom-3 left-3 z-10 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow text-xs text-gray-500 flex items-center gap-2">
           <span className="inline-block w-3 h-3 border-2 border-[#003366] border-t-transparent rounded-full animate-spin" />
-          Määran asukohta...
+          {t('locating')}
         </div>
       )}
       <div ref={containerRef} className="w-full h-full" />

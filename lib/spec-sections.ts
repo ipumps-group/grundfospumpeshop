@@ -6,6 +6,7 @@
 
 export interface SpecSection {
   key: string
+  labelKey: string
   label: string
   patterns: RegExp[]
 }
@@ -13,6 +14,7 @@ export interface SpecSection {
 export const SPEC_SECTIONS: SpecSection[] = [
   {
     key: 'tehniline',
+    labelKey: 'specTehniline',
     label: 'Tehnilised',
     patterns: [
       /nimijõudlus/i,
@@ -60,6 +62,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'elektri',
+    labelKey: 'specElektri',
     label: 'Elektriandmed',
     patterns: [
       /nimivõimsus/i,
@@ -113,6 +116,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'materjalid',
+    labelKey: 'specMaterjalid',
     label: 'Materjalid',
     patterns: [
       /pumbapesa/i,
@@ -138,6 +142,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'paigaldamine',
+    labelKey: 'specPaigaldamine',
     label: 'Paigaldamine',
     patterns: [
       /maksimaalne keskkonna temperatuur/i,
@@ -176,6 +181,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'vedelik',
+    labelKey: 'specVedelik',
     label: 'Vedelik',
     patterns: [
       /pumbatav vedelik/i,
@@ -188,6 +194,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'juhtimine',
+    labelKey: 'specJuhtimine',
     label: 'Juhtimine',
     patterns: [
       /cu 300/i,
@@ -199,6 +206,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'paak',
+    labelKey: 'specPaak',
     label: 'Paak',
     patterns: [
       /^paak$/i,
@@ -207,6 +215,7 @@ export const SPEC_SECTIONS: SpecSection[] = [
   },
   {
     key: 'muu',
+    labelKey: 'specMuu',
     label: 'Muu',
     patterns: [
       /.*/,   // catch-all — always last

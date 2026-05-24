@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import type { SearchBarBlock } from './types'
 
 export default function SearchBarBlockRenderer({ block }: { block: SearchBarBlock }) {
+  const t = useTranslations('nav')
   const [query, setQuery] = useState('')
   const router = useRouter()
 
@@ -29,7 +31,7 @@ export default function SearchBarBlockRenderer({ block }: { block: SearchBarBloc
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSearch()}
-          placeholder="Otsi tooteid..."
+          placeholder={t('searchPlaceholder')}
           className="flex-1 px-3 py-3.5 text-[15px] outline-none bg-transparent placeholder-current"
           style={{ color: block.text_color, opacity: 1 }}
         />
@@ -38,7 +40,7 @@ export default function SearchBarBlockRenderer({ block }: { block: SearchBarBloc
           className="px-6 py-3.5 text-[14px] font-semibold transition-opacity hover:opacity-85"
           style={{ backgroundColor: block.btn_color, color: '#ffffff' }}
         >
-          Otsi
+          {t('search')}
         </button>
       </div>
     </div>

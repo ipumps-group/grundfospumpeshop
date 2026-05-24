@@ -89,15 +89,15 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: `${SITE_URL}`,
+      canonical: locale === 'et' ? SITE_URL : `${SITE_URL}/${locale}`,
       languages: Object.fromEntries(
-        LOCALES.map(l => [l, `${SITE_URL}/${l}`])
+        LOCALES.map(l => [l, l === 'et' ? SITE_URL : `${SITE_URL}/${l}`])
       ),
     },
     openGraph: {
       title,
       description,
-      url: SITE_URL,
+      url: locale === 'et' ? SITE_URL : `${SITE_URL}/${locale}`,
       siteName: 'iPumps',
       locale,
       type: 'website',
@@ -149,7 +149,7 @@ export default async function HomePage() {
             )}
           </div>
         )}
-        <BlockRenderer sections={page.blocks as Section[]} />
+        <BlockRenderer sections={page.blocks as Section[]} locale={locale} />
       </div>
     )
   }

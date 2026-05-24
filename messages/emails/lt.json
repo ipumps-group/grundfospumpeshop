@@ -1,0 +1,58 @@
+{
+  "common": {
+    "greeting": "Sveiki, {name}!",
+    "thanks": "Ačiū, kad pasirinkote iPumps.",
+    "questions": "Turite klausimų? Atsakykite į šį laišką arba rašykite adresu {email}.",
+    "footer": "iPumps · {site}\nOficialus Grundfos atstovas Estijoje",
+    "viewOrder": "Peržiūrėti užsakymą",
+    "total": "Iš viso",
+    "subtotal": "Tarpinė suma",
+    "discount": "Nuolaida",
+    "quantity": "vnt",
+    "orderNumber": "Užsakymo numeris"
+  },
+  "orderConfirmation": {
+    "preview": "Užsakymas {orderNumber} patvirtintas — {total}",
+    "subject": "Užsakymas {orderNumber} patvirtintas",
+    "heading": "Ačiū už užsakymą!",
+    "intro": "Jūsų užsakymas <strong>{orderNumber}</strong> gautas ir mokėjimas sėkmingai patvirtintas. Mes nedelsdami pradedame pakuoti.",
+    "itemsHeading": "Užsakytos prekės",
+    "shippingHeading": "Pristatymas",
+    "shippingNote": "Mes atsiųsime jums naują laišką, kai tik siunta bus išsiųsta — su sekimo numeriu.",
+    "paymentMethod": "Mokėjimo būdas"
+  },
+  "orderShipped": {
+    "preview": "Užsakymas {orderNumber} jau pakeliui — sekimas {trackingNumber}",
+    "subject": "📦 Užsakymas {orderNumber} jau pakeliui",
+    "heading": "Jūsų užsakymas pakeliui!",
+    "intro": "Geros žinios — jūsų užsakymas <strong>{orderNumber}</strong> supakuotas ir perduotas kurjeriui. Turėtumėte jį gauti per {eta}.",
+    "trackingLabel": "SEKIMO NUMERIS",
+    "trackingButton": "Sekti siuntą",
+    "itemsHeading": "Siuntoje",
+    "etaDefault": "1–3 darbo dienos",
+    "deliveryMethod": {
+      "parcel_machine": "Paštomatas",
+      "courier": "Kurjerių tarnyba",
+      "post_office": "Pašto skyrius",
+      "pickup": "Atsiėmimas savarankiškai"
+    }
+  },
+  "refundConfirmation": {
+    "preview": "Grąžinimas už užsakymą {orderNumber} — {amount}",
+    "subject": "Grąžinimas už užsakymą {orderNumber}",
+    "heading": "{name}, pinigai grąžinti",
+    "intro": "Suma už užsakymą <strong>{orderNumber}</strong> grąžinta į jūsų mokėjimo būdą.",
+    "amountLabel": "Grąžinta suma",
+    "reasonLabel": "Grąžinimo priežastis",
+    "timingNote": "Pinigai paprastai pasiekia jūsų sąskaitą per 5–10 darbo dienų, priklausomai nuo jūsų banko."
+  },
+  "abandonedCart": {
+    "preview": "Ar ką nors pamiršote krepšelyje?",
+    "subject": "Ar ką nors pamiršote krepšelyje?",
+    "heading": "Turite nebaigtą krepšelį",
+    "intro": "Pastebėjome, kad palikote keletą prekių krepšelyje. Jos vis dar jūsų laukia — ar norėtumėte užbaigti užsakymą?",
+    "itemsHeading": "Jūsų krepšelyje",
+    "returnButton": "Grįžti į krepšelį",
+    "footerNote": "Jei jau atlikote užsakymą, prašome ignoruoti šį laišką."
+  }
+}

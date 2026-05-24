@@ -11,7 +11,7 @@
     "lh": "lhci autorun"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
+    "@anthropic-ai/sdk": "^0.97.1",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.6",
     "@react-pdf/renderer": "^4.3.2",
@@ -45,5 +45,18 @@
     "playwright": "^1.58.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "browserslist": {
+    "production": [
+      "last 2 Chrome versions",
+      "last 2 Firefox versions",
+      "last 2 Safari versions",
+      "last 2 Edge versions"
+    ],
+    "development": [
+      "last 1 Chrome version",
+      "last 1 Firefox version",
+      "last 1 Safari version"
+    ]
   }
 }

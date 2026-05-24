@@ -10,6 +10,10 @@ export interface HeadingBlock {
   type: 'heading'
   level: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   text: string
+  text_en?: string
+  text_ru?: string
+  text_lv?: string
+  text_lt?: string
   alignment: Alignment
   color: string
   custom_size?: number
@@ -20,6 +24,10 @@ export interface TextBlock {
   id: string
   type: 'text'
   content: string
+  content_en?: string
+  content_ru?: string
+  content_lv?: string
+  content_lt?: string
   alignment: Alignment
   color: string
   font_size?: number
@@ -40,6 +48,10 @@ export interface ButtonBlock {
   id: string
   type: 'button'
   text: string
+  text_en?: string
+  text_ru?: string
+  text_lv?: string
+  text_lt?: string
   url: string
   target: '_self' | '_blank'
   style: 'filled' | 'outline' | 'text'
