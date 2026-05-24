@@ -28,7 +28,18 @@ export async function generateMetadata(
       return { title: 'Tooted' }
     }
 
-    const title = area.meta_title || `${area.name_et} | iPumps`
+    const tCat = await getTranslations('categories')
+    const TITLE_KEY: Record<string, string> = {
+      'kuttepumbad': 'heatingTitle', 'puurkaevupumbad': 'borewellTitle',
+      'salvkaevupumbad': 'wellsTitle', 'drenaazipumbad': 'drainageTitle',
+      'rohutostepumbad': 'pressureTitle', 'reoveepumbad': 'sewageTitle',
+      'veeautomaadid': 'jpWaterAutomaticsTitle',
+      'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWaterTitle',
+    }
+    const tKey = TITLE_KEY[area.slug] || TITLE_KEY[tegevusala]
+    const catName = tKey ? tCat(tKey as any) : area.name_et
+
+    const title = locale !== 'et' ? `${catName} | iPumps` : (area.meta_title || `${area.name_et} | iPumps`)
     const description = area.meta_description || `${area.name_et} — vaata kõiki tooteid selles kategoorias.`
     const canonical = `${SITE_URL}/${locale}/tooted/${tegevusala}`
 
@@ -115,8 +126,9 @@ export default async function CategoryPage({
     const pageTitle = (area as any)?.h1 || (area as any)?.name_et || tegevusala
     const tNav = await getTranslations('nav')
     const tCat = await getTranslations('categories')
+    const locale = await getLocale()
 
-    // Translated category name for breadcrumb
+    // Translated category name for breadcrumb + page title
     const SLUG_TO_TITLE: Record<string, string> = {
       'kuttepumbad': 'heatingTitle', 'puurkaevupumbad': 'borewellTitle',
       'salvkaevupumbad': 'wellsTitle', 'drenaazipumbad': 'drainageTitle',
@@ -126,6 +138,7 @@ export default async function CategoryPage({
     }
     const titleKey = SLUG_TO_TITLE[tegevusala]
     const catDisplayName = titleKey ? tCat(titleKey as any) : (area as any)?.name_et || tegevusala
+    const displayTitle = locale !== 'et' ? catDisplayName : pageTitle
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -139,7 +152,7 @@ export default async function CategoryPage({
             <span className="text-[#003366] font-medium">{catDisplayName}</span>
           </nav>
 
-          <h1 className="text-3xl font-bold text-[#003366] mb-2">{pageTitle}</h1>
+          <h1 className="text-3xl font-bold text-[#003366] mb-2">{displayTitle}</h1>
           {(area as any)?.description && (
             <p className="text-[15px] text-gray-500 mb-6 max-w-3xl">{(area as any).description}</p>
           )}

@@ -8,7 +8,7 @@ import {
   Search, SlidersHorizontal, LayoutGrid, List,
   ShoppingCart, ChevronDown, ChevronRight, X, Check
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { withVat, fmt } from '@/lib/price'
 
 // ─── TÜÜBID ────────────────────────────────────────────────────────────────
@@ -99,8 +99,12 @@ function addToCart(product: Product) {
 
 function ProductCard({ product }: { product: Product }) {
   const t = useTranslations('products')
+  const locale = useLocale()
   const [added, setAdded] = useState(false)
   const displayPrice = product.sale_price ?? product.price
+
+  const desc = ((product as unknown) as Record<string, unknown>)[`short_description_${locale}`] as string | null
+    || product.short_description_et
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
@@ -132,8 +136,8 @@ function ProductCard({ product }: { product: Product }) {
         <div className="font-semibold text-gray-800 text-[15px] leading-tight mb-2 group-hover:text-[#003366] transition-colors line-clamp-2 flex-1">
           {product.name}
         </div>
-        {product.short_description_et && (
-          <div className="text-[13px] text-gray-400 line-clamp-1 mb-3">{product.short_description_et}</div>
+        {desc && (
+          <div className="text-[13px] text-gray-400 line-clamp-1 mb-3">{desc}</div>
         )}
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
           <div>
@@ -161,8 +165,12 @@ function ProductCard({ product }: { product: Product }) {
 
 function ProductRow({ product }: { product: Product }) {
   const t = useTranslations('products')
+  const locale = useLocale()
   const [added, setAdded] = useState(false)
   const displayPrice = product.sale_price ?? product.price
+
+  const desc = ((product as unknown) as Record<string, unknown>)[`short_description_${locale}`] as string | null
+    || product.short_description_et
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
@@ -191,8 +199,8 @@ function ProductRow({ product }: { product: Product }) {
         <div className="font-semibold text-gray-800 text-[15px] leading-snug group-hover:text-[#003366] transition-colors line-clamp-1">
           {product.name}
         </div>
-        {product.short_description_et && (
-          <div className="text-[13px] text-gray-400 line-clamp-1 mt-0.5">{product.short_description_et}</div>
+        {desc && (
+          <div className="text-[13px] text-gray-400 line-clamp-1 mt-0.5">{desc}</div>
         )}
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
@@ -489,7 +497,7 @@ function TootedPageContent({
 
     if (query.trim()) {
       const term = `%${query.trim()}%`
-      q = q.or(`name.ilike.${term},sku.ilike.${term},short_description_et.ilike.${term}`)
+      q = q.or(`name.ilike.${term},sku.ilike.${term},short_description_et.ilike.${term},short_description_en.ilike.${term},short_description_ru.ilike.${term}`)
     }
     if (inStockOnly) q = q.eq('in_stock', true)
     if (priceMin) q = q.gte('price', Number(priceMin))
