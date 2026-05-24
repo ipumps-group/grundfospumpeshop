@@ -43,7 +43,7 @@ function ProductCard({ product }: { product: Product }) {
   const [added, setAdded] = useState(false)
   const displayPrice = product.sale_price ?? product.price
 
-  const desc = (product as Record<string, unknown>)[`short_description_${locale}`] as string | null
+  const desc = ((product as unknown) as Record<string, unknown>)[`short_description_${locale}`] as string | null
     || product.short_description_et
 
   const handleAdd = (e: React.MouseEvent) => {
