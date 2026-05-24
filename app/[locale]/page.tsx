@@ -162,10 +162,9 @@ export default async function HomePage() {
   if (hasBlocks) {
     return (
       <div className="min-h-screen">
-        {bgImages.length > 0 && bgImages.map(url => {
-          const optUrl = optimizeUrl(url) || url
-          return <link key={url} rel="preload" as="image" href={optUrl} fetchPriority="high" />
-        })}
+        {bgImages.length > 0 && bgImages.map(url => (
+          <link key={url} rel="preload" as="image" href={url} fetchPriority="high" />
+        ))}
         {titleVisible && (
           <div className="max-w-[1200px] mx-auto px-4 md:px-6 pt-10 pb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h1>

@@ -19,18 +19,6 @@ function getEmbedUrl(url: string): string | null {
   return null
 }
 
-// ─── Image URL optimizer ───────────────────────────────────────────────────
-
-function optimizeUrl(url: string | null, maxWidth = 1920): string | null {
-  if (!url) return null
-  // Supabase storage URLs — append transformation params for on-the-fly resize
-  if (url.includes('supabase.co/storage/v1/object/public')) {
-    const sep = url.includes('?') ? '&' : '?'
-    return `${url}${sep}width=${maxWidth}&quality=80`
-  }
-  return url
-}
-
 // ─── Padding helper ────────────────────────────────────────────────────────
 
 function getPadding(size: string, custom?: number): { paddingTop?: string; paddingBottom?: string } {
@@ -125,7 +113,7 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
     }
     case 'image': {
       const b = block as ImageBlock
-      const src = optimizeUrl(b.url) || b.url
+      const src = b.url
       const isSupabase = b.url.includes('supabase.co') || b.url.includes('sdqnzyfmanflslsjhytf')
       const hasDimensions = b.image_width && b.image_height
 
@@ -249,6 +237,7 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
   const isCustom = settings.width === 'custom'
 
   const bgStyle: React.CSSProperties = {}
+  let bgImage: string | null = null
   if (settings.background_type === 'color') {
     bgStyle.backgroundColor = settings.background_color
   } else if (settings.background_type === 'gradient') {
@@ -257,9 +246,7 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
     const c2 = settings.background_gradient_color2 ?? '#01a0dc'
     bgStyle.backgroundImage = `linear-gradient(${dir}, ${c1}, ${c2})`
   } else if (settings.background_image_url) {
-    bgStyle.backgroundImage = `url(${optimizeUrl(settings.background_image_url)})`
-    bgStyle.backgroundSize = 'cover'
-    bgStyle.backgroundPosition = 'center'
+    bgImage = settings.background_image_url
   }
 
   // Border radius
@@ -357,6 +344,16 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
   return (
     <div className="w-full flex justify-center">
       <section style={{ ...bgStyle, ...bgWidthStyle }} className={`${isBgCustom ? '' : 'w-full'} relative`}>
+        {bgImage && (
+          <Image
+            src={bgImage}
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover z-0"
+            priority={section.order === 0}
+          />
+        )}
         {overlay}
         <div style={contentStyle} className={`${isBoxed || isCustom ? 'mx-auto' : ''} relative z-10`}>
           {inner}
