@@ -151,7 +151,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       } : {}),
       seller: {
         '@type': 'Organization',
-        name: 'iPumps / Intelligent Pump Solutions OÜ',
+        name: 'Pump OÜ',
       },
     },
   }
