@@ -9,7 +9,7 @@ import type { Section } from '@/components/page-builder/types'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import JsonLd from '@/components/seo/JsonLd'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 import { SITE_URL } from '@/lib/config'
 
 const LOCALES = ['et', 'en', 'ru', 'lv', 'lt'] as const
