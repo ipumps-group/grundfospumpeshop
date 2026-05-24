@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import {
-  Flame, Snowflake, Thermometer, Drill, Waves,
+  Flame, Thermometer, Drill, Waves,
   ArrowUpCircle, Filter, CircleDot,
   Search, ShoppingCart, User, ChevronDown,
   Phone, Mail, Menu, X, ChevronRight,
