@@ -207,7 +207,9 @@
     "next": "Kitas →",
     "loading": "Kraunama...",
     "sort": "Rūšiuoti",
-    "searchInCategory": "Ieškoti šioje kategorijoje..."
+    "searchInCategory": "Ieškoti šioje kategorijoje...",
+    "suggestCategory": "Gal turėjote omenyje kategoriją {name}?",
+    "showProducts": "Rodyti {name} produktus"
   },
   "product": {
     "inStock": "Sandėlyje",

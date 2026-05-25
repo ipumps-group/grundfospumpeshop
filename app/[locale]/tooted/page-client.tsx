@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -442,9 +442,9 @@ function TootedPageContent({
   const [tegevusalad, setTegevusalad]       = useState<Category[]>(initCategories || [])
   const [seeriad, setSeeriad]               = useState<Category[]>(initSeries || [])
   const [aiSuggestion, setAiSuggestion]     = useState<{ slug: string; type: string; name: string } | null>(null)
+  const navigatedRef = useRef('')
 
   useEffect(() => {
-    if (initCategories && initCategories.length > 0 && initSeries && initSeries.length > 0) return // already prefetched server-side
     async function loadCategories() {
       const { data: areas } = await supabase
         .from('activity_areas')
@@ -454,12 +454,12 @@ function TootedPageContent({
 
       const { data: allSeries } = await supabase
         .from('product_series')
-        .select('slug, name, sort_order')
+        .select('slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
         .eq('is_active', true)
         .order('sort_order')
 
       if (areas) setTegevusalad(areas.map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
-      if (allSeries) setSeeriad(allSeries.map(s => ({ slug: s.slug, name_et: s.name, parent_slug: null })))
+      if (allSeries) setSeeriad(allSeries.map(s => ({ slug: s.slug, name_et: (s as any).name, parent_slug: (s as any).activity_areas?.slug || null })))
     }
     loadCategories()
   }, [initCategories, initSeries])
@@ -494,7 +494,7 @@ function TootedPageContent({
 
     if (query.trim()) {
       const term = `%${query.trim()}%`
-      q = q.or(`name.ilike.${term},sku.ilike.${term},short_description_et.ilike.${term},short_description_en.ilike.${term},short_description_ru.ilike.${term}`)
+      q = q.or(`name.ilike.${term},sku.ilike.${term},short_description_et.ilike.${term},short_description_en.ilike.${term},short_description_ru.ilike.${term},short_description_lv.ilike.${term},short_description_lt.ilike.${term}`)
     }
     if (inStockOnly) q = q.eq('in_stock', true)
     if (priceMin) q = q.gte('price', Number(priceMin))
@@ -505,7 +505,9 @@ function TootedPageContent({
     q = q.range(from, to)
 
     const { data, count, error } = await q
-    if (!error) {
+    if (error) {
+      console.error('Search query error:', error)
+    } else {
       setProducts(data || [])
       setTotal(count || 0)
     }
@@ -514,32 +516,152 @@ function TootedPageContent({
 
   useEffect(() => { loadProducts() }, [loadProducts])
 
-  // AI fallback: kui DB otsing ei leidnud midagi ja otsingus├Ąna on olemas
+  // Multi-language keyword → slug mapping for client-side fallback
+  const SEARCH_KEYWORDS: Record<string, { slug: string; type: 'tegevusala' | 'seeria'; parentSlug?: string }> = {
+    'aiapump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'aiapumbad': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'kastmispump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'garden pump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'garden watering': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'watering pump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'irrigation': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'садовый насос': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'полив': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'dārza sūknis': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'laistīšana': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'sodo siurblys': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'laistymas': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'veeauatomaat': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'hüdrofoor': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'hydropneumatic': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'hydrofor': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'küte': { slug: 'kuttepumbad', type: 'tegevusala' },
+    'heating': { slug: 'kuttepumbad', type: 'tegevusala' },
+    'radiator': { slug: 'kuttepumbad', type: 'tegevusala' },
+    'circulation pump': { slug: 'kuttepumbad', type: 'tegevusala' },
+    'отопление': { slug: 'kuttepumbad', type: 'tegevusala' },
+    'tarbevesi': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
+    'hot water': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
+    'boiler': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
+    'dhw': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
+    'puurkaev': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'borewell': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'borehole': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'deep well': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'submersible': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'скважина': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'drenaaž': { slug: 'drenaazipumbad', type: 'tegevusala' },
+    'drainage': { slug: 'drenaazipumbad', type: 'tegevusala' },
+    'flood': { slug: 'drenaazipumbad', type: 'tegevusala' },
+    'cellar': { slug: 'drenaazipumbad', type: 'tegevusala' },
+    'дренаж': { slug: 'drenaazipumbad', type: 'tegevusala' },
+    'salvkaev': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'well': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'shallow well': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'surface pump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'колодец': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'rõhutõste': { slug: 'rohutostepumbad', type: 'tegevusala' },
+    'pressure booster': { slug: 'rohutostepumbad', type: 'tegevusala' },
+    'booster pump': { slug: 'rohutostepumbad', type: 'tegevusala' },
+    'low water pressure': { slug: 'rohutostepumbad', type: 'tegevusala' },
+    'повышение давления': { slug: 'rohutostepumbad', type: 'tegevusala' },
+    'reovesi': { slug: 'reoveepumbad', type: 'tegevusala' },
+    'sewage': { slug: 'reoveepumbad', type: 'tegevusala' },
+    'wastewater': { slug: 'reoveepumbad', type: 'tegevusala' },
+    'fecal': { slug: 'reoveepumbad', type: 'tegevusala' },
+    'kanalisatsioon': { slug: 'reoveepumbad', type: 'tegevusala' },
+    'канализация': { slug: 'reoveepumbad', type: 'tegevusala' },
+    // Product series names — mapped to their series page URL with parent category
+    'hydrojet': { slug: 'grundfos-cmb', type: 'seeria', parentSlug: 'rohutostepumbad' },
+    'cmb': { slug: 'grundfos-cmb', type: 'seeria', parentSlug: 'rohutostepumbad' },
+    'unilift': { slug: 'grundfos-unilift', type: 'seeria', parentSlug: 'drenaazipumbad' },
+    'jp': { slug: 'grundfos-jp', type: 'seeria', parentSlug: 'salvkaevupumbad' },
+    'grundfos jp': { slug: 'grundfos-jp', type: 'seeria', parentSlug: 'salvkaevupumbad' },
+    'sba': { slug: 'grundfos-sba', type: 'seeria', parentSlug: 'reoveepumbad' },
+    'seg': { slug: 'grundfos-seg', type: 'seeria', parentSlug: 'reoveepumbad' },
+    'scala': { slug: 'grundfos-scala', type: 'seeria', parentSlug: 'veeautomaadid' },
+    'scala2': { slug: 'grundfos-scala2', type: 'seeria', parentSlug: 'veeautomaadid' },
+    'sq': { slug: 'grundfos-sq', type: 'seeria', parentSlug: 'puurkaevupumbad' },
+    'grundfos sq': { slug: 'grundfos-sq', type: 'seeria', parentSlug: 'puurkaevupumbad' },
+    'sp': { slug: 'grundfos-sp', type: 'seeria', parentSlug: 'puurkaevupumbad' },
+    'cr': { slug: 'grundfos-cr', type: 'seeria', parentSlug: 'puurkaevupumbad' },
+    'magn': { slug: 'grundfos-magna', type: 'seeria', parentSlug: 'kuttepumbad' },
+    'magna': { slug: 'grundfos-magna', type: 'seeria', parentSlug: 'kuttepumbad' },
+    'alpha': { slug: 'grundfos-alpha', type: 'seeria', parentSlug: 'kuttepumbad' },
+    'tp': { slug: 'grundfos-tp', type: 'seeria', parentSlug: 'kuttepumbad' },
+  }
+
+  // Handle Enter key on the in-page search bar → check keyword map and navigate
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Enter' || !inputQuery.trim()) return
+    const q = inputQuery.trim().toLowerCase().replace(/-/g, ' ')
+    const kw = SEARCH_KEYWORDS[q]
+    if (kw) {
+      navigatedRef.current = q
+      setInputQuery('')
+      if (kw.type === 'seeria') {
+        const areaSlug = kw.parentSlug || seeriad.find(c => c.slug === kw.slug)?.parent_slug
+        if (areaSlug) router.push(`/tooted/${areaSlug}/${kw.slug}`)
+      } else {
+        router.push(`/tooted/${kw.slug}`)
+      }
+    }
+  }
+
+  // Auto-navigate for DB slug/name matches and AI fallback (only when query comes from URL/external, not typing)
   useEffect(() => {
-    if (loading || products.length > 0 || !query.trim()) return
-    let cancelled = false
-    fetch('/api/search-ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: query.trim() }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        if (cancelled || !data.categorySlug) return
-        let name = ''
-        if (data.categoryType === 'tegevusala') {
-          const area = tegevusalad.find(a => (DB_TO_URL[a.slug] ?? a.slug) === data.categorySlug)
-          name = area ? (SLUG_TO_CAT_KEY[area.slug] ? tCat(SLUG_TO_CAT_KEY[area.slug] as CatNameKey) : area.name_et) : data.categorySlug
-        } else {
-          const series = seeriad.find(s => s.slug === data.categorySlug)
-          name = series ? (SLUG_TO_CAT_KEY[series.slug] ? tCat(SLUG_TO_CAT_KEY[series.slug] as CatNameKey) : series.name_et) : data.categorySlug
-        }
-        if (!cancelled) setAiSuggestion({ slug: data.categorySlug, type: data.categoryType, name })
+    if (loading || !query.trim() || navigatedRef.current === query.trim()) return
+    const q = query.trim().toLowerCase().replace(/-/g, ' ')
+    const doNavigate = (slug: string, type: string, parentSlug?: string) => {
+      navigatedRef.current = query.trim()
+      setInputQuery('')
+      if (type === 'seeria') {
+        const areaSlug = parentSlug || seeriad.find(c => c.slug === slug)?.parent_slug
+        if (areaSlug) router.push(`/tooted/${areaSlug}/${slug}`)
+      } else {
+        router.push(`/tooted/${slug}`)
+      }
+    }
+    if (q.length < 3) return
+    // Check DB slugs and names → auto-navigate
+    for (const area of tegevusalad) {
+      const slugNorm = area.slug.replace(/-/g, ' ')
+      if (slugNorm.includes(q) || area.name_et.toLowerCase().includes(q)) {
+        doNavigate(area.slug, 'tegevusala')
+        return
+      }
+    }
+    for (const series of seeriad) {
+      const slugNorm = series.slug.replace(/-/g, ' ')
+      if (slugNorm.includes(q) || series.name_et.toLowerCase().includes(q)) {
+        doNavigate(series.slug, 'seeria', series.parent_slug ?? undefined)
+        return
+      }
+    }
+    // If nothing matched and SQL found no products, fire AI search as fallback
+    if (products.length === 0) {
+      fetch('/api/search-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query.trim() }),
       })
-      .catch(() => {})
-    return () => { cancelled = true }
+        .then(r => r.json())
+        .then(async (data) => {
+          if (!data.categorySlug || navigatedRef.current === query.trim()) return
+          navigatedRef.current = query.trim()
+          setInputQuery('')
+          if (data.categoryType === 'seeria') {
+            const s = seeriad.find(c => c.slug === data.categorySlug)
+            const areaSlug = s?.parent_slug
+            if (areaSlug) router.push(`/tooted/${areaSlug}/${data.categorySlug}`)
+          } else {
+            router.push(`/tooted/${data.categorySlug}`)
+          }
+        })
+        .catch(() => {})
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, products.length, query, tegevusalad, seeriad])
+  }, [loading, query, products.length, tegevusalad, seeriad, router])
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -552,7 +674,13 @@ function TootedPageContent({
   }
 
   const handleSetAla    = (v: string) => { if (v) router.push(`/tooted/${v}`); else { setSelectedAla(''); setPage(1) } }
-  const handleSetSeeria = (v: string) => { if (v) router.push(`/tooted/${v}`); else { setSelectedSeeria(''); setPage(1) } }
+  const handleSetSeeria = (v: string) => {
+    if (v) {
+      const series = seeriad.find(c => c.slug === v) ?? seeriad.flatMap(c => c.children || []).find(c => c.slug === v)
+      const areaSlug = series?.parent_slug || selectedAla
+      if (areaSlug) router.push(`/tooted/${areaSlug}/${v}`)
+    } else { setSelectedSeeria(''); setPage(1) }
+  }
 
   const activeCatRaw = tegevusalad.find(c => (DB_TO_URL[c.slug] ?? c.slug) === selectedAla)
     ?? seeriad.find(c => c.slug === selectedSeeria)
@@ -563,7 +691,7 @@ function TootedPageContent({
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
 
-        {/* P├żis */}
+        {/* Päis */}
         <div className="mb-6">
           <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-3">
             <Link href="/" className="hover:text-[#003366] transition-colors">{tCommon('home')}</Link>
@@ -584,6 +712,7 @@ function TootedPageContent({
             <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input type="search" placeholder={t('searchPlaceholder')}
               value={inputQuery} onChange={e => setInputQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-[15px] text-gray-900 focus:outline-none focus:border-[#003366] transition-colors shadow-sm" />
             {inputQuery && (
               <button onClick={() => { setInputQuery(''); setPage(1) }}
@@ -708,13 +837,13 @@ function TootedPageContent({
               </div>
             ) : products.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-                <div className="text-4xl mb-4">­¤öŹ</div>
+                <div className="flex justify-center mb-4"><Search size={36} className="text-gray-300" /></div>
                 <div className="font-semibold text-gray-800 text-lg mb-2">{t('noProducts')}</div>
                 <div className="text-[15px] text-gray-400 mb-5">{t('noProductsHint')}</div>
                 {aiSuggestion && (
                   <div className="mb-5">
                     <p className="text-[15px] text-gray-500 mb-3">
-                      Kas m├Ątlesid kategooriat <strong className="text-gray-800">{aiSuggestion.name}</strong>?
+                      {t('suggestCategory', { name: aiSuggestion.name })}
                     </p>
                     <button
                       onClick={() => {
@@ -728,7 +857,7 @@ function TootedPageContent({
                       }}
                       className="bg-[#003366] text-white px-6 py-2.5 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors"
                     >
-                      N├żita {aiSuggestion.name} tooteid
+                      {t('showProducts', { name: aiSuggestion.name })}
                     </button>
                   </div>
                 )}

@@ -17,7 +17,7 @@ export async function fetchSidebarData(): Promise<{ categories: Category[]; seri
 
     const { data: allSeries } = await supabaseAdmin
       .from('product_series')
-      .select('slug, name, sort_order')
+      .select('slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
       .eq('is_active', true)
       .order('sort_order')
 
@@ -26,7 +26,7 @@ export async function fetchSidebarData(): Promise<{ categories: Category[]; seri
         slug: a.slug, name_et: a.name_et, parent_slug: null as string | null,
       })),
       series: (allSeries || []).map(s => ({
-        slug: s.slug, name_et: s.name.replace(/Grundfos\s*/g, ''), parent_slug: null as string | null,
+        slug: s.slug, name_et: (s as any).name.replace(/Grundfos\s*/g, ''), parent_slug: (s as any).activity_areas?.slug || null,
       })),
     }
   } catch {

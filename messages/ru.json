@@ -207,7 +207,9 @@
     "next": "Вперёд →",
     "loading": "Загрузка...",
     "sort": "Сортировать",
-    "searchInCategory": "Поиск в этой категории..."
+    "searchInCategory": "Поиск в этой категории...",
+    "suggestCategory": "Возможно, вы искали категорию {name}?",
+    "showProducts": "Показать товары {name}"
   },
   "product": {
     "inStock": "В наличии",

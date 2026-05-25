@@ -207,7 +207,9 @@
     "next": "Next →",
     "loading": "Loading...",
     "sort": "Sort",
-    "searchInCategory": "Search in this category..."
+    "searchInCategory": "Search in this category...",
+    "suggestCategory": "Did you mean category {name}?",
+    "showProducts": "Show {name} products"
   },
   "product": {
     "inStock": "In stock",

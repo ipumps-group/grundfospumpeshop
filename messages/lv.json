@@ -207,7 +207,9 @@
     "next": "Nākamā →",
     "loading": "Ielāde...",
     "sort": "Kārtot",
-    "searchInCategory": "Meklēt šajā kategorijā..."
+    "searchInCategory": "Meklēt šajā kategorijā...",
+    "suggestCategory": "Varbūt domājāt kategoriju {name}?",
+    "showProducts": "Parādīt {name} produktus"
   },
   "product": {
     "inStock": "Noliktavā",

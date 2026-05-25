@@ -209,7 +209,9 @@
     "next": "Järgmine →",
     "loading": "Laadin...",
     "sort": "Sorteeri",
-    "searchInCategory": "Otsi selles kategoorias..."
+    "searchInCategory": "Otsi selles kategoorias...",
+    "suggestCategory": "Kas mõtlesid kategooriat {name}?",
+    "showProducts": "Näita {name} tooteid"
   },
   "product": {
     "inStock": "Laos",
