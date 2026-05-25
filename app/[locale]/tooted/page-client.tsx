@@ -442,7 +442,6 @@ function TootedPageContent({
   const [tegevusalad, setTegevusalad]       = useState<Category[]>(initCategories || [])
   const [seeriad, setSeeriad]               = useState<Category[]>(initSeries || [])
   const [aiSuggestion, setAiSuggestion]     = useState<{ slug: string; type: string; name: string } | null>(null)
-  const navigatedRef = useRef('')
 
   useEffect(() => {
     async function loadCategories() {
@@ -463,11 +462,6 @@ function TootedPageContent({
     }
     loadCategories()
   }, [initCategories, initSeries])
-
-  useEffect(() => {
-    const timer = setTimeout(() => { setQuery(inputQuery); setPage(1) }, 350)
-    return () => clearTimeout(timer)
-  }, [inputQuery])
 
   useEffect(() => {
     const p = new URLSearchParams()
@@ -493,9 +487,10 @@ function TootedPageContent({
       .eq('published', true)
 
     if (query.trim()) {
-      const term = `%${query.trim()}%`
-      q = q.or(`name.ilike.${term},sku.ilike.${term},short_description_et.ilike.${term},short_description_en.ilike.${term},short_description_ru.ilike.${term},short_description_lv.ilike.${term},short_description_lt.ilike.${term}`)
+      q = q.textSearch('search_vector', query.trim(), { config: 'simple', type: 'plain' })
     }
+    if (selectedAla)   q = q.eq('primary_activity_area_slug', selectedAla)
+    if (selectedSeeria) q = q.eq('series_slug', selectedSeeria)
     if (inStockOnly) q = q.eq('in_stock', true)
     if (priceMin) q = q.gte('price', Number(priceMin))
     if (priceMax) q = q.lte('price', Number(priceMax))
@@ -512,7 +507,7 @@ function TootedPageContent({
       setTotal(count || 0)
     }
     setLoading(false)
-  }, [query, inStockOnly, priceMin, priceMax, sortBy, page])
+  }, [query, selectedAla, selectedSeeria, inStockOnly, priceMin, priceMax, sortBy, page])
 
   useEffect(() => { loadProducts() }, [loadProducts])
 
@@ -521,6 +516,9 @@ function TootedPageContent({
     'aiapump': { slug: 'veeautomaadid', type: 'tegevusala' },
     'aiapumbad': { slug: 'veeautomaadid', type: 'tegevusala' },
     'kastmispump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'kasvuhoonepump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'kasvuhoone pump': { slug: 'veeautomaadid', type: 'tegevusala' },
+    'greenhouse pump': { slug: 'veeautomaadid', type: 'tegevusala' },
     'garden pump': { slug: 'veeautomaadid', type: 'tegevusala' },
     'garden watering': { slug: 'veeautomaadid', type: 'tegevusala' },
     'watering pump': { slug: 'veeautomaadid', type: 'tegevusala' },
@@ -549,6 +547,10 @@ function TootedPageContent({
     'borehole': { slug: 'puurkaevupumbad', type: 'tegevusala' },
     'deep well': { slug: 'puurkaevupumbad', type: 'tegevusala' },
     'submersible': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'kaevupump': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'kaevu pump': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'süvapump': { slug: 'puurkaevupumbad', type: 'tegevusala' },
+    'süvapuurauk': { slug: 'puurkaevupumbad', type: 'tegevusala' },
     'скважина': { slug: 'puurkaevupumbad', type: 'tegevusala' },
     'drenaaž': { slug: 'drenaazipumbad', type: 'tegevusala' },
     'drainage': { slug: 'drenaazipumbad', type: 'tegevusala' },
@@ -556,6 +558,8 @@ function TootedPageContent({
     'cellar': { slug: 'drenaazipumbad', type: 'tegevusala' },
     'дренаж': { slug: 'drenaazipumbad', type: 'tegevusala' },
     'salvkaev': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'salvkaevupump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
+    'salvkaevu pump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
     'well': { slug: 'salvkaevupumbad', type: 'tegevusala' },
     'shallow well': { slug: 'salvkaevupumbad', type: 'tegevusala' },
     'surface pump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
@@ -591,13 +595,13 @@ function TootedPageContent({
     'tp': { slug: 'grundfos-tp', type: 'seeria', parentSlug: 'kuttepumbad' },
   }
 
-  // Handle Enter key on the in-page search bar → check keyword map and navigate
-  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+  // Handle Enter key — check keywords, AI cache, then search
+  const handleSearchKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key !== 'Enter' || !inputQuery.trim()) return
     const q = inputQuery.trim().toLowerCase().replace(/-/g, ' ')
+    // 1. Hardcoded keyword map
     const kw = SEARCH_KEYWORDS[q]
     if (kw) {
-      navigatedRef.current = q
       setInputQuery('')
       if (kw.type === 'seeria') {
         const areaSlug = kw.parentSlug || seeriad.find(c => c.slug === kw.slug)?.parent_slug
@@ -605,63 +609,141 @@ function TootedPageContent({
       } else {
         router.push(`/tooted/${kw.slug}`)
       }
+      return
     }
-  }
-
-  // Auto-navigate for DB slug/name matches and AI fallback (only when query comes from URL/external, not typing)
-  useEffect(() => {
-    if (loading || !query.trim() || navigatedRef.current === query.trim()) return
-    const q = query.trim().toLowerCase().replace(/-/g, ' ')
-    const doNavigate = (slug: string, type: string, parentSlug?: string) => {
-      navigatedRef.current = query.trim()
-      setInputQuery('')
-      if (type === 'seeria') {
-        const areaSlug = parentSlug || seeriad.find(c => c.slug === slug)?.parent_slug
-        if (areaSlug) router.push(`/tooted/${areaSlug}/${slug}`)
-      } else {
-        router.push(`/tooted/${slug}`)
+    // 2. Check AI cache — previously learned terms
+    try {
+      const { data: cached } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', `search:${q}`)
+        .maybeSingle()
+      if (cached && cached.value && cached.value !== 'none') {
+        const parts = cached.value.split(':')
+        const cacheType = parts.length === 2 ? parts[0] : 'tegevusala'
+        const cacheSlug = parts.length === 2 ? parts[1] : cached.value
+        setInputQuery('')
+        if (cacheType === 'seeria') {
+          const s = seeriad.find(c => c.slug === cacheSlug)
+          const parentSlug = s?.parent_slug
+          if (parentSlug) router.push(`/tooted/${parentSlug}/${cacheSlug}`)
+        } else {
+          router.push(`/tooted/${cacheSlug}`)
+        }
+        return
       }
-    }
-    if (q.length < 3) return
-    // Check DB slugs and names → auto-navigate
+    } catch {}
+    // 3. Check DB slugs and names
     for (const area of tegevusalad) {
       const slugNorm = area.slug.replace(/-/g, ' ')
       if (slugNorm.includes(q) || area.name_et.toLowerCase().includes(q)) {
-        doNavigate(area.slug, 'tegevusala')
+        setInputQuery('')
+        router.push(`/tooted/${area.slug}`)
         return
       }
     }
     for (const series of seeriad) {
       const slugNorm = series.slug.replace(/-/g, ' ')
       if (slugNorm.includes(q) || series.name_et.toLowerCase().includes(q)) {
-        doNavigate(series.slug, 'seeria', series.parent_slug ?? undefined)
+        setInputQuery('')
+        const parentSlug = series.parent_slug
+        if (parentSlug) router.push(`/tooted/${parentSlug}/${series.slug}`)
         return
       }
     }
-    // If nothing matched and SQL found no products, fire AI search as fallback
-    if (products.length === 0) {
-      fetch('/api/search-ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim() }),
+    // 4. No match — run the search (SQL + AI fallback)
+    setQuery(inputQuery.trim())
+    setPage(1)
+  }
+
+  // On query change (Enter or URL load), check keyword/slug matches first
+  useEffect(() => {
+    if (loading || !query.trim()) return
+    const q = query.trim().toLowerCase().replace(/-/g, ' ')
+    // 1. Check keyword map
+    const kw = SEARCH_KEYWORDS[q]
+    if (kw) {
+      setInputQuery('')
+      if (kw.type === 'seeria') {
+        const areaSlug = kw.parentSlug || seeriad.find(c => c.slug === kw.slug)?.parent_slug
+        if (areaSlug) router.push(`/tooted/${areaSlug}/${kw.slug}`)
+      } else {
+        router.push(`/tooted/${kw.slug}`)
+      }
+      return
+    }
+    // 2. Check DB slugs and names
+    for (const area of tegevusalad) {
+      const slugNorm = area.slug.replace(/-/g, ' ')
+      if (slugNorm.includes(q) || area.name_et.toLowerCase().includes(q)) {
+        setInputQuery('')
+        router.push(`/tooted/${area.slug}`)
+        return
+      }
+    }
+    for (const series of seeriad) {
+      const slugNorm = series.slug.replace(/-/g, ' ')
+      if (slugNorm.includes(q) || series.name_et.toLowerCase().includes(q)) {
+        setInputQuery('')
+        const parentSlug = series.parent_slug
+        if (parentSlug) router.push(`/tooted/${parentSlug}/${series.slug}`)
+        return
+      }
+    }
+    // 3. No match — let SQL + AI fallback handle it
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, query])
+
+  // When SQL finds no results, consult AI for a category suggestion
+  const aiRef = useRef('')
+  useEffect(() => {
+    if (loading || !query.trim() || products.length > 0 || aiRef.current === query.trim()) return
+    aiRef.current = query.trim()
+    setAiSuggestion(null)
+    const currentQuery = query.trim()
+    fetch('/api/search-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: currentQuery }),
+    })
+      .then(async (res) => {
+        if (!res.ok) { console.error('search-ai status:', res.status); return null }
+        return res.json()
       })
-        .then(r => r.json())
-        .then(async (data) => {
-          if (!data.categorySlug || navigatedRef.current === query.trim()) return
-          navigatedRef.current = query.trim()
+      .then(async (data) => {
+        if (currentQuery !== aiRef.current) return
+        if (!data || !data.categorySlug) {
+          aiRef.current = ''  // Allow retry if AI found nothing
+          return
+        }
+        // Check if the suggested category actually has products
+        const slugField = data.categoryType === 'seeria' ? 'series_slug' : 'primary_activity_area_slug'
+        const { count } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq(slugField, data.categorySlug)
+          .eq('published', true)
+        if (count && count > 0) {
+          // Auto-navigate since the category has products
           setInputQuery('')
           if (data.categoryType === 'seeria') {
             const s = seeriad.find(c => c.slug === data.categorySlug)
-            const areaSlug = s?.parent_slug
-            if (areaSlug) router.push(`/tooted/${areaSlug}/${data.categorySlug}`)
+            const parentSlug = s?.parent_slug
+            if (parentSlug) router.push(`/tooted/${parentSlug}/${data.categorySlug}`)
           } else {
             router.push(`/tooted/${data.categorySlug}`)
           }
-        })
-        .catch(() => {})
-    }
+          return
+        }
+        // Category has no products — show suggestion button instead
+        const name = data.categoryType === 'tegevusala'
+          ? catName(data.categorySlug, data.categorySlug)
+          : (seeriad.find(s => s.slug === data.categorySlug)?.name_et || data.categorySlug)
+        setAiSuggestion({ slug: data.categorySlug, type: data.categoryType, name })
+      })
+      .catch((err) => { console.error('search-ai fetch error:', err); aiRef.current = '' })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, query, products.length, tegevusalad, seeriad, router])
+  }, [loading, query, products.length])
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -670,7 +752,7 @@ function TootedPageContent({
   const clearFilters = () => {
     setSelectedAla(''); setSelectedSeeria('')
     setInStockOnly(false); setPriceMin(''); setPriceMax('')
-    setInputQuery(''); setPage(1); setAiSuggestion(null)
+    setInputQuery(''); setQuery(''); setPage(1); setAiSuggestion(null)
   }
 
   const handleSetAla    = (v: string) => { if (v) router.push(`/tooted/${v}`); else { setSelectedAla(''); setPage(1) } }

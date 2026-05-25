@@ -23,22 +23,43 @@ export async function POST(req: NextRequest) {
   const normalized = query.trim().toLowerCase()
   const cacheKey   = `search:${normalized}`
 
-  // 1. Check synonym cache in settings table
+  // 1. Check synonym cache in settings table (validate cached slugs still exist)
   const { data: cached } = await supabaseAdmin
     .from('settings')
-    .select('value')
+    .select('value, updated_at')
     .eq('key', cacheKey)
     .single()
 
   if (cached) {
+    // Expire "none" caches after 24h so future searches can retry
     if (cached.value === 'none') {
-      return NextResponse.json({ categorySlug: null, categoryType: null })
+      const age = Date.now() - new Date(cached.updated_at || 0).getTime()
+      if (age < 86400000) {
+        return NextResponse.json({ categorySlug: null, categoryType: null })
+      }
+      // Expired — fall through to re-query Claude
+    } else {
+      const parts = cached.value.split(':')
+      const cachedSlug = parts.length === 2 ? parts[1] : cached.value
+      const cachedType = parts.length === 2 ? parts[0] as 'tegevusala' | 'seeria' : 'tegevusala'
+      // Validate cached slug against current DB state
+      if (cachedType === 'tegevusala' && AREA_NAMES[cachedSlug]) {
+        return NextResponse.json({ categorySlug: cachedSlug, categoryType: cachedType })
+      }
+      if (cachedType === 'seeria') {
+        const { data: validSeries } = await supabaseAdmin
+          .from('product_series')
+          .select('slug')
+          .eq('slug', cachedSlug)
+          .eq('is_active', true)
+          .single()
+        if (validSeries) {
+          return NextResponse.json({ categorySlug: cachedSlug, categoryType: cachedType })
+        }
+      }
+      // Cache is stale — invalidate it
+      await supabaseAdmin.from('settings').update({ value: 'none' }).eq('key', cacheKey)
     }
-    const parts = cached.value.split(':')
-    if (parts.length === 2) {
-      return NextResponse.json({ categorySlug: parts[1], categoryType: parts[0] as 'tegevusala' | 'seeria' })
-    }
-    return NextResponse.json({ categorySlug: cached.value, categoryType: 'tegevusala' })
   }
 
   // 2. Fetch all products with their names, descriptions, and category/series info
@@ -78,6 +99,7 @@ export async function POST(req: NextRequest) {
 
   // 3. Fetch active product series
   let seriesLines = ''
+  let seriesSlugs = ''
   try {
     const { data: series } = await supabaseAdmin
       .from('product_series')
@@ -86,6 +108,7 @@ export async function POST(req: NextRequest) {
       .order('sort_order')
     if (series && series.length > 0) {
       seriesLines = series.map(s => s.name).join(', ')
+      seriesSlugs = series.map(s => s.slug).join(', ')
     }
   } catch {
     // non-fatal
@@ -110,6 +133,12 @@ ${productCatalog}
 
 Product series: ${seriesLines || 'none listed'}
 
+VALID CATEGORY SLUGS (use ONLY one of these for category matches):
+kuttepumbad, tsirkulatsioonipumbad-soe-tarbevesi, puurkaevupumbad, drenaazipumbad, salvkaevupumbad, veeautomaadid, rohutostepumbad, reoveepumbad
+
+VALID SERIES SLUGS (use ONLY one of these for series matches):
+${seriesSlugs || 'none'}
+
 SEARCH TERM:
 "${normalized}"
 
@@ -122,14 +151,20 @@ The search term may:
 - be in Estonian, English, Russian, Latvian, or Lithuanian
 
 Instructions:
-1. Analyze ALL product names and descriptions across ALL categories.
-2. Consider semantic meaning, not only exact keyword matches.
-3. The user is looking for products — find which category or series contains them.
-4. If multiple categories could match, pick the most relevant one.
-5. Ignore clearly unrelated categories.
+1. First, think about what the search term means. For example, "kaevupump" means "well pump" in Estonian — it relates to borewell/well water extraction.
+2. Then, analyze ALL product names and descriptions across ALL categories with that understanding.
+3. Consider semantic meaning, not only exact keyword matches.
+4. The user is looking for products — find which category or series contains relevant products.
+5. If multiple categories could match, pick the most relevant one.
+6. Ignore clearly unrelated categories.
+7. You MUST reply with a slug from the VALID lists above. Do NOT invent or modify slugs.
+8. Check that the category or series you pick actually has products listed under it in the catalogue above.
+9. If the best-matching category has no products listed, try the next best category.
+10. Never return a slug that does not appear in the VALID lists.
+11. If the search term does not appear verbatim in the catalogue, still do your best to map it to the closest category based on meaning and purpose. Only reply "none" if the term is completely unrelated to any product category.
 
 Reply with ONLY the category slug (e.g. "kuttepumbad") or series slug (e.g. "grundfos-ups") of the best match.
-If nothing matches, reply with "none".`,
+If nothing matches after careful analysis, reply with "none".`,
       }],
     })
 
