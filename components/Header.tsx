@@ -87,6 +87,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
   const [langOpen, setLangOpen]         = useState(false)
   const [megaOpen, setMegaOpen]         = useState(false)
   const [series, setSeries]             = useState<{ slug: string; name: string; activity_areas?: { slug: string } }[]>([])
+  const [activeCategorySlugs, setActiveCategorySlugs] = useState<Set<string>>(new Set())
   const [searchOpen, setSearchOpen]     = useState(false)
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(initialSettings ?? null)
   const [searchQuery, setSearchQuery]   = useState('')
@@ -114,14 +115,34 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
 
   // Laadi tooteseeria dropdowni jaoks
   useEffect(() => {
-    supabase
-      .from('product_series')
-      .select('slug, name, activity_areas!primary_activity_area_id(slug)')
-      .eq('is_active', true)
-      .order('sort_order')
-      .then(({ data }) => {
-        if (data) setSeries(data as any)
-      })
+    Promise.all([
+      supabase
+        .from('product_series')
+        .select('slug, name, activity_areas!primary_activity_area_id(slug)')
+        .eq('is_active', true)
+        .order('sort_order'),
+      supabase
+        .from('products')
+        .select('series_slug')
+        .eq('published', true),
+    ]).then(([seriesResult, productsResult]) => {
+      const seriesData = seriesResult.data
+      const productData = productsResult.data
+      if (!seriesData) return
+
+      const seriesWithProducts = new Set((productData || []).map(p => p.series_slug).filter(Boolean))
+      const activeSeries = seriesData.filter(s => s.slug && seriesWithProducts.has(s.slug))
+
+      setSeries(activeSeries as any)
+
+      // Filter categories to only those with products
+      const activeAreaSlugs = new Set(
+        activeSeries
+          .map((s: any) => s.activity_areas?.slug)
+          .filter(Boolean)
+      )
+      setActiveCategorySlugs(activeAreaSlugs)
+    })
   }, [])
 
   // Laadi saidi seaded kui pole algsetest
@@ -402,7 +423,9 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
               <div className="flex-[3] bg-white p-5 border-r border-gray-100">
                 <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">{t('buildings')}</div>
                 <div className="grid grid-cols-2 gap-0.5">
-                  {categories.map(cat => (
+                  {categories
+                    .filter(cat => activeCategorySlugs.has(cat.slug))
+                    .map(cat => (
                     <Link
                       key={cat.slug}
                       href={`/tooted/${cat.slug}`}
@@ -412,7 +435,6 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
                       <cat.icon size={16} className="text-[#003366] group-hover:text-[#01a0dc] flex-shrink-0 transition-colors" />
                       <div>
                         <div className="text-[14px] font-medium text-gray-800 leading-tight">{tCat(cat.nameKey)}</div>
-                        <div className="text-[12px] text-gray-400">{cat.count} {tCat('products')}</div>
                       </div>
                     </Link>
                   ))}

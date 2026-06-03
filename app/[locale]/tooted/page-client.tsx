@@ -457,20 +457,28 @@ function TootedPageContent({
         .eq('is_active', true)
         .order('name')
 
-      if (areas) setTegevusalad(areas.map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
+      const { data: products } = await supabase
+        .from('products')
+        .select('series_slug')
+        .eq('published', true)
+
+      const seriesWithProducts = new Set((products || []).map(p => p.series_slug).filter(Boolean))
+      const activeSeries = (allSeries || []).filter(s => seriesWithProducts.has(s.slug))
+
+      const areaIdsWithProducts = new Set(
+        activeSeries
+          .map(s => (s as any).activity_areas?.slug)
+          .filter(Boolean)
+      )
+
+      if (areas) {
+        setTegevusalad(areas
+          .filter(a => areaIdsWithProducts.has(a.slug))
+          .map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
+      }
 
       if (allSeries) {
-        const seriesSlugs = allSeries.map(s => s.slug)
-        const { data: counts } = await supabase
-          .from('products')
-          .select('series_slug')
-          .in('series_slug', seriesSlugs)
-          .eq('published', true)
-
-        const slugSet = new Set((counts || []).map(c => c.series_slug).filter(Boolean))
-
-        setSeeriad(allSeries
-          .filter(s => slugSet.has(s.slug))
+        setSeeriad(activeSeries
           .map(s => ({ slug: s.slug, name_et: (s as any).name, parent_slug: (s as any).activity_areas?.slug || null })))
       }
     }

@@ -42,30 +42,49 @@ export default function ProductsLayoutWithSidebar({ children }: { children: Reac
     async function load() {
       const { data: areas } = await supabase
         .from('activity_areas')
-        .select('slug, name_et, sort_order')
+        .select('id, slug, name_et, sort_order')
         .eq('is_active', true)
         .order('sort_order')
 
       const { data: allSeries } = await supabase
         .from('product_series')
-        .select('slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
+        .select('id, slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
         .eq('is_active', true)
         .order('name')
 
-      if (areas) setTegevusalad(areas.map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
+      const { data: saa } = await supabase
+        .from('series_activity_areas')
+        .select('series_id, activity_area_id')
+
+      const { data: products } = await supabase
+        .from('products')
+        .select('series_slug')
+        .eq('published', true)
+
+      // Series that have published products
+      const seriesWithProducts = new Set((products || []).map(p => p.series_slug).filter(Boolean))
+      // Series objects that have products
+      const activeSeries = (allSeries || []).filter(s => seriesWithProducts.has(s.slug))
+      // Activity area IDs linked to those series
+      const saaMap = new Map<number, Set<unknown>>()
+      for (const r of saa || []) {
+        if (!saaMap.has(r.activity_area_id)) saaMap.set(r.activity_area_id, new Set())
+        saaMap.get(r.activity_area_id)!.add(r.series_id)
+      }
+      const areaIdsWithProducts = new Set(
+        activeSeries
+          .map(s => (s as any).activity_areas?.slug)
+          .filter(Boolean) as string[]
+      )
+
+      if (areas) {
+        setTegevusalad(areas
+          .filter(a => areaIdsWithProducts.has(a.slug))
+          .map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
+      }
 
       if (allSeries) {
-        const seriesSlugs = allSeries.map(s => s.slug)
-        const { data: counts } = await supabase
-          .from('products')
-          .select('series_slug')
-          .in('series_slug', seriesSlugs)
-          .eq('published', true)
-
-        const slugSet = new Set((counts || []).map(c => c.series_slug).filter(Boolean))
-
-        setSeeriad(allSeries
-          .filter(s => slugSet.has(s.slug))
+        setSeeriad(activeSeries
           .map(s => ({ slug: s.slug, name_et: (s as any).name.replace(/Grundfos\s*/g, ''), parent_slug: (s as any).activity_areas?.slug || null })))
       }
     }
