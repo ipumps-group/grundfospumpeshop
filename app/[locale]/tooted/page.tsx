@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
 import SafeImage from '@/components/SafeImage'
+import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 import TootedPageClient from './page-client'
 
 export const dynamic = 'force-dynamic'
@@ -57,7 +58,8 @@ async function CatalogView() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-[#003366] mb-8">{tNav('products')}</h1>
+        <ProductsLayoutWithSidebar>
+          <h1 className="text-3xl font-bold text-[#003366] mb-8">{tNav('products')}</h1>
 
         {areas
           .map(area => {
@@ -125,6 +127,7 @@ async function CatalogView() {
               </div>
             )
           })}
+          </ProductsLayoutWithSidebar>
       </div>
     </div>
   )
