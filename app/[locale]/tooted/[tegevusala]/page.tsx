@@ -114,37 +114,34 @@ async function getSeriesWithMeta(areaId: number, areaSlug: string, locale: strin
 
   if (!seriesList) return []
 
-  const result: SeriesWithMeta[] = []
-  for (const s of seriesList) {
-    const { count } = await supabaseAdmin
-      .from('products')
-      .select('*', { count: 'exact', head: true })
-      .eq('series_slug', (s as any).slug)
-      .eq('published', true)
+  const seriesSlugs = seriesList.map((s: any) => s.slug)
+  const { data: productData } = await supabaseAdmin
+    .from('products')
+    .select('series_slug, image_url')
+    .in('series_slug', seriesSlugs)
+    .eq('published', true)
 
-    const { data: firstProduct } = await supabaseAdmin
-      .from('products')
-      .select('image_url')
-      .eq('series_slug', (s as any).slug)
-      .eq('published', true)
-      .not('image_url', 'is', null)
-      .limit(1)
-      .single()
-
-    if (!count || count === 0) continue
-
-    result.push({
-      id: (s as any).id,
-      slug: (s as any).slug,
-      name: (s as any).name,
-      sort_order: (s as any).sort_order,
-      description: (s as any)[descField] || (s as any).description || '',
-      product_count: count,
-      image_url: firstProduct?.image_url || null,
-    })
+  const productMap = new Map<string, { count: number; image: string | null }>()
+  for (const p of productData || []) {
+    const slug = p.series_slug
+    if (!slug) continue
+    if (!productMap.has(slug)) productMap.set(slug, { count: 0, image: null })
+    const entry = productMap.get(slug)!
+    entry.count++
+    if (!entry.image && p.image_url) entry.image = p.image_url
   }
 
-  return result
+  return seriesList
+    .map((s: any) => ({
+      id: s.id,
+      slug: s.slug,
+      name: s.name,
+      sort_order: s.sort_order,
+      description: (s as any)[descField] || s.description || '',
+      product_count: productMap.get(s.slug)?.count || 0,
+      image_url: productMap.get(s.slug)?.image || null,
+    }))
+    .filter(s => s.product_count > 0)
 }
 
 export default async function CategoryPage({
