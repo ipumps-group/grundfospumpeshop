@@ -1,13 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 import XLSX from 'xlsx'
 import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
 
 const supabaseUrl = 'https://sdqnzyfmanflslsjhytf.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW56eWZtYW5mbHNsc2poeXRmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU1MDY3NSwiZXhwIjoyMDkxMTI2Njc1fQ.H3LiyHS8ZEgoqGd3TYmPoINGGwneMffASgzML2Aei8k'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const FILE = 'D:\\WORKS\\iPumps\\tooted-2026-06-01_kategooria_seeria_esiletostetud.xlsx'
+const FILE = fileURLToPath(new URL('tooted-2026-06-01_kategooria_seeria_esiletostetud.xlsx', import.meta.url))
 
 const CATEGORY_MAP = {
   'Küte': 'kuttepumbad',

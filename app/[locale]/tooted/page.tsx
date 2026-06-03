@@ -28,8 +28,6 @@ async function CatalogView() {
     'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWaterTitle',
   }
 
-  const areaSlugs = areas.map(a => a.slug)
-
   // Batch load series for all categories
   const { data: allSaa } = await supabaseAdmin
     .from('series_activity_areas')
@@ -60,66 +58,73 @@ async function CatalogView() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-[#003366] mb-8">{tNav('products')}</h1>
 
-        {areas.map(area => {
-          const areaDesc = locale === 'et' ? area.description : (area as any)[`description_${locale}`] || area.description
-          const titleKey = SLUG_TO_TITLE[area.slug]
-          const displayName = titleKey ? tCat(titleKey as any) : area.name_et
+        {areas
+          .map(area => {
+            const saaRows = (allSaa || []).filter((r: any) => r.activity_area_id === area.id)
+            const seriesIds = [...new Set(saaRows.map((r: any) => r.series_id) as number[])]
+            const areaSeries = seriesIds.map(id => psMap.get(id)).filter(Boolean) as { slug: string; name: string }[]
+            const hasProducts = areaSeries.some(s => (productMap.get(s.slug)?.count || 0) > 0)
+            return hasProducts ? { area, areaSeries } : null
+          })
+          .filter(Boolean)
+          .map((item: any) => {
+            const { area, areaSeries } = item
+            const areaDesc = locale === 'et' ? area.description : (area as any)[`description_${locale}`] || area.description
+            const titleKey = SLUG_TO_TITLE[area.slug]
+            const displayName = titleKey ? tCat(titleKey as any) : area.name_et
 
-          // Get series for this area
-          const saaRows = (allSaa || []).filter((r: any) => r.activity_area_id === area.id)
-          const seriesIds = [...new Set(saaRows.map((r: any) => r.series_id) as number[])]
-          const areaSeries = seriesIds.map(id => psMap.get(id)).filter(Boolean) as { slug: string; name: string }[]
-
-          const hasProducts = areaSeries.some(s => (productMap.get(s.slug)?.count || 0) > 0)
-          if (!hasProducts) return null
-
-          return (
-            <div key={area.slug} className="mb-12">
-              <div className="flex items-end justify-between mb-4">
-                <div>
-                  <Link href={`/tooted/${area.slug}`} className="text-2xl font-bold text-[#003366] hover:text-[#01a0dc] transition-colors">
-                    {displayName}
-                  </Link>
-                  {areaDesc && (
-                    <p className="text-[15px] text-gray-500 mt-1">{areaDesc}</p>
-                  )}
-                </div>
-                <Link href={`/tooted/${area.slug}`} className="text-[15px] text-[#003366] hover:underline font-medium flex-shrink-0">
-                  {tNav('allProducts')}
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {areaSeries.map(s => {
-                  const pm = productMap.get(s.slug)
-                  if (!pm || pm.count === 0) return null
-                  return (
-                    <Link
-                      key={s.slug}
-                      href={`/tooted/${area.slug}/${s.slug}`}
-                      className="group bg-white rounded-xl border border-gray-100 hover:border-[#003366]/20 hover:shadow-md transition-all duration-200 overflow-hidden"
-                    >
-                      <div className="aspect-square bg-gray-50 flex items-center justify-center p-6">
-                        {pm.image ? (
-                          <img src={pm.image} alt={s.name} className="h-16 object-contain group-hover:scale-105 transition-transform duration-200"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                        ) : (
-                          <div className="text-gray-300 text-3xl font-bold opacity-20">{s.name.charAt(0)}</div>
-                        )}
-                      </div>
-                      <div className="p-3">
-                        <div className="font-semibold text-gray-800 text-[14px] leading-tight group-hover:text-[#003366] transition-colors line-clamp-2">
-                          {s.name.replace(/^Grundfos\s*/i, '')}
-                        </div>
-                        <div className="text-[12px] text-gray-400 mt-1">{pm.count} {locale === 'et' ? 'toodet' : 'products'}</div>
-                      </div>
+            return (
+              <div key={area.slug} className="mb-12">
+                <div className="flex items-end justify-between mb-4">
+                  <div>
+                    <Link href={`/tooted/${area.slug}`} className="text-2xl font-bold text-[#003366] hover:text-[#01a0dc] transition-colors">
+                      {displayName}
                     </Link>
-                  )
-                })}
+                    {areaDesc && (
+                      <p className="text-[15px] text-gray-500 mt-1">{areaDesc}</p>
+                    )}
+                  </div>
+                  <Link href={`/tooted/${area.slug}`} className="text-[15px] text-[#003366] hover:underline font-medium flex-shrink-0">
+                    {tNav('allProducts')}
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {areaSeries
+                    .map((s: any) => {
+                      const pm = productMap.get(s.slug)
+                      return (pm && pm.count > 0) ? { s, pm } : null
+                    })
+                    .filter(Boolean)
+                    .map((item: any) => {
+                      const { s, pm } = item
+                      return (
+                        <Link
+                          key={s.slug}
+                          href={`/tooted/${area.slug}/${s.slug}`}
+                          className="group bg-white rounded-xl border border-gray-100 hover:border-[#003366]/20 hover:shadow-md transition-all duration-200 overflow-hidden"
+                        >
+                          <div className="aspect-square bg-gray-50 flex items-center justify-center p-6">
+                            {pm.image ? (
+                              <img src={pm.image} alt={s.name} className="h-16 object-contain group-hover:scale-105 transition-transform duration-200"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                            ) : (
+                              <div className="text-gray-300 text-3xl font-bold opacity-20">{s.name.charAt(0)}</div>
+                            )}
+                          </div>
+                          <div className="p-3">
+                            <div className="font-semibold text-gray-800 text-[14px] leading-tight group-hover:text-[#003366] transition-colors line-clamp-2">
+                              {s.name.replace(/^Grundfos\s*/i, '')}
+                            </div>
+                            <div className="text-[12px] text-gray-400 mt-1">{pm.count} {locale === 'et' ? 'toodet' : 'products'}</div>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
       </div>
     </div>
   )
