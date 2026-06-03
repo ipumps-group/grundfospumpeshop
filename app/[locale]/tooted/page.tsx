@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
+import SafeImage from '@/components/SafeImage'
 import TootedPageClient from './page-client'
 
 export const dynamic = 'force-dynamic'
@@ -106,8 +107,7 @@ async function CatalogView() {
                         >
                           <div className="aspect-square bg-gray-50 flex items-center justify-center p-6">
                             {pm.image ? (
-                              <img src={pm.image} alt={s.name} className="h-16 object-contain group-hover:scale-105 transition-transform duration-200"
-                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                              <SafeImage src={pm.image} alt={s.name} className="h-16 object-contain group-hover:scale-105 transition-transform duration-200" />
                             ) : (
                               <div className="text-gray-300 text-3xl font-bold opacity-20">{s.name.charAt(0)}</div>
                             )}
