@@ -239,13 +239,14 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
           <div className="flex items-center gap-4 h-16">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center flex-shrink-0" aria-label="iPumps home">
+            <Link href="/" className="flex items-center flex-shrink-0" aria-label="Pumbapood home">
               <Image 
                 src="/ipumps-logo-white.svg" 
-                alt="iPumps" 
-                width={100}
-                height={32}
-                className="h-8 w-auto"
+                alt="Pumbapood" 
+                width={189}
+                height={36}
+                className="w-auto"
+                style={{ height: 36 }}
                 priority
               />
             </Link>

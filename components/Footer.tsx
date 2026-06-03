@@ -98,10 +98,11 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
             <Link href="/et" className="mb-4 block">
               <Image 
                 src="/ipumps-logo-white.svg" 
-                alt="iPumps" 
-                width={100}
-                height={28}
-                className="h-7 w-auto"
+                alt="Pumbapood" 
+                width={189}
+                height={36}
+                className="w-auto"
+                style={{ height: 36 }}
                 priority
               />
             </Link>

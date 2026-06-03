@@ -209,7 +209,9 @@
     "sort": "Rūšiuoti",
     "searchInCategory": "Ieškoti šioje kategorijoje...",
     "suggestCategory": "Gal turėjote omenyje kategoriją {name}?",
-    "showProducts": "Rodyti {name} produktus"
+    "showProducts": "Rodyti {name} produktus",
+    "noSeries": "Šioje kategorijoje nėra serijų",
+    "seriesProductCount": "{count} {count, plural, one {produktas} other {produktai}}"
   },
   "product": {
     "inStock": "Sandėlyje",

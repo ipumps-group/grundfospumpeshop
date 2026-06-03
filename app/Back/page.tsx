@@ -117,7 +117,7 @@ function Header() {
         <div className="flex items-center gap-6 h-16">
           {/* Logo */}
           <a href="/" className="flex items-center flex-shrink-0">
-            <img src="/ipumps-logo-white.svg" alt="iPumps" className="h-8 w-auto" />
+            <img src="/ipumps-logo-white.svg" alt="Pumbapood" style={{ height: 36 }} className="w-auto" />
           </a>
 
           {/* Nav links */}
@@ -572,7 +572,7 @@ function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div className="col-span-2 lg:col-span-1">
             <div className="mb-4">
-              <img src="/ipumps-logo-white.svg" alt="iPumps" className="h-7 w-auto" />
+              <img src="/ipumps-logo-white.svg" alt="Pumbapood" style={{ height: 36 }} className="w-auto" />
             </div>
             <p className="text-sm leading-relaxed mb-4">
               Grundfos pumpade ametlik edasimüüja Eestis. Tooted, paigaldus ja hooldus.

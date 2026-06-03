@@ -455,10 +455,24 @@ function TootedPageContent({
         .from('product_series')
         .select('slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
         .eq('is_active', true)
-        .order('sort_order')
+        .order('name')
 
       if (areas) setTegevusalad(areas.map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
-      if (allSeries) setSeeriad(allSeries.map(s => ({ slug: s.slug, name_et: (s as any).name, parent_slug: (s as any).activity_areas?.slug || null })))
+
+      if (allSeries) {
+        const seriesSlugs = allSeries.map(s => s.slug)
+        const { data: counts } = await supabase
+          .from('products')
+          .select('series_slug')
+          .in('series_slug', seriesSlugs)
+          .eq('published', true)
+
+        const slugSet = new Set((counts || []).map(c => c.series_slug).filter(Boolean))
+
+        setSeeriad(allSeries
+          .filter(s => slugSet.has(s.slug))
+          .map(s => ({ slug: s.slug, name_et: (s as any).name, parent_slug: (s as any).activity_areas?.slug || null })))
+      }
     }
     loadCategories()
   }, [initCategories, initSeries])

@@ -39,12 +39,8 @@ function addToCart(product: Product) {
 // ─── TOOTEKAART (GRID) ─────────────────────────────────────────────────────
 function ProductCard({ product }: { product: Product }) {
   const t = useTranslations('products')
-  const locale = useLocale()
   const [added, setAdded] = useState(false)
   const displayPrice = product.sale_price ?? product.price
-
-  const desc = ((product as unknown) as Record<string, unknown>)[`short_description_${locale}`] as string | null
-    || product.short_description_et
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
@@ -76,9 +72,6 @@ function ProductCard({ product }: { product: Product }) {
         <div className="font-semibold text-gray-800 text-[15px] leading-tight mb-2 group-hover:text-[#003366] transition-colors line-clamp-2 flex-1">
           {product.name}
         </div>
-        {desc && (
-          <div className="text-[13px] text-gray-400 line-clamp-1 mb-3">{desc}</div>
-        )}
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
           <div>
             <div className="text-lg font-bold text-[#003366]">

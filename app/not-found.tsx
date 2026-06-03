@@ -18,7 +18,7 @@ export default async function NotFound() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="mb-6">
-          <img src="/ipumps-logo-white.svg" alt="iPumps" className="h-10 mx-auto opacity-30" />
+          <img src="/ipumps-logo-white.svg" alt="Pumbapood" style={{ height: 36 }} className="mx-auto opacity-30" />
         </div>
         <div className="text-7xl font-bold text-[#003366] mb-3">404</div>
         <h1 className="text-2xl font-bold text-gray-800 mb-3">{t.notFound}</h1>

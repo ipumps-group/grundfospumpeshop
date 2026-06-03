@@ -33,7 +33,7 @@ function eq(a: unknown, b: unknown): boolean {
 
 const HEADER_TO_FIELD: Record<string, string> = {
   'SKU': 'sku', 'Nimi': 'name', 'Kategooria': 'category',
-  'Tähtsus (1–10)': 'importance', 'Hind (€)': 'price', 'Müügihind (€)': 'sale_price',
+  'Tähtsus (1–10)': 'importance', 'Hind (€)': 'price', 'Uus hind (€)': 'price', 'Müügihind (€)': 'sale_price',
   'Laos': 'in_stock', 'Avaldatud': 'published', 'Lühikirjeldus': 'short_description_et',
   'Sildid': 'tags', 'Kaal (kg)': 'weight_kg', 'Pikkus (cm)': 'length_cm',
   'Laius (cm)': 'width_cm', 'Kõrgus (cm)': 'height_cm', 'Slug': 'slug',

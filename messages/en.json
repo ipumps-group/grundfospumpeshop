@@ -209,7 +209,9 @@
     "sort": "Sort",
     "searchInCategory": "Search in this category...",
     "suggestCategory": "Did you mean category {name}?",
-    "showProducts": "Show {name} products"
+    "showProducts": "Show {name} products",
+    "noSeries": "No series in this category",
+    "seriesProductCount": "{count} {count, plural, one {product} other {products}}"
   },
   "product": {
     "inStock": "In stock",

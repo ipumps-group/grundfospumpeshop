@@ -209,7 +209,9 @@
     "sort": "Сортировать",
     "searchInCategory": "Поиск в этой категории...",
     "suggestCategory": "Возможно, вы искали категорию {name}?",
-    "showProducts": "Показать товары {name}"
+    "showProducts": "Показать товары {name}",
+    "noSeries": "В этой категории нет серий",
+    "seriesProductCount": "{count} {count, plural, one {товар} other {товаров}}"
   },
   "product": {
     "inStock": "В наличии",

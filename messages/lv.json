@@ -209,7 +209,9 @@
     "sort": "Kārtot",
     "searchInCategory": "Meklēt šajā kategorijā...",
     "suggestCategory": "Varbūt domājāt kategoriju {name}?",
-    "showProducts": "Parādīt {name} produktus"
+    "showProducts": "Parādīt {name} produktus",
+    "noSeries": "Šajā kategorijā nav sēriju",
+    "seriesProductCount": "{count} {count, plural, one {produkts} other {produkti}}"
   },
   "product": {
     "inStock": "Noliktavā",

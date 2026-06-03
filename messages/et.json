@@ -211,7 +211,9 @@
     "sort": "Sorteeri",
     "searchInCategory": "Otsi selles kategoorias...",
     "suggestCategory": "Kas mõtlesid kategooriat {name}?",
-    "showProducts": "Näita {name} tooteid"
+    "showProducts": "Näita {name} tooteid",
+    "noSeries": "Selles kategoorias ei ole ühtegi seeriat.",
+    "seriesProductCount": "{count} {count, plural, one {toode} other {toodet}}"
   },
   "product": {
     "inStock": "Laos",

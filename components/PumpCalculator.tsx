@@ -358,6 +358,7 @@ export default function PumpCalculator() {
       .from('products')
       .select('id, slug, name, sku, price, sale_price, image_url, in_stock, short_description_et', { count: 'exact' })
       .in('id', productIds)
+      .order('importance', { ascending: true, nullsFirst: false })
       .order('name')
       .limit(6)
 

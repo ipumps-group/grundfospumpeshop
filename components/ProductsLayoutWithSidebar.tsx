@@ -50,22 +50,38 @@ export default function ProductsLayoutWithSidebar({ children }: { children: Reac
         .from('product_series')
         .select('slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
         .eq('is_active', true)
-        .order('sort_order')
+        .order('name')
 
       if (areas) setTegevusalad(areas.map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
-      if (allSeries) setSeeriad(allSeries.map(s => ({ slug: s.slug, name_et: (s as any).name.replace(/Grundfos\s*/g, ''), parent_slug: (s as any).activity_areas?.slug || null })))
+
+      if (allSeries) {
+        const seriesSlugs = allSeries.map(s => s.slug)
+        const { data: counts } = await supabase
+          .from('products')
+          .select('series_slug')
+          .in('series_slug', seriesSlugs)
+          .eq('published', true)
+
+        const slugSet = new Set((counts || []).map(c => c.series_slug).filter(Boolean))
+
+        setSeeriad(allSeries
+          .filter(s => slugSet.has(s.slug))
+          .map(s => ({ slug: s.slug, name_et: (s as any).name.replace(/Grundfos\s*/g, ''), parent_slug: (s as any).activity_areas?.slug || null })))
+      }
     }
     load()
   }, [])
 
   const handleSetAla = (v: string) => {
-    if (v) router.push(`/tooted/${v}`)
-    else router.push('/tooted')
+    router.push(v ? `/tooted/${v}` : '/tooted')
   }
 
   const handleSetSeeria = (v: string) => {
-    if (v) router.push(`/tooted/${currentTegevusala}/${v}`)
-    else if (currentTegevusala) router.push(`/tooted/${currentTegevusala}`)
+    if (v) {
+      const series = seeriad.find(c => c.slug === v) ?? seeriad.flatMap(c => c.children || []).find(c => c.slug === v)
+      const areaSlug = series?.parent_slug || currentTegevusala
+      if (areaSlug) router.push(`/tooted/${areaSlug}/${v}`)
+    } else if (currentTegevusala) router.push(`/tooted/${currentTegevusala}`)
     else router.push('/tooted')
   }
 

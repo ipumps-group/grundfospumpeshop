@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import {
@@ -39,6 +39,8 @@ export interface Product {
   tags: string | null
   curve_url: string | null
   drawing_url: string | null
+  series_slug: string | null
+  primary_activity_area_slug: string | null
 }
 
 export interface Attribute {
@@ -109,12 +111,72 @@ function addToCart(product: Product, qty: number) {
 
 function Breadcrumb({ product }: { product: Product }) {
   const tNav = useTranslations('nav')
+  const tCat = useTranslations('categories')
+  const [catName, setCatName] = useState('')
+  const [seriesName, setSeriesName] = useState('')
+
+  const SLUG_TO_CAT_KEY: Record<string, string> = {
+    'kuttepumbad': 'heatingTitle', 'puurkaevupumbad': 'borewellTitle',
+    'salvkaevupumbad': 'wellsTitle', 'drenaazipumbad': 'drainageTitle',
+    'rohutostepumbad': 'pressureTitle', 'reoveepumbad': 'sewageTitle',
+    'veeautomaadid': 'jpWaterAutomaticsTitle',
+    'tsirkulatsioonipumbad-soe-tarbevesi': 'hotWaterTitle',
+  }
+
+  useEffect(() => {
+    async function load() {
+      const { supabase } = await import('@/lib/supabase')
+      const areaSlug = product.primary_activity_area_slug
+      const seriesSlug = product.series_slug
+
+      if (areaSlug) {
+        const key = SLUG_TO_CAT_KEY[areaSlug]
+        if (key) {
+          setCatName(tCat(key as any))
+        } else {
+          const { data: area } = await supabase
+            .from('activity_areas')
+            .select('name_et')
+            .eq('slug', areaSlug)
+            .single()
+          if (area) setCatName((area as any).name_et)
+        }
+      }
+
+      if (seriesSlug) {
+        const { data: series } = await supabase
+          .from('product_series')
+          .select('name')
+          .eq('slug', seriesSlug)
+          .single()
+        if (series) setSeriesName((series as any).name)
+      }
+    }
+    load()
+  }, [product.primary_activity_area_slug, product.series_slug, tCat])
+
   return (
     <nav className="bg-gray-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2 text-[15px] text-gray-500 flex-wrap">
         <a href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</a>
         <ChevronRight size={14} className="text-gray-300" />
         <a href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</a>
+        {catName && (
+          <>
+            <ChevronRight size={14} className="text-gray-300" />
+            <a href={`/tooted/${product.primary_activity_area_slug}`} className="hover:text-[#003366] transition-colors">
+              {catName}
+            </a>
+          </>
+        )}
+        {seriesName && (
+          <>
+            <ChevronRight size={14} className="text-gray-300" />
+            <a href={`/tooted/${product.primary_activity_area_slug}/${product.series_slug}`} className="hover:text-[#003366] transition-colors">
+              {seriesName}
+            </a>
+          </>
+        )}
         <ChevronRight size={14} className="text-gray-300" />
         <span className="text-gray-800 font-medium truncate max-w-xs">{product.name}</span>
       </div>
