@@ -256,14 +256,14 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
               className="hidden lg:flex items-center gap-1 flex-1"
               onMouseEnter={() => setMegaOpen(true)}
             >
-              <button className={`flex items-center gap-1 px-3 py-2 rounded text-[15px] font-medium transition-colors hover:bg-white/10 ${megaOpen ? 'text-white' : 'text-white/90 hover:text-white'}`}>
+              <Link href="/tooted" className={`flex items-center gap-1 px-3 py-2 rounded text-[15px] font-medium transition-colors hover:bg-white/10 ${megaOpen ? 'text-white' : 'text-white/90 hover:text-white'}`}
+                onMouseEnter={() => setMegaOpen(true)}>
                 {t('buildings')}
-                <ChevronDown size={14} className={`transition-transform duration-200 ${megaOpen ? 'rotate-180' : ''}`} />
-              </button>
-              <button className={`flex items-center gap-1 px-3 py-2 rounded text-[15px] font-medium transition-colors hover:bg-white/10 ${megaOpen ? 'text-white' : 'text-white/90 hover:text-white'}`}>
+              </Link>
+              <Link href="/tooted" className={`flex items-center gap-1 px-3 py-2 rounded text-[15px] font-medium transition-colors hover:bg-white/10 ${megaOpen ? 'text-white' : 'text-white/90 hover:text-white'}`}
+                onMouseEnter={() => setMegaOpen(true)}>
                 {t('products')}
-                <ChevronDown size={14} className={`transition-transform duration-200 ${megaOpen ? 'rotate-180' : ''}`} />
-              </button>
+              </Link>
 <Link href="/leht/kontakt"
                 onMouseEnter={() => setMegaOpen(false)}
                 className={`px-3 py-2 rounded text-[15px] font-medium transition-colors hover:bg-white/10 ${megaOpen ? 'text-white' : 'text-white/90 hover:text-white'}`}>
