@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Search, ChevronDown, LayoutGrid, List } from 'lucide-react'
+import { ViewModeProvider, useViewMode } from '@/lib/ViewModeContext'
 import { useTranslations } from 'next-intl'
 import { supabase } from '@/lib/supabase'
 import { FiltersPanel, type Category } from '@/components/ProductFiltersSidebar'
@@ -15,6 +16,15 @@ const SORT_OPTIONS = [
 ]
 
 export default function ProductsLayoutWithSidebar({ children }: { children: React.ReactNode }) {
+  return (
+    <ViewModeProvider>
+      <ProductsLayoutInner>{children}</ProductsLayoutInner>
+    </ViewModeProvider>
+  )
+}
+
+function ProductsLayoutInner({ children }: { children: React.ReactNode }) {
+  const { viewMode, setViewMode } = useViewMode()
   const [tegevusalad, setTegevusalad] = useState<Category[]>([])
   const [seeriad, setSeeriad] = useState<Category[]>([])
   const [selectedAla, setSelectedAla] = useState('')
@@ -24,7 +34,6 @@ export default function ProductsLayoutWithSidebar({ children }: { children: Reac
   const [priceMax, setPriceMax] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOpen, setSortOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const router = useRouter()
   const params = useParams()
   const currentTegevusala = (params?.tegevusala as string) || ''

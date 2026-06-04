@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
         push({ phase: 'fetching', msg: `Andmed laetud — alustan võrdlemist...` })
 
         // Phase 3: process rows
-        let updated = 0, skipped = 0, unchanged = 0
+        let updated = 0, created = 0, skipped = 0, unchanged = 0
         const errors: string[] = []
         const total = rows.length
 
@@ -160,10 +160,8 @@ export async function POST(req: NextRequest) {
             push({ phase: 'processing', current: i + 1, total, pct, msg: `Töötlen toodet ${i + 1} / ${total}` })
           }
 
-          const prod = productBySku[sku]
-          if (!prod) { skipped++; continue }
-
-          const productUpdate: Record<string, unknown> = {}
+          // Build field values from row
+          const productData: Record<string, unknown> = { sku }
           const attrUpdates: Array<{ name: string; value: string }> = []
 
           colMap.forEach((col, ci) => {
@@ -175,12 +173,12 @@ export async function POST(req: NextRequest) {
                 case 'slug': case 'name': case 'short_description_et': case 'tags':
                 case 'image_url': case 'curve_url': case 'drawing_url':
                 case 'category_gf': case 'url_gf':
-                  productUpdate[col.field] = parseStr(raw); break
+                  productData[col.field] = parseStr(raw); break
                 case 'price': case 'sale_price': case 'weight_kg': case 'length_cm':
                 case 'width_cm': case 'height_cm': case 'importance':
-                  productUpdate[col.field] = parseNum(raw); break
+                  productData[col.field] = parseNum(raw); break
                 case 'in_stock': case 'published':
-                  productUpdate[col.field] = parseBool(raw); break
+                  productData[col.field] = parseBool(raw); break
               }
             } else if (col.type === 'attr') {
               const val = parseStr(raw)
@@ -188,7 +186,37 @@ export async function POST(req: NextRequest) {
             }
           })
 
-          const prodChanged = Object.entries(productUpdate).some(
+          const prod = productBySku[sku]
+
+          // ── New product ──────────────────────────────────────────────────
+          if (!prod) {
+            try {
+              // Ensure required fields
+              if (!productData['name']) productData['name'] = sku
+              if (!productData['slug']) {
+                productData['slug'] = sku.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+              }
+              const { data: newProd, error: insErr } = await supabaseAdmin
+                .from('products')
+                .insert({ ...productData, created_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+                .select('id')
+                .single()
+              if (insErr) { errors.push(`${sku}: ${insErr.message}`); continue }
+
+              if (hasAttrCols && attrUpdates.length > 0) {
+                await supabaseAdmin.from('product_attributes').insert(
+                  attrUpdates.map(a => ({ product_id: newProd.id, attribute_name: a.name, attribute_value: a.value }))
+                )
+              }
+              created++
+            } catch (e) {
+              errors.push(`${sku}: ${e instanceof Error ? e.message : 'Tundmatu viga'}`)
+            }
+            continue
+          }
+
+          // ── Existing product — detect diff ──────────────────────────────
+          const prodChanged = Object.entries(productData).some(
             ([k, v]) => !eq((prod as Record<string, unknown>)[k], v)
           )
 
@@ -207,7 +235,7 @@ export async function POST(req: NextRequest) {
             if (prodChanged) {
               const { error: pErr } = await supabaseAdmin
                 .from('products')
-                .update({ ...productUpdate, updated_at: new Date().toISOString() })
+                .update({ ...productData, updated_at: new Date().toISOString() })
                 .eq('id', prod.id)
               if (pErr) { errors.push(`${sku}: ${pErr.message}`); continue }
             }
@@ -225,7 +253,7 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        push({ phase: 'done', updated, unchanged, skipped, errors: errors.slice(0, 20), total_errors: errors.length })
+        push({ phase: 'done', updated, unchanged, skipped, created, errors: errors.slice(0, 20), total_errors: errors.length })
       } catch (e) {
         push({ phase: 'error', msg: e instanceof Error ? e.message : 'Tundmatu viga' })
       } finally {

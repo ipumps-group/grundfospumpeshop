@@ -19,6 +19,7 @@ interface ProgressEvent {
   updated?: number
   unchanged?: number
   skipped?: number
+  created?: number
   errors?: string[]
   total_errors?: number
 }
@@ -27,6 +28,7 @@ interface Result {
   updated: number
   unchanged: number
   skipped: number
+  created: number
   errors: string[]
   total_errors: number
 }
@@ -92,6 +94,7 @@ export default function ImportPage() {
                 updated: event.updated ?? 0,
                 unchanged: event.unchanged ?? 0,
                 skipped: event.skipped ?? 0,
+                created: event.created ?? 0,
                 errors: event.errors ?? [],
                 total_errors: event.total_errors ?? 0,
               })
@@ -216,9 +219,10 @@ export default function ImportPage() {
               <div className="text-[15px] text-green-800">
                 <p className="font-semibold">Import lõpetatud</p>
                 <p className="mt-0.5">
+                  {result.created > 0 && <><span className="font-bold">{result.created}</span> loodud, </>}
                   <span className="font-bold">{result.updated}</span> uuendatud
                   {result.unchanged > 0 && <>, <span className="font-bold">{result.unchanged}</span> muutmata</>}
-                  {result.skipped > 0 && <>, <span className="font-bold">{result.skipped}</span> ei leitud</>}
+                  {result.skipped > 0 && <>, <span className="font-bold">{result.skipped}</span> vahelejäetud</>}
                   {result.total_errors > 0 && <>, <span className="font-bold text-red-600">{result.total_errors}</span> viga</>}
                 </p>
               </div>
