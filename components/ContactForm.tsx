@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Send, CheckCircle } from 'lucide-react'
+import { trackContactFormSubmit } from '@/lib/google-ads'
 import { useTranslations } from 'next-intl'
 
 export default function ContactForm({ pageId }: { pageId?: string }) {
@@ -39,6 +40,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
     }
 
     setSent(true)
+    trackContactFormSubmit()
   }
 
   if (sent) {

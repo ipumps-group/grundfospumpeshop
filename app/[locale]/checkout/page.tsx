@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { trackBeginCheckout } from '@/lib/google-ads'
 import Link from 'next/link'
 import {
   ChevronRight, Lock, Loader2, AlertCircle,
@@ -90,10 +91,21 @@ export default function CheckoutPage() {
   const [loading, setLoading]   = useState(false)
   const [apiError, setApiError] = useState('')
 
+  const tracked = useRef(false)
+
   useEffect(() => {
     setItems(getCart())
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (items.length > 0 && !tracked.current) {
+      tracked.current = true
+      const value = subtotal - discount + vat
+      try { sessionStorage.setItem('pumbapood_last_checkout_value', String(value)) } catch {}
+      trackBeginCheckout(value)
+    }
+  }, [items, subtotal, discount, vat])
 
   const subtotal  = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount  = coupon ? coupon.discountAmount : 0

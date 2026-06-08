@@ -3,14 +3,27 @@
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { trackPurchase } from '@/lib/google-ads'
 
 function SuccessContent() {
   const t = useTranslations('checkout')
   const tCart = useTranslations('cart')
   const searchParams = useSearchParams()
   const ref = searchParams.get('ref') || ''
+
+  useEffect(() => {
+    if (!ref) return
+    const key = 'pumbapood_tracked_purchase'
+    try {
+      if (sessionStorage.getItem(key)) return
+      sessionStorage.setItem(key, '1')
+    } catch {}
+    const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('pumbapood_last_checkout_value') : null
+    const value = raw ? Number(raw) : undefined
+    trackPurchase(value, ref)
+  }, [ref])
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

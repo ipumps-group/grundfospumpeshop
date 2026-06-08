@@ -97,6 +97,11 @@ s.parentNode.insertBefore(t,s)}(window,document,'script',
 fbq('init','2133761077401963');
 fbq('track','PageView');`}
         </Script>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-18154845685" strategy="afterInteractive" />
+        <Script id="google-ads-config" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','AW-18154845685');`}
+        </Script>
       </head>
       <body className={inter.className}>
         <noscript><img height="1" width="1" style={{display:'none'}} src="https://www.facebook.com/tr?id=2133761077401963&ev=PageView&noscript=1" /></noscript>
