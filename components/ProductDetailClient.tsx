@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { groupBySection } from '@/lib/spec-sections'
 import { withVat, fmt } from '@/lib/price'
+import { trackMetaViewContent } from '@/lib/meta-pixel'
 
 // ─── TÜÜBID ────────────────────────────────────────────────────────────────
 
@@ -654,6 +655,18 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product, attributes, attrNameMap, related, documents }: ProductDetailClientProps) {
   const t = useTranslations('product')
   const locale = useLocale()
+
+  useEffect(() => {
+    if (!product) return
+    const displayPrice = product.sale_price ?? product.price
+    trackMetaViewContent({
+      content_ids: [String(product.id)],
+      content_name: product.name,
+      content_category: product.primary_activity_area_slug || undefined,
+      value: displayPrice,
+      currency: 'EUR',
+    })
+  }, [product])
 
   if (!product) {
     return (

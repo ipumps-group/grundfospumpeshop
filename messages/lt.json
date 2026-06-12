@@ -525,5 +525,11 @@
   },
   "tegevusalad": { "kute": "Šildymo siurbliai", "jahutus": "Aušinimo siurbliai", "sooja-tarbevee-tsirkulatsioonipump": "Karšto vandens cirkuliacija", "puurkaevud": "Gilynių siurbliai", "drenaaz": "Drenavimo siurbliai", "salvkaevud": "Šulinių siurbliai", "rohutoste": "Slėgio didinimo siurbliai", "reovesi": "Nuotekų siurbliai" },
   "tegevusaladTitle": { "kute": "Šildymo siurbliai – {count} modeliai | iPumps", "jahutus": "Aušinimas – {count} | iPumps", "sooja-tarbevee-tsirkulatsioonipump": "Karštas vanduo – {count} | iPumps", "puurkaevud": "Gilyniai – {count} | iPumps", "drenaaz": "Drenavimas – {count} | iPumps", "salvkaevud": "Šuliniai – {count} | iPumps", "rohutoste": "Slėgis – {count} | iPumps", "reovesi": "Nuotekos – {count} | iPumps" },
-  "tegevusaladDesc": { "kute": "Grundfos šildymo siurbliai namams.", "jahutus": "Aušinimo siurbliai sistemoms.", "sooja-tarbevee-tsirkulatsioonipump": "Karšto vandens cirkuliacija.", "puurkaevud": "Gilynių siurbliai šuliniams.", "drenaaz": "Drenavimo siurbliai rūsiams.", "salvkaevud": "Šulinių siurbliai paviršiams.", "rohutoste": "Slėgio didinimo siurbliai.", "reovesi": "Nuotekų siurbliai." }
+  "tegevusaladDesc": { "kute": "Grundfos šildymo siurbliai namams.", "jahutus": "Aušinimo siurbliai sistemoms.", "sooja-tarbevee-tsirkulatsioonipump": "Karšto vandens cirkuliacija.", "puurkaevud": "Gilynių siurbliai šuliniams.", "drenaaz": "Drenavimo siurbliai rūsiams.", "salvkaevud": "Šulinių siurbliai paviršiams.", "rohutoste": "Slėgio didinimo siurbliai.", "reovesi": "Nuotekų siurbliai." },
+  "cookieConsent": {
+    "message": "Naudojame slapukus svetainės veikimui ir lankomumo statistikai.",
+    "learnMore": "Skaityti daugiau",
+    "acceptAll": "Sutikti",
+    "essential": "Tik būtini"
+  }
 }

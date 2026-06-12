@@ -525,5 +525,11 @@
   },
   "tegevusalad": { "kute": "Sildīšanas sūkņi", "jahutus": "Dzesēšanas sūkņi", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija", "puurkaevud": "Urbuma sūkņi", "drenaaz": "Drenāžas sūkņi", "salvkaevud": "Akas sūkņi", "rohutoste": "Spiediena sūkņi", "reovesi": "Notekūdeņu sūkņi" },
   "tegevusaladTitle": { "kute": "Sildīšanas sūkņi – {count} modeļi | iPumps", "jahutus": "Dzesēšanas sūkņi – {count} | iPumps", "sooja-tarbevee-tsirkulatsioonipump": "Karstais ūdens – {count} | iPumps", "puurkaevud": "Urbuma sūkņi – {count} | iPumps", "drenaaz": "Drenāža – {count} | iPumps", "salvkaevud": "Akas sūkņi – {count} | iPumps", "rohutoste": "Spiediens – {count} | iPumps", "reovesi": "Notekūdeņi – {count} | iPumps" },
-  "tegevusaladDesc": { "kute": "Grundfos sildīšanas sūkņi mājām.", "jahutus": "Dzesēšanas sūkņi sistēmām.", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija.", "puurkaevud": "Dziļie sūkņi urbumiem.", "drenaaz": "Drenāžas sūkņi pagrabiem.", "salvkaevud": "Akas sūkņi virsējiem ūdeņiem.", "rohutoste": "Spiediena sūkņi ūdens spiedienam.", "reovesi": "Notekūdeņu sūkņi." }
+  "tegevusaladDesc": { "kute": "Grundfos sildīšanas sūkņi mājām.", "jahutus": "Dzesēšanas sūkņi sistēmām.", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija.", "puurkaevud": "Dziļie sūkņi urbumiem.", "drenaaz": "Drenāžas sūkņi pagrabiem.", "salvkaevud": "Akas sūkņi virsējiem ūdeņiem.", "rohutoste": "Spiediena sūkņi ūdens spiedienam.", "reovesi": "Notekūdeņu sūkņi." },
+  "cookieConsent": {
+    "message": "Mēs izmantojam sīkfailus vietnes darbībai un apmeklējumu statistikai.",
+    "learnMore": "Uzzināt vairāk",
+    "acceptAll": "Piekrist",
+    "essential": "Tikai obligātie"
+  }
 }

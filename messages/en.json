@@ -558,5 +558,11 @@
     "salvkaevud": "Well pumps for surface water. Powerful and reliable.",
     "rohutoste": "Pressure boosting pumps for water pressure. Even water pressure in the house.",
     "reovesi": "Sewage pumps for sewerage. Strong and durable."
+  },
+  "cookieConsent": {
+    "message": "We use cookies to operate the site and collect visit statistics.",
+    "learnMore": "Learn more",
+    "acceptAll": "Accept all",
+    "essential": "Only essential"
   }
 }

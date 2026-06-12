@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { trackBeginCheckout } from '@/lib/google-ads'
+import { trackMetaInitiateCheckout } from '@/lib/meta-pixel'
 import Link from 'next/link'
 import {
   ChevronRight, Lock, Loader2, AlertCircle,
@@ -98,19 +99,26 @@ export default function CheckoutPage() {
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (items.length > 0 && !tracked.current) {
-      tracked.current = true
-      const value = subtotal - discount + vat
-      try { sessionStorage.setItem('pumbapood_last_checkout_value', String(value)) } catch {}
-      trackBeginCheckout(value)
-    }
-  }, [items, subtotal, discount, vat])
-
   const subtotal  = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount  = coupon ? coupon.discountAmount : 0
   const vat       = (subtotal - discount) * VAT_RATE
   const total     = subtotal - discount + vat
+
+  useEffect(() => {
+    if (items.length > 0 && !tracked.current) {
+      tracked.current = true
+      const value = subtotal - discount + vat
+      const contentIds = items.map(i => String(i.id))
+      const contents = items.map(i => ({ id: String(i.id), quantity: i.qty }))
+      const numItems = items.reduce((s, i) => s + i.qty, 0)
+      try {
+        sessionStorage.setItem('pumbapood_last_checkout_value', String(value))
+        sessionStorage.setItem('pumbapood_last_checkout_items', JSON.stringify(contents.map(c => ({ id: Number(c.id), qty: c.quantity }))))
+      } catch {}
+      trackBeginCheckout(value)
+      trackMetaInitiateCheckout({ value, currency: 'EUR', content_ids: contentIds, contents, num_items: numItems })
+    }
+  }, [items, subtotal, discount, vat])
 
   const validate = useCallback((): boolean => {
     const e: Record<string, string> = {}

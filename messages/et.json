@@ -560,5 +560,11 @@
     "driveTime": "Sõiduaeg",
     "min": "min",
     "openInGoogleMaps": "Ava Google Mapsis"
+  },
+  "cookieConsent": {
+    "message": "Kasutame küpsiseid saidi toimimiseks ja külastusstatistika kogumiseks.",
+    "learnMore": "Loe lähemalt",
+    "acceptAll": "Nõustun",
+    "essential": "Ainult vajalikud"
   }
 }

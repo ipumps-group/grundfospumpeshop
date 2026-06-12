@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { trackPurchase } from '@/lib/google-ads'
+import { trackMetaPurchase } from '@/lib/meta-pixel'
 
 function SuccessContent() {
   const t = useTranslations('checkout')
@@ -22,7 +23,20 @@ function SuccessContent() {
     } catch {}
     const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('pumbapood_last_checkout_value') : null
     const value = raw ? Number(raw) : undefined
+    const contentsRaw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('pumbapood_last_checkout_items') : null
+    let contents: { id: string; quantity: number }[] = []
+    let numItems = 0
+    try {
+      if (contentsRaw) {
+        const parsed = JSON.parse(contentsRaw)
+        if (Array.isArray(parsed)) {
+          contents = parsed.map((i: { id: number; qty: number }) => ({ id: String(i.id), quantity: i.qty }))
+          numItems = parsed.reduce((s: number, i: { qty: number }) => s + i.qty, 0)
+        }
+      }
+    } catch {}
     trackPurchase(value, ref)
+    trackMetaPurchase({ value, currency: 'EUR', transaction_id: ref, contents, num_items: numItems || undefined })
   }, [ref])
 
   return (
