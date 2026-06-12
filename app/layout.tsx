@@ -85,6 +85,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-18154845685'
   const ga4Id = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID || 'G-KD26VEJVWY'
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || '2133761077401963'
+  const gtmId = process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || 'GTM-MN86P7WH'
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -92,6 +93,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://sdqnzyfmanflslsjhytf.supabase.co" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://connect.facebook.net" />
+
+        <Script id="gtm-head" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`}
+        </Script>
 
         <Script id="gtag-base" strategy="afterInteractive">
           {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
@@ -127,6 +136,7 @@ if(window.gtag){gtag('event','page_view');gtag('consent','update',{ad_storage:'g
         </Script>
       </head>
       <body className={inter.className}>
+        <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`} height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe></noscript>
         <noscript><img height="1" width="1" style={{display:'none'}} alt="" src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} /></noscript>
         <ConsentProvider>
           {children}
