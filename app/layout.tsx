@@ -6,7 +6,6 @@ import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import './globals.css'
 import { ConsentProvider } from '@/lib/consent-context'
-import CookieConsent from '@/components/CookieConsent'
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -131,7 +130,6 @@ if(window.gtag){gtag('event','page_view');gtag('consent','update',{ad_storage:'g
         <noscript><img height="1" width="1" style={{display:'none'}} alt="" src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} /></noscript>
         <ConsentProvider>
           {children}
-          <CookieConsent />
         </ConsentProvider>
         <SpeedInsights />
         <Analytics />

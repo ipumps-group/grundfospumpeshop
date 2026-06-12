@@ -8,6 +8,7 @@ import LocaleDetector from '@/components/LocaleDetector'
 import JsonLd from '@/components/seo/JsonLd'
 import { AuthProvider } from '@/lib/auth-context'
 import GoogleAdsTracker from '@/components/GoogleAdsTracker'
+import CookieConsent from '@/components/CookieConsent'
 import { NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
@@ -183,6 +184,7 @@ export default async function LocaleLayout({
         <Header siteSettings={siteSettings} />
         <main>{children}</main>
         <Footer siteSettings={siteSettings} />
+        <CookieConsent />
       </AuthProvider>
     </NextIntlClientProvider>
   )
