@@ -691,7 +691,10 @@ function TootedPageContent({
       .then(async (data) => {
         if (currentQuery !== aiRef.current) return
         if (!data || !data.categorySlug) {
-          aiRef.current = ''  // Allow retry if AI found nothing
+          // AI found nothing — redirect to catalog
+          setInputQuery('')
+          setQuery('')
+          router.push('/tooted')
           return
         }
         // Check if the suggested category actually has products
@@ -713,13 +716,20 @@ function TootedPageContent({
           }
           return
         }
-        // Category has no products — show suggestion button instead
+        // Category has no products — show suggestion button
         const name = data.categoryType === 'tegevusala'
           ? catName(data.categorySlug, data.categorySlug)
           : (seeriad.find(s => s.slug === data.categorySlug)?.name_et || data.categorySlug)
         setAiSuggestion({ slug: data.categorySlug, type: data.categoryType, name })
       })
-      .catch((err) => { console.error('search-ai fetch error:', err); aiRef.current = '' })
+      .catch((err) => {
+        console.error('search-ai fetch error:', err)
+        if (currentQuery === aiRef.current) {
+          setInputQuery('')
+          setQuery('')
+          router.push('/tooted')
+        }
+      })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, query, products.length])
 
@@ -921,12 +931,16 @@ function TootedPageContent({
                     </button>
                   </div>
                 )}
-                {!aiSuggestion && (
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button onClick={clearFilters}
-                    className="bg-[#003366] text-white px-6 py-2.5 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors">
+                    className="text-[15px] text-gray-500 hover:text-[#003366] underline transition-colors">
                     {t('clearFilters')}
                   </button>
-                )}
+                  <Link href="/tooted"
+                    className="bg-[#003366] text-white px-6 py-2.5 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors">
+                    {tCommon('allProducts')}
+                  </Link>
+                </div>
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">

@@ -86,7 +86,9 @@ export async function POST(req: NextRequest) {
         const areaName = AREA_NAMES[slug]
         const langLabels = areaName ? `${areaName.et} / ${areaName.en} / ${areaName.ru} / ${areaName.lv} / ${areaName.lt}` : slug
         lines.push(`=== ${slug} (${langLabels}) ===`)
-        const uniqueDescs = [...new Set(data.descs)].slice(0, 5)
+        const uniqueNames = [...new Set(data.names)].slice(0, 20)
+        lines.push(`  Products: ${uniqueNames.join(' | ')}`)
+        const uniqueDescs = [...new Set(data.descs)].slice(0, 3)
         for (const desc of uniqueDescs) {
           lines.push(`  • ${desc}`)
         }
@@ -123,48 +125,36 @@ export async function POST(req: NextRequest) {
       max_tokens: 1500,
       messages: [{
         role: 'user',
-        content: `You are an intelligent product search and categorization assistant.
+        content: `You are an intelligent product search and categorization assistant for a pump store.
 
-Below is a product catalogue containing product names, descriptions, categories, and series.
+Below is a product catalogue containing product names, categories, and descriptions.
 
-Your task is to analyze the catalogue and determine the best matching category or series for the search term.
+Your task: match the search term to the best category or series, even if the term is misspelled, in a different language, or uses phonetic variations.
 
 ${productCatalog}
 
 Product series: ${seriesLines || 'none listed'}
 
-VALID CATEGORY SLUGS (use ONLY one of these for category matches):
+VALID CATEGORY SLUGS (use ONLY one of these):
 kuttepumbad, tsirkulatsioonipumbad-soe-tarbevesi, puurkaevupumbad, drenaazipumbad, salvkaevupumbad, veeautomaadid, rohutostepumbad, reoveepumbad
 
-VALID SERIES SLUGS (use ONLY one of these for series matches):
+VALID SERIES SLUGS (use ONLY one of these):
 ${seriesSlugs || 'none'}
 
-SEARCH TERM:
-"${normalized}"
+SEARCH TERM: "${normalized}"
 
-The search term may:
-- directly match the product name
-- be a synonym or related concept
-- describe a use case
-- describe a product type
-- partially match category names or descriptions
-- be in Estonian, English, Russian, Latvian, or Lithuanian
+CRITICAL RULES:
+1. The search term might be MISSPELLED (e.g. "Skaala" = "Scala", "unlift" = "Unilift", "Alfa" = "Alpha"). Use phonetic and visual similarity to guess what the user meant.
+2. The term might be in Estonian, English, Russian, Latvian, or Lithuanian — translate it in your head first.
+3. Look at PRODUCT NAMES in the catalogue — match the search term to product names even if spelled slightly differently.
+4. If the search term matches a product series name (or a close variant), return that series slug.
+5. If it matches multiple products in a category, return that category slug.
+6. NEVER invent slugs — use ONLY from the VALID lists above.
+7. NEVER return "none" if there is ANY plausible match. Try your best.
+8. Only return "none" if the term is completely unrelated to pumps (e.g. "kala" = fish, "auto" = car).
 
-Instructions:
-1. First, think about what the search term means. For example, "kaevupump" means "well pump" in Estonian — it relates to borewell/well water extraction.
-2. Then, analyze ALL product names and descriptions across ALL categories with that understanding.
-3. Consider semantic meaning, not only exact keyword matches.
-4. The user is looking for products — find which category or series contains relevant products.
-5. If multiple categories could match, pick the most relevant one.
-6. Ignore clearly unrelated categories.
-7. You MUST reply with a slug from the VALID lists above. Do NOT invent or modify slugs.
-8. Check that the category or series you pick actually has products listed under it in the catalogue above.
-9. If the best-matching category has no products listed, try the next best category.
-10. Never return a slug that does not appear in the VALID lists.
-11. If the search term does not appear verbatim in the catalogue, still do your best to map it to the closest category based on meaning and purpose. Only reply "none" if the term is completely unrelated to any product category.
-
-Reply with ONLY the category slug (e.g. "kuttepumbad") or series slug (e.g. "grundfos-ups") of the best match.
-If nothing matches after careful analysis, reply with "none".`,
+Reply with ONLY the category slug (e.g. "kuttepumbad") or series slug (e.g. "grundfos-scala").
+If absolutely nothing matches, reply with "none".`,
       }],
     })
 
