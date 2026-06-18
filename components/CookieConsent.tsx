@@ -36,8 +36,9 @@ export default function CookieConsent() {
       el.style.display = 'none'
       if (all) {
         try {
-          if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
-            (window as any).gtag('consent', 'update', {
+          const w = window as Window & { gtag?: (...args: unknown[]) => void }
+          if (typeof w.gtag === 'function') {
+            w.gtag('consent', 'update', {
               ad_storage: 'granted', analytics_storage: 'granted',
               ad_user_data: 'granted', ad_personalization: 'granted',
             })
