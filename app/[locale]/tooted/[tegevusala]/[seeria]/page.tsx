@@ -126,9 +126,9 @@ export default async function SeriesPage({
         .select('id, name, slug')
         .eq('is_active', true)
         .ilike('name', `%${namePart}%`)
-        .maybeSingle()
-      if (alt) {
-        series = alt
+        .limit(1)
+      if (alt && alt.length > 0) {
+        series = alt[0]
       }
     }
 

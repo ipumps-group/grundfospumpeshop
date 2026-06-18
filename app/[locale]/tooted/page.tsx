@@ -28,8 +28,8 @@ async function resolveSeriesSlug(hardcodedSlug: string): Promise<string | null> 
     .select('slug, name')
     .eq('is_active', true)
     .ilike('name', `%${namePart}%`)
-    .maybeSingle()
-  if (byName) return byName.slug
+    .limit(1)
+  if (byName && byName.length > 0) return byName[0].slug
 
   // 3. Try matching the full slug as a LIKE pattern
   const { data: byLike } = await supabaseAdmin
@@ -37,8 +37,8 @@ async function resolveSeriesSlug(hardcodedSlug: string): Promise<string | null> 
     .select('slug')
     .eq('is_active', true)
     .ilike('slug', `%${namePart}%`)
-    .maybeSingle()
-  if (byLike) return byLike.slug
+    .limit(1)
+  if (byLike && byLike.length > 0) return byLike[0].slug
 
   return null
 }
