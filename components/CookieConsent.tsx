@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useConsent } from '@/lib/consent-context'
 import { useTranslations } from 'next-intl'
@@ -7,16 +8,19 @@ import { useTranslations } from 'next-intl'
 export default function CookieConsent() {
   const t = useTranslations('cookieConsent')
   const { consentGiven, setConsent } = useConsent()
+  const [hidden, setHidden] = useState(false)
 
-  if (consentGiven) return null
+  if (consentGiven || hidden) return null
 
   const acceptAll = () => {
     setConsent({ analytics: true, advertising: true, functional: true })
-    activateTracking()
+    setHidden(true)
+    try { activateTracking() } catch {}
   }
 
   const acceptEssential = () => {
     setConsent({ analytics: false, advertising: false, functional: true })
+    setHidden(true)
   }
 
   return (
@@ -24,7 +28,7 @@ export default function CookieConsent() {
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <p className="text-[14px] text-gray-600 flex-1 leading-relaxed">
           {t('message')}{' '}
-          <Link href="/privaatsus" className="text-[#003366] underline hover:text-[#004080]">
+          <Link href="/leht/privaatsuspoliitika" className="text-[#003366] underline hover:text-[#004080]">
             {t('learnMore')}
           </Link>
         </p>
