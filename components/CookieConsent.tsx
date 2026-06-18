@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { useConsent } from '@/lib/consent-context'
 import { useTranslations } from 'next-intl'
@@ -8,19 +7,16 @@ import { useTranslations } from 'next-intl'
 export default function CookieConsent() {
   const t = useTranslations('cookieConsent')
   const { consentGiven, setConsent } = useConsent()
-  const [open, setOpen] = useState(!consentGiven)
 
-  if (!open) return null
+  if (consentGiven) return null
 
   const acceptAll = () => {
     setConsent({ analytics: true, advertising: true, functional: true })
-    setOpen(false)
     activateTracking()
   }
 
   const acceptEssential = () => {
     setConsent({ analytics: false, advertising: false, functional: true })
-    setOpen(false)
   }
 
   return (

@@ -60,7 +60,7 @@ function fmt(n: number) {
 export function InvoicePDF({ order, items, customerName, customerEmail }: InvoiceProps) {
   const invoiceNr = `INV-${order.id.slice(0, 8).toUpperCase()}`
   const date = new Date(order.created_at).toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  const subtotal = order.subtotal ?? order.total / 1.22
+  const subtotal = order.subtotal ?? items.reduce((s, it) => s + it.qty * it.price, 0)
   const vat = order.vat ?? order.total - subtotal
 
   return (

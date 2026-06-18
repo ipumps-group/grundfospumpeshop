@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { withVat, fmt } from '@/lib/price'
+import { matchSearchKeyword } from '@/lib/search-keywords'
 
 // ŌöĆŌöĆŌöĆ T├£├£BID ŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆ
 
@@ -503,126 +504,80 @@ function TootedPageContent({
     const from = (page - 1) * PAGE_SIZE
     const to   = from + PAGE_SIZE - 1
 
-    let q = supabase
-      .from('products')
-      .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock', { count: 'exact' })
-      .eq('published', true)
+    try {
+      let q = supabase
+        .from('products')
+        .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock', { count: 'exact' })
+        .eq('published', true)
 
-    if (query.trim()) {
-      q = q.textSearch('search_vector', query.trim(), { config: 'simple', type: 'plain' })
-    }
-    if (selectedAla)   q = q.eq('primary_activity_area_slug', selectedAla)
-    if (selectedSeeria) q = q.eq('series_slug', selectedSeeria)
-    if (inStockOnly) q = q.eq('in_stock', true)
-    if (priceMin) q = q.gte('price', Number(priceMin))
-    if (priceMax) q = q.lte('price', Number(priceMax))
+      if (query.trim()) {
+        q = q.textSearch('search_vector', query.trim(), { config: 'simple', type: 'plain' })
+      }
+      if (selectedAla)   q = q.eq('primary_activity_area_slug', selectedAla)
+      if (selectedSeeria) q = q.eq('series_slug', selectedSeeria)
+      if (inStockOnly) q = q.eq('in_stock', true)
+      if (priceMin) q = q.gte('price', Number(priceMin))
+      if (priceMax) q = q.lte('price', Number(priceMax))
 
-    const [field, dir] = sortBy.split('_')
-    q = q.order(field === 'name' ? 'name' : 'price', { ascending: dir === 'asc' })
-    q = q.range(from, to)
+      const [field, dir] = sortBy.split('_')
+      q = q.order(field === 'name' ? 'name' : 'price', { ascending: dir === 'asc' })
+      q = q.range(from, to)
 
-    const { data, count, error } = await q
-    if (error) {
-      console.error('Search query error:', error)
-    } else {
-      setProducts(data || [])
-      setTotal(count || 0)
+      const { data, count, error } = await q
+      if (error) {
+        console.error('Search query error:', error)
+        setProducts([])
+        setTotal(0)
+      } else if (data && data.length > 0) {
+        setProducts(data)
+        setTotal(count || 0)
+      } else if (query.trim()) {
+        // textSearch found nothing — try ILIKE fallback for partial name/SKU matches
+        const pattern = `%${query.trim()}%`
+        let fb = supabase
+          .from('products')
+          .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock', { count: 'exact' })
+          .eq('published', true)
+          .or(`name.ilike.${pattern},sku.ilike.${pattern}`)
+        if (selectedAla)   fb = fb.eq('primary_activity_area_slug', selectedAla)
+        if (selectedSeeria) fb = fb.eq('series_slug', selectedSeeria)
+        if (inStockOnly) fb = fb.eq('in_stock', true)
+        if (priceMin) fb = fb.gte('price', Number(priceMin))
+        if (priceMax) fb = fb.lte('price', Number(priceMax))
+        fb = fb.order(field === 'name' ? 'name' : 'price', { ascending: dir === 'asc' })
+        fb = fb.range(from, to)
+
+        const fbResult = await fb
+        if (fbResult.error) {
+          console.error('ILIKE fallback error:', fbResult.error)
+          setProducts([])
+          setTotal(0)
+        } else {
+          setProducts(fbResult.data || [])
+          setTotal(fbResult.count || 0)
+        }
+      } else {
+        setProducts([])
+        setTotal(0)
+      }
+    } catch (err) {
+      console.error('loadProducts error:', err)
+      setProducts([])
+      setTotal(0)
     }
     setLoading(false)
   }, [query, selectedAla, selectedSeeria, inStockOnly, priceMin, priceMax, sortBy, page])
 
   useEffect(() => { loadProducts() }, [loadProducts])
 
-  // Multi-language keyword → slug mapping for client-side fallback
-  const SEARCH_KEYWORDS: Record<string, { slug: string; type: 'tegevusala' | 'seeria'; parentSlug?: string }> = {
-    'aiapump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'aiapumbad': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'kastmispump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'kasvuhoonepump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'kasvuhoone pump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'greenhouse pump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'garden pump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'garden watering': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'watering pump': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'irrigation': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'садовый насос': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'полив': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'dārza sūknis': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'laistīšana': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'sodo siurblys': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'laistymas': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'veeauatomaat': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'hüdrofoor': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'hydropneumatic': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'hydrofor': { slug: 'veeautomaadid', type: 'tegevusala' },
-    'küte': { slug: 'kuttepumbad', type: 'tegevusala' },
-    'heating': { slug: 'kuttepumbad', type: 'tegevusala' },
-    'radiator': { slug: 'kuttepumbad', type: 'tegevusala' },
-    'circulation pump': { slug: 'kuttepumbad', type: 'tegevusala' },
-    'отопление': { slug: 'kuttepumbad', type: 'tegevusala' },
-    'tarbevesi': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
-    'hot water': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
-    'boiler': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
-    'dhw': { slug: 'tsirkulatsioonipumbad-soe-tarbevesi', type: 'tegevusala' },
-    'puurkaev': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'borewell': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'borehole': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'deep well': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'submersible': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'kaevupump': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'kaevu pump': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'süvapump': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'süvapuurauk': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'скважина': { slug: 'puurkaevupumbad', type: 'tegevusala' },
-    'drenaaž': { slug: 'drenaazipumbad', type: 'tegevusala' },
-    'drainage': { slug: 'drenaazipumbad', type: 'tegevusala' },
-    'flood': { slug: 'drenaazipumbad', type: 'tegevusala' },
-    'cellar': { slug: 'drenaazipumbad', type: 'tegevusala' },
-    'дренаж': { slug: 'drenaazipumbad', type: 'tegevusala' },
-    'salvkaev': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'salvkaevupump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'salvkaevu pump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'well': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'shallow well': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'surface pump': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'колодец': { slug: 'salvkaevupumbad', type: 'tegevusala' },
-    'rõhutõste': { slug: 'rohutostepumbad', type: 'tegevusala' },
-    'pressure booster': { slug: 'rohutostepumbad', type: 'tegevusala' },
-    'booster pump': { slug: 'rohutostepumbad', type: 'tegevusala' },
-    'low water pressure': { slug: 'rohutostepumbad', type: 'tegevusala' },
-    'повышение давления': { slug: 'rohutostepumbad', type: 'tegevusala' },
-    'reovesi': { slug: 'reoveepumbad', type: 'tegevusala' },
-    'sewage': { slug: 'reoveepumbad', type: 'tegevusala' },
-    'wastewater': { slug: 'reoveepumbad', type: 'tegevusala' },
-    'fecal': { slug: 'reoveepumbad', type: 'tegevusala' },
-    'kanalisatsioon': { slug: 'reoveepumbad', type: 'tegevusala' },
-    'канализация': { slug: 'reoveepumbad', type: 'tegevusala' },
-    // Product series names — mapped to their series page URL with parent category
-    'hydrojet': { slug: 'grundfos-cmb', type: 'seeria', parentSlug: 'rohutostepumbad' },
-    'cmb': { slug: 'grundfos-cmb', type: 'seeria', parentSlug: 'rohutostepumbad' },
-    'unilift': { slug: 'grundfos-unilift', type: 'seeria', parentSlug: 'drenaazipumbad' },
-    'jp': { slug: 'grundfos-jp', type: 'seeria', parentSlug: 'salvkaevupumbad' },
-    'grundfos jp': { slug: 'grundfos-jp', type: 'seeria', parentSlug: 'salvkaevupumbad' },
-    'sba': { slug: 'grundfos-sba', type: 'seeria', parentSlug: 'reoveepumbad' },
-    'seg': { slug: 'grundfos-seg', type: 'seeria', parentSlug: 'reoveepumbad' },
-    'scala': { slug: 'grundfos-scala', type: 'seeria', parentSlug: 'veeautomaadid' },
-    'scala2': { slug: 'grundfos-scala2', type: 'seeria', parentSlug: 'veeautomaadid' },
-    'sq': { slug: 'grundfos-sq', type: 'seeria', parentSlug: 'puurkaevupumbad' },
-    'grundfos sq': { slug: 'grundfos-sq', type: 'seeria', parentSlug: 'puurkaevupumbad' },
-    'sp': { slug: 'grundfos-sp', type: 'seeria', parentSlug: 'puurkaevupumbad' },
-    'cr': { slug: 'grundfos-cr', type: 'seeria', parentSlug: 'puurkaevupumbad' },
-    'magn': { slug: 'grundfos-magna', type: 'seeria', parentSlug: 'kuttepumbad' },
-    'magna': { slug: 'grundfos-magna', type: 'seeria', parentSlug: 'kuttepumbad' },
-    'alpha': { slug: 'grundfos-alpha', type: 'seeria', parentSlug: 'kuttepumbad' },
-    'tp': { slug: 'grundfos-tp', type: 'seeria', parentSlug: 'kuttepumbad' },
-  }
+
 
   // Handle Enter key — check keywords, AI cache, then search
   const handleSearchKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key !== 'Enter' || !inputQuery.trim()) return
-    const q = inputQuery.trim().toLowerCase().replace(/-/g, ' ')
+    const q = inputQuery.trim()
     // 1. Hardcoded keyword map
-    const kw = SEARCH_KEYWORDS[q]
+    const kw = matchSearchKeyword(q)
     if (kw) {
       setInputQuery('')
       if (kw.type === 'seeria') {
@@ -633,12 +588,13 @@ function TootedPageContent({
       }
       return
     }
+    const qLower = q.toLowerCase().replace(/-/g, ' ')
     // 2. Check AI cache — previously learned terms
     try {
       const { data: cached } = await supabase
         .from('settings')
         .select('value')
-        .eq('key', `search:${q}`)
+        .eq('key', `search:${qLower}`)
         .maybeSingle()
       if (cached && cached.value && cached.value !== 'none') {
         const parts = cached.value.split(':')
@@ -658,7 +614,7 @@ function TootedPageContent({
     // 3. Check DB slugs and names
     for (const area of tegevusalad) {
       const slugNorm = area.slug.replace(/-/g, ' ')
-      if (slugNorm.includes(q) || area.name_et.toLowerCase().includes(q)) {
+      if (slugNorm.includes(qLower) || area.name_et.toLowerCase().includes(qLower)) {
         setInputQuery('')
         router.push(`/tooted/${area.slug}`)
         return
@@ -666,7 +622,7 @@ function TootedPageContent({
     }
     for (const series of seeriad) {
       const slugNorm = series.slug.replace(/-/g, ' ')
-      if (slugNorm.includes(q) || series.name_et.toLowerCase().includes(q)) {
+      if (slugNorm.includes(qLower) || series.name_et.toLowerCase().includes(qLower)) {
         setInputQuery('')
         const parentSlug = series.parent_slug
         if (parentSlug) router.push(`/tooted/${parentSlug}/${series.slug}`)
@@ -683,7 +639,7 @@ function TootedPageContent({
     if (loading || !query.trim()) return
     const q = query.trim().toLowerCase().replace(/-/g, ' ')
     // 1. Check keyword map
-    const kw = SEARCH_KEYWORDS[q]
+    const kw = matchSearchKeyword(query.trim())
     if (kw) {
       setInputQuery('')
       if (kw.type === 'seeria') {

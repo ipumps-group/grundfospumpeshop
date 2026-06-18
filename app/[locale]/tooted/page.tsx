@@ -1,13 +1,47 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
+import { matchSearchKeyword } from '@/lib/search-keywords'
 import SafeImage from '@/components/SafeImage'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 import TootedPageClient from './page-client'
 
 export const dynamic = 'force-dynamic'
+
+async function resolveSeriesSlug(hardcodedSlug: string): Promise<string | null> {
+  // 1. Try exact match
+  const { data: exact } = await supabaseAdmin
+    .from('product_series')
+    .select('slug')
+    .eq('slug', hardcodedSlug)
+    .eq('is_active', true)
+    .maybeSingle()
+  if (exact) return exact.slug
+
+  // 2. Try to find by extracting the product name from the slug (e.g. "grundfos-alpha" -> "alpha")
+  const namePart = hardcodedSlug.replace(/^grundfos-?/i, '').replace(/-/g, ' ')
+  const { data: byName } = await supabaseAdmin
+    .from('product_series')
+    .select('slug, name')
+    .eq('is_active', true)
+    .ilike('name', `%${namePart}%`)
+    .maybeSingle()
+  if (byName) return byName.slug
+
+  // 3. Try matching the full slug as a LIKE pattern
+  const { data: byLike } = await supabaseAdmin
+    .from('product_series')
+    .select('slug')
+    .eq('is_active', true)
+    .ilike('slug', `%${namePart}%`)
+    .maybeSingle()
+  if (byLike) return byLike.slug
+
+  return null
+}
 
 async function CatalogView() {
   const tNav = await getTranslations('nav')
@@ -140,8 +174,21 @@ export default async function TootedPage({
 }) {
   const { q } = await searchParams
 
-  // Has search query -> show search page
+  // Has search query -> check keywords first (server-side redirect avoids flash of "no products")
   if (q?.trim()) {
+    const kw = matchSearchKeyword(q.trim())
+    if (kw) {
+      if (kw.type === 'seeria' && kw.parentSlug) {
+        // Validate & resolve series slug against DB (hardcoded slug may not match actual DB value)
+        const resolvedSlug = await resolveSeriesSlug(kw.slug)
+        if (resolvedSlug) {
+          redirect(`/tooted/${kw.parentSlug}/${resolvedSlug}`)
+        }
+      } else {
+        redirect(`/tooted/${kw.slug}`)
+      }
+    }
+
     const sidebarData = await fetchSidebarData()
     return (
       <Suspense>

@@ -134,7 +134,7 @@ function TellimusDetail() {
   }
 
   const sa      = order.shipping_address ?? {}
-  const subtotal = Number((order.total / 1.22).toFixed(2))
+  const subtotal = Number((order.total / 1.24).toFixed(2))
   const vat      = Number((order.total - subtotal).toFixed(2))
 
   return (

@@ -162,8 +162,6 @@ const logEntry: Record<string, unknown> = { order_id: orderId, type }
       logEntry.resend_id = (data as { id?: string })?.id
 
     } else if (type === 'newOrderAdmin') {
-      if (!(await isNotifEnabled('notif_new_order_admin'))) return
-
       const html = buildNewOrderAdminHtml({
         orderRef,
         order: { total: order.total, created_at: order.created_at },

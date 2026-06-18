@@ -112,11 +112,25 @@ export default async function SeriesPage({
   const { tegevusala, seeria } = await params
 
   try {
-    const { data: series } = await supabaseAdmin
+    let { data: series } = await supabaseAdmin
       .from('product_series')
       .select('id, name, slug')
       .eq('slug', seeria)
       .single()
+
+    // If exact slug not found, try name-based lookup
+    if (!series) {
+      const namePart = seeria.replace(/^grundfos-?/i, '').replace(/-/g, ' ')
+      const { data: alt } = await supabaseAdmin
+        .from('product_series')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .ilike('name', `%${namePart}%`)
+        .maybeSingle()
+      if (alt) {
+        series = alt
+      }
+    }
 
     const { data: area } = await supabaseAdmin
       .from('activity_areas')
@@ -124,10 +138,12 @@ export default async function SeriesPage({
       .eq('slug', tegevusala)
       .single()
 
+    const effectiveSeeria = series?.slug || seeria
+
     const { data: products } = await supabaseAdmin
       .from('products')
       .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock')
-      .eq('series_slug', seeria)
+      .eq('series_slug', effectiveSeeria)
       .eq('published', true)
       .order('name', { ascending: true })
 

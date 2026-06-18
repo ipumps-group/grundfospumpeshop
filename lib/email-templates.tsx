@@ -81,8 +81,9 @@ interface OrderConfirmationData {
 
 export function buildOrderConfirmationHtml(d: OrderConfirmationData): string {
   const sa = d.order.shipping_address ?? {}
-  const subtotal = Number((d.order.total / 1.22).toFixed(2))
-  const vat      = Number((d.order.total - subtotal).toFixed(2))
+  const subtotal = d.items.reduce((s, item) => s + item.quantity * item.unit_price, 0)
+  const total = Number(d.order.total)
+  const vat = Number((total - subtotal).toFixed(2))
   
   const orderUrl = `https://pumbapood.ee/tellimus/${d.orderRef}${d.customerEmail ? `?email=${encodeURIComponent(d.customerEmail)}` : ''}`
 
@@ -121,7 +122,7 @@ export function buildOrderConfirmationHtml(d: OrderConfirmationData): string {
         <td style="padding:4px 0;font-size:14px;text-align:right;">${subtotal.toFixed(2)} €</td>
       </tr>
       <tr>
-        <td style="padding:4px 0;font-size:14px;color:#64748b;">Käibemaks 22%</td>
+        <td style="padding:4px 0;font-size:14px;color:#64748b;">Käibemaks 24%</td>
         <td style="padding:4px 0;font-size:14px;text-align:right;">${vat.toFixed(2)} €</td>
       </tr>
       <tr style="border-top:2px solid #f1f5f9;">

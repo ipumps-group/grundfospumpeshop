@@ -177,6 +177,7 @@ If nothing matches after careful analysis, reply with "none".`,
         resultSlug = text
         resultType = 'tegevusala'
       } else {
+        // Try exact slug match first
         const { data: seriesCheck } = await supabaseAdmin
           .from('product_series')
           .select('slug')
@@ -186,6 +187,18 @@ If nothing matches after careful analysis, reply with "none".`,
         if (seriesCheck) {
           resultSlug = text
           resultType = 'seeria'
+        } else {
+          // Try name-based lookup (Claude might have returned a name variant)
+          const { data: byName } = await supabaseAdmin
+            .from('product_series')
+            .select('slug')
+            .eq('is_active', true)
+            .or(`name.ilike.%${text}%,slug.ilike.%${text}%`)
+            .limit(1)
+          if (byName && byName.length > 0) {
+            resultSlug = byName[0].slug
+            resultType = 'seeria'
+          }
         }
       }
     }

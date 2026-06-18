@@ -33,31 +33,28 @@ export function useConsent() {
   return useContext(ConsentContext)
 }
 
+function readStored(): { given: boolean; state: ConsentState } {
+  try {
+    const stored = localStorage.getItem(CONSENT_KEY)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed.v === CONSENT_VERSION) {
+        return { given: true, state: parsed.state }
+      }
+    }
+  } catch {}
+  return { given: false, state: defaultConsent }
+}
+
 export function ConsentProvider({ children }: { children: ReactNode }) {
   const [consent, setConsentState] = useState<ConsentState>(() => {
     if (typeof window === 'undefined') return defaultConsent
-    try {
-      const stored = localStorage.getItem(CONSENT_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        if (parsed.v === CONSENT_VERSION) {
-          return parsed.state
-        }
-      }
-    } catch {}
-    return defaultConsent
+    return readStored().state
   })
 
   const [consentGiven, setConsentGiven] = useState(() => {
     if (typeof window === 'undefined') return false
-    try {
-      const stored = localStorage.getItem(CONSENT_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        return parsed.v === CONSENT_VERSION
-      }
-    } catch {}
-    return false
+    return readStored().given
   })
 
   const hasConsent = consent.advertising || consent.analytics
@@ -65,7 +62,9 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
   const setConsent = useCallback((state: ConsentState) => {
     setConsentState(state)
     setConsentGiven(true)
-    localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VERSION, state }))
+    try {
+      localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VERSION, state }))
+    } catch {}
   }, [])
 
   return (
