@@ -23,5 +23,6 @@ export async function getImageDimensions(url: string): Promise<{ width: number; 
 }
 
 export function isOptimizableUrl(url: string): boolean {
-  return url.includes('supabase.co') || url.includes('sdqnzyfmanflslsjhytf') || url.includes('ipumps.ee') || url.includes('pumbapood.ee')
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  return url.includes('supabase.co') || url.includes(supabaseUrl.replace(/^https?:\/\//, '')) || url.includes('ipumps.ee') || url.includes('pumbapood.ee')
 }

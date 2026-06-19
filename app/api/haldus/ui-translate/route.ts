@@ -12,6 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient }             from '@supabase/supabase-js'
+import { requireSuperadmin } from '@/lib/api-auth'
+import { rateLimit, AI_RATE } from '@/lib/rate-limit'
 
 import etJson from '@/messages/et.json'
 import enJson from '@/messages/en.json'
@@ -190,6 +192,11 @@ export async function GET() {
 // ── POST — translate missing keys ─────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  try { await requireSuperadmin() } catch (e) { return e as NextResponse }
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, AI_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   const body = await req.json().catch(() => ({})) as { locale?: string; force?: boolean }
   const locales = body.locale ? [body.locale] : [...LOCALES]
   const force   = body.force ?? false

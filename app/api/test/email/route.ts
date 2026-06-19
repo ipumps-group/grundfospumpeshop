@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendOrderEmail } from '@/lib/send-email'
+import { requireAdmin } from '@/lib/api-auth'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 // POST /api/test/email - Test email sending
 export async function POST(req: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, STRICT_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   const { orderId, type = 'statusUpdate', status = 'processing' } = await req.json().catch(() => ({}))
   
   console.log('[test-email] Received:', { orderId, type, status })

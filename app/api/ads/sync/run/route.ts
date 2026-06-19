@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { runSync } from '@/lib/ads/sync'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireAdmin } from '@/lib/api-auth'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 async function getOrCreateCompany(): Promise<string> {
   // Find first company, or create a default one
@@ -118,6 +120,11 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+  const ip = request.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, STRICT_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   try {
     let { accountId, platform, dateStart, dateEnd } = await request.json()
 

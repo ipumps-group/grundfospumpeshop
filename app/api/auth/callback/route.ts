@@ -3,14 +3,24 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code')
+  const redirectUrl = new URL('/konto', request.url)
 
   if (code) {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    await supabase.auth.exchangeCodeForSession(code)
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      if (error) {
+        console.error('Auth callback error:', error.message)
+        redirectUrl.searchParams.set('error', 'auth_failed')
+      }
+    } catch (e) {
+      console.error('Auth callback exception:', e)
+      redirectUrl.searchParams.set('error', 'auth_failed')
+    }
   }
 
-  return NextResponse.redirect(new URL('/konto', request.url))
+  return NextResponse.redirect(redirectUrl)
 }

@@ -64,6 +64,46 @@ function statusColor(status: string): string {
   return map[status] ?? '#94a3b8'
 }
 
+function statusHeading(status: string): string {
+  const map: Record<string, string> = {
+    pending:    'Tellimus ootab makset',
+    paid:       'Aitäh tellimuse eest!',
+    processing: 'Tellimus on töötlemisel',
+    shipped:    'Tellimus on saadetud',
+    delivered:  'Tellimus on kohale toimetatud',
+    cancelled:  'Tellimus on tühistatud',
+    failed:     'Tellimus ebaõnnestus',
+  }
+  return map[status] ?? 'Tellimuse staatus on uuendatud'
+}
+
+export function statusSubject(status: string): string {
+  const map: Record<string, string> = {
+    pending:    'ootab makset',
+    paid:       'makse kinnitatud',
+    processing: 'on töötlemisel',
+    shipped:    'on saadetud',
+    delivered:  'on kohale toimetatud',
+    cancelled:  'on tühistatud',
+    failed:     'ebaõnnestus',
+  }
+  return map[status] ?? 'staatuse uuendus'
+}
+
+function statusBody(status: string, customerName: string | null, orderRef: string): string {
+  const name = customerName ? `, <strong>${customerName}</strong>` : ''
+  const bodies: Record<string, string> = {
+    pending:    `Tere${name}! Teie tellimus <strong>#${orderRef}</strong> on registreeritud ja ootab makset. Makse kinnitusel asume seda komplekteerima.`,
+    paid:       `Tere${name}! Makse on kinnitatud. Saime teie tellimuse kätte ning asume seda komplekteerima. Saadame peatselt teavituse, kui tellimus on teele pandud.`,
+    processing: `Tere${name}! Teie tellimus <strong>#${orderRef}</strong> on töötlemisel. Tegeleme selle komplekteerimisega.`,
+    shipped:    `Tere${name}! Teie tellimus <strong>#${orderRef}</strong> on üle antud kullerile ja on teel Teieni.`,
+    delivered:  `Tere${name}! Teie tellimus <strong>#${orderRef}</strong> on kohale toimetatud. Täname ostu eest!`,
+    cancelled:  `Tere${name}! Teie tellimus <strong>#${orderRef}</strong> on tühistatud. Küsimuste korral võtke meiega ühendust.`,
+    failed:     `Tere${name}! Tellimuse <strong>#${orderRef}</strong> töötlemine ebaõnnestus. Palun võtke meiega ühendust või proovige uuesti.`,
+  }
+  return bodies[status] ?? `Tere${name}! Tellimuse <strong>#${orderRef}</strong> staatus on muutunud: <strong>${statusLabel(status)}</strong>.`
+}
+
 // ─── Tellimuse kinnitus kliendile ─────────────────────────────────────────────
 
 interface OrderConfirmationData {
@@ -159,10 +199,13 @@ interface StatusUpdateData {
 }
 
 export function buildStatusUpdateHtml(d: StatusUpdateData): string {
+  const heading = statusHeading(d.newStatus)
+  const body = statusBody(d.newStatus, d.customerName, d.orderRef)
+
   const content = `
-    <h1 style="margin:0 0 8px;font-size:22px;color:#1a202c;">Tellimuse staatus on uuendatud</h1>
-    <p style="margin:0 0 24px;font-size:15px;color:#64748b;">
-      Tere${d.customerName ? `, <strong>${d.customerName}</strong>` : ''}!
+    <h1 style="margin:0 0 8px;font-size:22px;color:#1a202c;">${heading}</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#333;line-height:1.6;">
+      ${body}
     </p>
 
     <div style="background:#f8fafc;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
@@ -171,7 +214,7 @@ export function buildStatusUpdateHtml(d: StatusUpdateData): string {
     </div>
 
     <div style="margin-bottom:24px;">
-      <div style="font-size:13px;color:#64748b;margin-bottom:8px;">Uus staatus</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:8px;">Staatus</div>
       <span style="display:inline-block;background:${statusColor(d.newStatus)}22;color:${statusColor(d.newStatus)};padding:6px 14px;border-radius:20px;font-size:15px;font-weight:600;">
         ${statusLabel(d.newStatus)}
       </span>

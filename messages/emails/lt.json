@@ -15,7 +15,7 @@
     "preview": "Užsakymas {orderNumber} patvirtintas — {total}",
     "subject": "Užsakymas {orderNumber} patvirtintas",
     "heading": "Ačiū už užsakymą!",
-    "intro": "Jūsų užsakymas <strong>{orderNumber}</strong> gautas ir mokėjimas sėkmingai patvirtintas. Mes nedelsdami pradedame pakuoti.",
+    "intro": "Gavome jūsų užsakymą <strong>{orderNumber}</strong> ir mokėjimas patvirtintas. Pradedame jį komplektuoti. Pranešime, kai tik užsakymas bus išsiųstas.",
     "itemsHeading": "Užsakytos prekės",
     "shippingHeading": "Pristatymas",
     "shippingNote": "Mes atsiųsime jums naują laišką, kai tik siunta bus išsiųsta — su sekimo numeriu.",

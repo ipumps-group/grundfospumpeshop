@@ -15,7 +15,7 @@
     "preview": "Pasūtījums {orderNumber} apstiprināts — {total}",
     "subject": "Pasūtījums {orderNumber} apstiprināts",
     "heading": "Paldies par pasūtījumu!",
-    "intro": "Jūsu pasūtījums <strong>{orderNumber}</strong> ir saņemts un maksājums veiksmīgi apstiprināts. Mēs nekavējoties sākam pakot.",
+    "intro": "Mēs saņēmām jūsu pasūtījumu <strong>{orderNumber}</strong> un maksājums ir apstiprināts. Mēs sākam to komplektēt. Mēs jūs informēsim, tiklīdz pasūtījums būs ceļā.",
     "itemsHeading": "Pasūtītie produkti",
     "shippingHeading": "Piegāde",
     "shippingNote": "Mēs jums nosūtīsim jaunu e-pastu, tiklīdz paka būs ceļā — ar izsekošanas numuru.",

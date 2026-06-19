@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireSuperadmin } from '@/lib/api-auth'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 // Helper
 function id() { return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) }
@@ -168,7 +170,12 @@ const blocks = [
 
 // ─── Route ────────────────────────────────────────────────────────────────
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  try { await requireSuperadmin() } catch (e) { return e as NextResponse }
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, STRICT_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   // Kontrolli kas esileht juba on olemas
   const { data: existing } = await supabaseAdmin
     .from('pages')

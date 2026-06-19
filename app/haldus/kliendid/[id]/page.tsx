@@ -93,6 +93,7 @@ export default function KlientDetailPage() {
   async function handleBlockToggle() {
     if (!client) return
     setSaving(true); setSaveMsg('')
+    try {
     const newStatus = client.status === 'blocked' ? 'active' : 'blocked'
     const res = await fetch(`/api/haldus/clients/${id}`, {
       method: 'PATCH',
@@ -105,12 +106,14 @@ export default function KlientDetailPage() {
     } else {
       setSaveMsg('Viga!')
     }
+    } catch { setSaveMsg('Võrguviga!') }
     setSaving(false)
     setTimeout(() => setSaveMsg(''), 3000)
   }
 
   async function handleConfirmEmail() {
     setSaving(true); setSaveMsg('')
+    try {
     const res = await fetch(`/api/haldus/clients/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -122,12 +125,14 @@ export default function KlientDetailPage() {
     } else {
       setSaveMsg('Viga!')
     }
+    } catch { setSaveMsg('Võrguviga!') }
     setSaving(false)
     setTimeout(() => setSaveMsg(''), 3000)
   }
 
   async function handleSaveProfile() {
     setSaving(true); setSaveMsg('')
+    try {
     const res = await fetch(`/api/haldus/clients/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -139,6 +144,7 @@ export default function KlientDetailPage() {
     } else {
       setSaveMsg('Viga!')
     }
+    } catch { setSaveMsg('Võrguviga!') }
     setSaving(false)
     setTimeout(() => setSaveMsg(''), 3000)
   }
@@ -146,6 +152,7 @@ export default function KlientDetailPage() {
   async function handleRoleChange() {
     if (!client || newRole === client.role) return
     setSaving(true); setSaveMsg('')
+    try {
     const res = await fetch(`/api/haldus/clients/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -157,12 +164,14 @@ export default function KlientDetailPage() {
     } else {
       setSaveMsg('Viga!')
     }
+    } catch { setSaveMsg('Võrguviga!') }
     setSaving(false)
     setTimeout(() => setSaveMsg(''), 3000)
   }
 
   async function handleDelete() {
     setSaving(true); setSaveMsg('')
+    try {
     const res = await fetch(`/api/haldus/clients/${id}`, { method: 'DELETE' })
     if (res.ok) {
       router.replace('/haldus/kliendid')
@@ -171,6 +180,7 @@ export default function KlientDetailPage() {
       setSaveMsg(data.error ?? 'Viga!')
       setSaving(false)
     }
+    } catch { setSaveMsg('Võrguviga!'); setSaving(false) }
   }
 
   if (profile && !canManageOrders(profile.role)) return null

@@ -84,6 +84,7 @@ export default function TellimusDetailPage() {
   async function handleDelete() {
     if (!confirm('Kustuta see tellimus? Tegevus on pöördumatu.')) return
     setDeleting(true)
+    try {
     const token = (await supabase.auth.getSession()).data.session?.access_token
     const res = await fetch(`/api/haldus/orders/${id}/delete`, {
       method: 'DELETE',
@@ -93,6 +94,10 @@ export default function TellimusDetailPage() {
       router.push('/haldus/tellimused')
     } else {
       alert('Kustutamine ebaõnnestus')
+      setDeleting(false)
+    }
+    } catch {
+      alert('Võrguviga - kustutamine ebaõnnestus')
       setDeleting(false)
     }
   }

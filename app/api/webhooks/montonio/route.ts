@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendOrderConfirmation } from '@/lib/email';
+import { sendOrderEmail } from '@/lib/send-email';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -109,7 +110,26 @@ export async function POST(req: NextRequest) {
     payload: payload as unknown as Record<string, unknown>,
   });
 
-  // 5. Käitleme ainult PAID staatust
+  // 5. Handle ABANDONED / VOIDED — send pending reminder email
+  if (payload.paymentStatus === 'ABANDONED' || payload.paymentStatus === 'VOIDED') {
+    const { data: orderForPending } = await supabaseAdmin
+      .from('orders')
+      .select('id, order_number, status, email')
+      .eq('order_number', payload.merchantReference)
+      .single();
+
+    if (orderForPending && orderForPending.status === 'pending' && orderForPending.email) {
+      sendOrderEmail(orderForPending.id, 'statusUpdate', { newStatus: 'pending' }).catch(err =>
+        console.error('[montonio-webhook] Pending email failed', err)
+      );
+    }
+    console.log(
+      `[montonio-webhook] Status ${payload.paymentStatus} for ${payload.merchantReference} — pending email sent`
+    );
+    return NextResponse.json({ received: true, status: payload.paymentStatus });
+  }
+
+  // 6. Käitleme ainult PAID staatust
   if (payload.paymentStatus !== 'PAID') {
     console.log(
       `[montonio-webhook] Status ${payload.paymentStatus} for ${payload.merchantReference} — no action`
@@ -117,7 +137,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true, status: payload.paymentStatus });
   }
 
-  // 6. Leia tellimus
+  // 7. Leia tellimus
   const { data: order, error: orderErr } = await supabaseAdmin
     .from('orders')
     .select(

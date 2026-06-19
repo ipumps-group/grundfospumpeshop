@@ -15,7 +15,7 @@
     "preview": "Order {orderNumber} confirmed — {total}",
     "subject": "Order {orderNumber} confirmed",
     "heading": "Thanks for your order!",
-    "intro": "Your order <strong>{orderNumber}</strong> has been received and payment is confirmed. We'll start packing right away.",
+    "intro": "We received your order <strong>{orderNumber}</strong> and payment is confirmed. We are now preparing it for dispatch. We'll notify you as soon as your order is on its way.",
     "itemsHeading": "Items ordered",
     "shippingHeading": "Shipping",
     "shippingNote": "We'll email you again as soon as your package ships — with a tracking number.",

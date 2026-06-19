@@ -19,9 +19,26 @@
  *   ANTHROPIC_API_KEY=sk-ant-... node scripts/migrate-multilingual.mjs
  */
 
-const SUPABASE_URL = 'https://avfvouczlgbtrhtqgokx.supabase.co'
-const SERVICE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2ZnZvdWN6bGdidHJodHFnb2t4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjE5MDk2NSwiZXhwIjoyMDg3NzY2OTY1fQ.075yZg1W37Z8c6qKfxrXZQPkP3aAuF9x8x2adSBwQrw'
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
+import { readFileSync } from 'fs'
+import { resolve, dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const envPath = resolve(dirname(fileURLToPath(import.meta.url)), '..', '.env.local')
+const envRaw = readFileSync(envPath, 'utf-8')
+const env = Object.fromEntries(
+  envRaw.split('\n')
+    .filter(l => l.includes('='))
+    .map(l => { const i = l.indexOf('='); return [l.substring(0, i).trim(), l.substring(i + 1).trim().replace(/^["']|["']$/g, '')] })
+)
+
+const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
+const SERVICE_KEY  = env.SUPABASE_SERVICE_ROLE_KEY
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY
+
+if (!SUPABASE_URL || !SERVICE_KEY) {
+  console.error('ERROR: Missing env vars in .env.local (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)')
+  process.exit(1)
+}
 
 if (!ANTHROPIC_KEY) {
   console.error('ERROR: ANTHROPIC_API_KEY is not set.')

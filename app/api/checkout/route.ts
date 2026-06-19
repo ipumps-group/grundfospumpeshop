@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { sendOrderEmail } from '@/lib/send-email'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 // ─── JWT ─────────────────────────────────────────────────────────────────────
 
@@ -54,12 +56,24 @@ interface CheckoutBody {
   coupon_id?: string
   items: CartItem[]
   delivery_method?: string
-  user_id?: string
 }
 
 // ─── POST /api/checkout ───────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // ── Derive user_id from session cookie, NEVER from request body ─────────────
+  let user_id: string | null = null
+  try {
+    const cookieStore = await cookies()
+    const supabaseServer = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } },
+    )
+    const { data: { user } } = await supabaseServer.auth.getUser()
+    if (user) user_id = user.id
+  } catch { /* guest checkout if no session */ }
+
   // ── Debug: Log all Montonio env vars ──────────────────────────────────────────
   const envCheck = {
     MONTONIO_SANDBOX: process.env.MONTONIO_SANDBOX,
@@ -96,7 +110,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Vigane päringu keha' }, { status: 400 })
   }
 
-  const { customer, shipping, notes, coupon_id, items, delivery_method, user_id } = body
+  const { customer, shipping, notes, coupon_id, items, delivery_method } = body
 
   if (!customer?.first_name || !customer?.last_name || !customer?.email ||
       !customer?.phone || !items?.length || !shipping?.carrier) {
@@ -325,8 +339,8 @@ export async function POST(req: NextRequest) {
         .eq('id', orderId)
     }
 
-    // Send confirmation emails (fire-and-forget)
-    sendOrderEmail(orderId, 'orderConfirmation').catch(console.error)
+    // Send admin notification about new order (fire-and-forget)
+    // Customer pending email is sent by Montonio webhook when payment is ABANDONED/VOIDED
     sendOrderEmail(orderId, 'newOrderAdmin').catch(console.error)
 
     return NextResponse.json({ payment_url: data.paymentUrl, ref: orderNumber })

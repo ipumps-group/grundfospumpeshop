@@ -2,10 +2,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { buildChangeRequestFromAction } from '@/lib/ads/mutations'
+import { requireAdmin } from '@/lib/api-auth'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 // This endpoint creates a change request from a mutation action.
 // The actual mutation is NOT executed here — it goes through the approval flow.
 export async function POST(request: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+  const ip = request.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, STRICT_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   try {
     const body = await request.json()
     const { action, target_type, target_id, platform, values } = body

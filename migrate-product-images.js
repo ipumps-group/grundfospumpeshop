@@ -1,13 +1,21 @@
-// migrate-images-v24.js
-// Käivita: node migrate-images-v24.js
-// Töötab Node.js v18+ (native fetch)
-
 const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
 const fs = require('fs/promises');
 
-const SUPABASE_URL = 'https://avfvouczlgbtrhtqgokx.supabase.co';
-const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2ZnZvdWN6bGdidHJodHFnb2t4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjE5MDk2NSwiZXhwIjoyMDg3NzY2OTY1fQ.075yZg1W37Z8c6qKfxrXZQPkP3aAuF9x8x2adSBwQrw'; // ← VAHETADA!
+const envRaw = require('fs').readFileSync(path.join(__dirname, '.env.local'), 'utf-8');
+const env = Object.fromEntries(
+  envRaw.split('\n')
+    .filter(l => l.includes('='))
+    .map(l => { const i = l.indexOf('='); return [l.substring(0, i).trim(), l.substring(i + 1).trim().replace(/^["']|["']$/g, '')] })
+);
+
+const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL;
+const SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+  console.error('ERROR: Missing env vars in .env.local (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)');
+  process.exit(1);
+}
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false }

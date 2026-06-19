@@ -4,6 +4,7 @@ import {
   buildOrderConfirmationHtml,
   buildStatusUpdateHtml,
   buildNewOrderAdminHtml,
+  statusSubject,
 } from './email-templates'
 
 type EmailType = 'orderConfirmation' | 'statusUpdate' | 'newOrderAdmin'
@@ -128,15 +129,19 @@ const logEntry: Record<string, unknown> = { order_id: orderId, type }
       logEntry.resend_id = (data as { id?: string })?.id
 
     } else if (type === 'statusUpdate') {
-      console.log('[sendOrderEmail] Checking notif_enabled (HARDCODED)')
-      const notifEnabled = true // await isNotifEnabled('notif_status_update')
-      console.log('[sendOrderEmail] statusUpdate - notifEnabled:', notifEnabled, 'customerEmail:', customerEmail, 'newStatus:', options?.newStatus)
-      if (!notifEnabled) {
-        console.log('[sendOrderEmail] NOTIF DISABLED - returning early')
-        return
-      }
       if (!customerEmail) throw new Error('No customer email')
       if (!options?.newStatus) throw new Error('newStatus required')
+
+      // Check per-status notification setting
+      const notifKey = `notify_${options.newStatus}`
+      const notifEnabled = await isNotifEnabled(notifKey)
+      console.log('[sendOrderEmail] statusUpdate - status:', options.newStatus, 'key:', notifKey, 'enabled:', notifEnabled)
+      if (!notifEnabled) {
+        console.log('[sendOrderEmail] NOTIF DISABLED for', options.newStatus, '- returning early')
+        return
+      }
+
+      const subject = `Tellimus #${orderRef} — ${statusSubject(options.newStatus)} — iPumps`
 
       console.log('[sendOrderEmail] Building HTML for statusUpdate')
       const html = buildStatusUpdateHtml({
@@ -150,7 +155,7 @@ const logEntry: Record<string, unknown> = { order_id: orderId, type }
       const { data, error } = await getResend().emails.send({
         from,
         to: customerEmail,
-        subject: `Tellimus #${orderRef} — staatuse uuendus`,
+        subject,
         html,
       })
       

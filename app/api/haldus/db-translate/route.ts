@@ -11,6 +11,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { requireSuperadmin } from '@/lib/api-auth'
+import { rateLimit, AI_RATE } from '@/lib/rate-limit'
 
 export const maxDuration = 60
 
@@ -162,6 +164,11 @@ export async function GET() {
 // ── POST — translate ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  try { await requireSuperadmin() } catch (e) { return e as NextResponse }
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, AI_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   if (!SERVICE_KEY)                   return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY not set' }, { status: 500 })
   if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: 'ANTHROPIC_API_KEY not set' }, { status: 500 })
 

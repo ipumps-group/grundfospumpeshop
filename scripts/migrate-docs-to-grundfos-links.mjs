@@ -18,12 +18,18 @@ import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { SUPABASE_URL as _SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } from './env.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+if (!_SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Missing env vars: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY in .env.local')
+  process.exit(1)
+}
+
 // ─── Config ────────────────────────────────────────────────────────────────
-const SUPABASE_URL     = 'https://avfvouczlgbtrhtqgokx.supabase.co'
-const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2ZnZvdWN6bGdidHJodHFnb2t4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjE5MDk2NSwiZXhwIjoyMDg3NzY2OTY1fQ.075yZg1W37Z8c6qKfxrXZQPkP3aAuF9x8x2adSBwQrw'
+const SUPABASE_URL     = _SUPABASE_URL
+const SERVICE_ROLE_KEY = SUPABASE_SERVICE_ROLE_KEY
 const BUCKET           = 'product-documents'
 const MANIFEST_PATH    = path.join(__dirname, 'grundfos-scraper/output/pdf_manifest.json')
 const SUPABASE_STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/`

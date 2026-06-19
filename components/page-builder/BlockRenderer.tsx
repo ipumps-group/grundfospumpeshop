@@ -114,7 +114,8 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
     case 'image': {
       const b = block as ImageBlock
       const src = b.url
-      const isSupabase = b.url.includes('supabase.co') || b.url.includes('sdqnzyfmanflslsjhytf')
+      if (!src) return null
+      const isSupabase = b.url.includes('supabase.co') || b.url.includes(process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/^https?:\/\//, '') || '')
       const hasDimensions = b.image_width && b.image_height
 
       const img = hasDimensions ? (

@@ -1,4 +1,5 @@
 import type { Carrier, DeliveryMethod } from './carriers';
+import { fetchWithTimeout } from './fetch-utils';
 
 interface CreateShipmentInput {
   carrier: Carrier;
@@ -65,7 +66,7 @@ async function createOmnivaShipment(input: CreateShipmentInput): Promise<CreateS
 
   const auth = Buffer.from(`${customerCode}:${password}`).toString('base64');
   
-  const res = await fetch('https://edixml.post.ee/epmx/services/messagesService.wsdl', {
+  const res = await fetchWithTimeout('https://edixml.post.ee/epmx/services/messagesService.wsdl', {
     method: 'POST',
     headers: {
       'Content-Type': 'text/xml; charset=utf-8',
@@ -73,7 +74,7 @@ async function createOmnivaShipment(input: CreateShipmentInput): Promise<CreateS
       'SOAPAction': '',
     },
     body: xml,
-  });
+  }, 20_000);
 
   if (!res.ok) {
     throw new Error(`Omniva API error: ${res.status}`);

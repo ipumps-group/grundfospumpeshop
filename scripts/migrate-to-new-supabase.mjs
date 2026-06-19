@@ -6,16 +6,27 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { readFileSync } from 'fs'
+import { resolve, dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const envPath = resolve(dirname(fileURLToPath(import.meta.url)), '..', '.env.local')
+const envRaw = readFileSync(envPath, 'utf-8')
+const env = Object.fromEntries(
+  envRaw.split('\n')
+    .filter(l => l.includes('='))
+    .map(l => { const i = l.indexOf('='); return [l.substring(0, i).trim(), l.substring(i + 1).trim().replace(/^["']|["']$/g, '')] })
+)
 
 // ── Credentials ───────────────────────────────────────────────────────────────
 const OLD = {
-  url: 'https://avfvouczlgbtrhtqgokx.supabase.co',
-  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2ZnZvdWN6bGdidHJodHFnb2t4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjE5MDk2NSwiZXhwIjoyMDg3NzY2OTY1fQ.075yZg1W37Z8c6qKfxrXZQPkP3aAuF9x8x2adSBwQrw',
+  url: env.OLD_SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL,
+  key: env.OLD_SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY,
 }
 
 const NEW = {
-  url: 'https://sdqnzyfmanflslsjhytf.supabase.co',
-  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkcW56eWZtYW5mbHNsc2poeXRmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU1MDY3NSwiZXhwIjoyMDkxMTI2Njc1fQ.H3LiyHS8ZEgoqGd3TYmPoINGGwneMffASgzML2Aei8k',
+  url: env.NEXT_PUBLIC_SUPABASE_URL,
+  key: env.SUPABASE_SERVICE_ROLE_KEY,
 }
 
 // ── Table migration order (respects foreign key dependencies) ─────────────────

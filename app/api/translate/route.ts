@@ -1,5 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireSuperadmin } from '@/lib/api-auth'
+import { rateLimit, AI_RATE } from '@/lib/rate-limit'
 
 const LOCALES = ['en', 'ru', 'lv', 'lt'] as const
 const LOCALE_NAMES: Record<string, string> = {
@@ -65,6 +67,11 @@ async function updateDB(table: string, id: number, patch: Record<string, string 
  * Columns must exist: fieldName_en, fieldName_ru, etc.
  */
 export async function POST(req: NextRequest) {
+  try { await requireSuperadmin() } catch (e) { return e as NextResponse }
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, AI_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'ANTHROPIC_API_KEY not set' }, { status: 500 })
   if (!SERVICE_KEY) return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY not set' }, { status: 500 })

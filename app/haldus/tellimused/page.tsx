@@ -116,15 +116,20 @@ export default function TellimusedPage() {
 
     setDeleting(true)
     const ids = Array.from(selected)
+    const token = (await supabase.auth.getSession()).data.session?.access_token
     
-    for (const id of ids) {
-      const { error } = await supabase.auth.getSession()
-      const token = (await supabase.auth.getSession()).data.session?.access_token
-      
-      await fetch(`/api/haldus/orders/${id}/delete`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    const results = await Promise.allSettled(
+      ids.map(id =>
+        fetch(`/api/haldus/orders/${id}/delete`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(e => { console.error(`Failed to delete order ${id}:`, e); return null })
+      )
+    )
+
+    const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value && !r.value.ok)).length
+    if (failed > 0) {
+      alert(`${failed} of ${ids.length} orders failed to delete`)
     }
 
     setSelected(new Set())

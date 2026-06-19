@@ -1,6 +1,7 @@
 ﻿import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { rateLimit, AI_RATE } from '@/lib/rate-limit'
 
 const client = new Anthropic()
 
@@ -17,6 +18,10 @@ const AREA_NAMES: Record<string, { et: string; en: string; ru: string; lv: strin
 }
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, AI_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   const { query } = await req.json().catch(() => ({}))
   if (!query?.trim()) return NextResponse.json({ categorySlug: null, categoryType: null })
 

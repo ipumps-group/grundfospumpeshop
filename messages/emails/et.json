@@ -15,7 +15,7 @@
     "preview": "Tellimus {orderNumber} kinnitatud — {total}",
     "subject": "Tellimus {orderNumber} kinnitatud",
     "heading": "Aitäh tellimuse eest!",
-    "intro": "Teie tellimus <strong>{orderNumber}</strong> on saadud ja makse edukalt kinnitatud. Asume kohe pakkimise kallale.",
+    "intro": "Saime teie tellimuse <strong>{orderNumber}</strong> kätte ning makse on kinnitatud. Asume seda komplekteerima. Saadame peatselt teavituse, kui tellimus on teele pandud.",
     "itemsHeading": "Tellitud tooted",
     "shippingHeading": "Kohaletoimetamine",
     "shippingNote": "Saadame teile uue e-kirja kohe, kui pakk on teel — koos jälgimisnumbriga.",

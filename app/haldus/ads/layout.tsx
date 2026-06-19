@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/ads/utils'
 
+const ADMIN_ROLES = ['manager', 'superadmin']
+
 const navItems = [
   { href: '/haldus/ads', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/haldus/ads/campaigns', label: 'Campaigns', icon: Megaphone },
@@ -31,8 +33,15 @@ export default function AdsLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) router.push('/haldus')
-      else setUserEmail(session.user?.email || null)
+      if (!session) { router.push('/haldus'); return }
+      const userId = session.user.id
+      supabase.from('profiles').select('role').eq('id', userId).single().then(({ data: profile }) => {
+        if (!profile || !ADMIN_ROLES.includes(profile.role)) {
+          router.push('/haldus')
+        } else {
+          setUserEmail(session.user.email || null)
+        }
+      })
     })
   }, [router])
 

@@ -4,8 +4,15 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getAdAccounts, getAggregatedInsights, getPeriodComparison, createRecommendation } from '@/lib/ads/admin-queries'
 import { analyzePerformance } from '@/lib/ads/openai'
 import { getDateRangePreset, getPreviousPeriod } from '@/lib/ads/utils'
+import { requireAdmin } from '@/lib/api-auth'
+import { rateLimit, AI_RATE } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+  const ip = request.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, AI_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   try {
     const { data: accounts } = await getAdAccounts()
     if (!accounts?.length) {

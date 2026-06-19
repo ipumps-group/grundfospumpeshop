@@ -3,9 +3,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createChangeRequest, updateChangeRequest, getChangeRequests } from '@/lib/ads/admin-queries'
 import { buildChangeRequestFromAction, executeMutation } from '@/lib/ads/mutations'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireAdmin } from '@/lib/api-auth'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 // Create a change request
 export async function POST(request: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+  const ip = request.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, STRICT_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   try {
     const body = await request.json()
 
@@ -56,6 +63,11 @@ export async function POST(request: NextRequest) {
 
 // Approve / reject / update a change request
 export async function PATCH(request: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+  const ip = request.headers.get('x-forwarded-for') || 'unknown'
+  const rl = rateLimit(ip, STRICT_RATE.maxRequests)
+  if (rl.blocked) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
   try {
     const body = await request.json()
     const { id, status } = body
