@@ -1,9 +1,9 @@
 {
   "common": {
     "greeting": "Hi {name}!",
-    "thanks": "Thank you for choosing iPumps.",
+    "thanks": "Thank you for choosing Pump OÜ.",
     "questions": "Questions? Reply to this email or write to {email}.",
-    "footer": "iPumps · {site}\nOfficial Grundfos dealer in Estonia",
+    "footer": "Pump OÜ · {site}\nOfficial Grundfos dealer in Estonia",
     "viewOrder": "View order",
     "total": "Total",
     "subtotal": "Subtotal",

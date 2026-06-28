@@ -7,6 +7,11 @@ import OrderShipped from '@/emails/OrderShipped';
 import RefundConfirmation from '@/emails/RefundConfirmation';
 import AbandonedCart from '@/emails/AbandonedCart';
 import type { Carrier, DeliveryMethod } from './carriers';
+import {
+  buildStatusUpdateHtml,
+  buildNewOrderAdminHtml,
+  statusSubject,
+} from './email-templates';
 
 // ── Tüübid ────────────────────────────────────────────────────────────────
 
@@ -61,6 +66,26 @@ async function isSuppressed(
   if (data.reason === 'manual') return true;
   if (data.reason === 'bounced' && !TRANSACTIONAL.includes(category)) return true;
   return false;
+}
+
+// ── Teavituste seaded settings tabelist ──────────────────────────────────
+
+async function getSetting(key: string, fallback: string): Promise<string> {
+  try {
+    const { data } = await supabaseAdmin
+      .from('settings')
+      .select('value')
+      .eq('key', key)
+      .single()
+    return data?.value ?? fallback
+  } catch {
+    return fallback
+  }
+}
+
+export async function isNotifEnabled(key: string): Promise<boolean> {
+  const val = await getSetting(key, 'true')
+  return val !== 'false' && val !== '0'
 }
 
 /**
@@ -294,4 +319,122 @@ export async function sendAbandonedCart(data: {
       replyToEmail: EMAIL_REPLY_TO,
     }),
   });
+}
+
+// ── Staatuse muutuse teavitus kliendile ──────────────────────────────────
+
+interface StatusUpdateData {
+  orderId: string
+  newStatus: string
+  note?: string
+}
+
+export async function sendOrderStatusUpdate({ orderId, newStatus, note }: StatusUpdateData): Promise<void> {
+  // Check notification toggle
+  const notifKey = `notify_${newStatus}`
+  if (!(await isNotifEnabled(notifKey))) {
+    console.log(`[email] Status update skipped — ${notifKey} disabled`)
+    return
+  }
+
+  // Load order
+  const { data: order, error: orderErr } = await supabaseAdmin
+    .from('orders')
+    .select('id, order_number, email, customer_name, shipping_address, total, created_at, montonio_order_id')
+    .eq('id', orderId)
+    .single()
+
+  if (orderErr || !order) {
+    console.error('[email] Order not found for status update', orderId)
+    return
+  }
+
+  const sa: Record<string, string> = order.shipping_address ?? {}
+  let customerEmail: string | null = sa.customer_email ?? order.email ?? null
+  let customerName: string | null = sa.full_name ?? sa.customer_name ?? order.customer_name ?? null
+  const orderRef = (order.order_number ?? order.montonio_order_id ?? order.id).toString()
+
+  if (!customerEmail) {
+    console.warn(`[email] No customer email for order ${orderRef}, skipping status update`)
+    return
+  }
+
+  // Check suppression
+  if (await isSuppressed(customerEmail, 'order_delivered')) {
+    console.log(`[email] Skipped suppressed address: ${customerEmail} (status update)`)
+    return
+  }
+
+  const subject = `Tellimus #${orderRef} — ${statusSubject(newStatus)} — Pump OÜ`
+  const html = buildStatusUpdateHtml({
+    orderRef,
+    customerName,
+    newStatus,
+    note,
+  })
+
+  try {
+    const { data, error } = await getResend().emails.send({
+      from: EMAIL_FROM,
+      to: customerEmail,
+      subject,
+      html,
+      tags: [
+        { name: 'category', value: 'status_update' },
+        { name: 'order_number', value: orderRef },
+        { name: 'new_status', value: newStatus },
+      ],
+    })
+    if (error) throw new Error(error.message)
+    console.log(`[email] Sent status update (${newStatus}) → ${customerEmail} (id=${data?.id})`)
+  } catch (err) {
+    console.error(`[email] Status update failed (${newStatus} → ${customerEmail})`, err)
+  }
+}
+
+// ── Uue tellimuse teavitus adminile ──────────────────────────────────────
+
+export async function sendNewOrderAdmin(orderId: string): Promise<void> {
+  // Load order with items
+  const { data: order, error: orderErr } = await supabaseAdmin
+    .from('orders')
+    .select('id, order_number, email, customer_name, shipping_address, total, created_at, montonio_order_id, order_items(product_name, quantity, unit_price)')
+    .eq('id', orderId)
+    .single()
+
+  if (orderErr || !order) {
+    console.error('[email] Order not found for admin notification', orderId)
+    return
+  }
+
+  const sa: Record<string, string> = order.shipping_address ?? {}
+  const customerEmail = sa.customer_email ?? order.email ?? null
+  const customerName = sa.full_name ?? sa.customer_name ?? order.customer_name ?? null
+  const orderRef = (order.order_number ?? order.montonio_order_id ?? order.id).toString()
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL ?? 'info@pumbapood.ee'
+
+  const items = (order.order_items ?? []) as Array<{ product_name: string; quantity: number; unit_price: number }>
+
+  const html = buildNewOrderAdminHtml({
+    orderRef,
+    order: { total: order.total, created_at: order.created_at },
+    items,
+    customerName,
+    customerEmail,
+    shippingAddress: sa,
+  })
+
+  try {
+    const { data, error } = await getResend().emails.send({
+      from: EMAIL_FROM,
+      to: adminEmail,
+      subject: `Uus tellimus #${orderRef}`,
+      html,
+      tags: [{ name: 'category', value: 'new_order_admin' }],
+    })
+    if (error) throw new Error(error.message)
+    console.log(`[email] Sent admin notification #${orderRef} → ${adminEmail} (id=${data?.id})`)
+  } catch (err) {
+    console.error(`[email] Admin notification failed (#${orderRef})`, err)
+  }
 }

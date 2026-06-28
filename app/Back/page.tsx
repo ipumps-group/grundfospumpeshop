@@ -606,13 +606,13 @@ function Footer() {
             <div className="text-white font-semibold text-sm mb-4">Kontakt</div>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2"><Phone size={13} /> +372 5555 1234</div>
-              <div className="flex items-center gap-2"><Mail size={13} /> info@ipumps.ee</div>
+              <div className="flex items-center gap-2"><Mail size={13} /> info@pumbapood.ee</div>
               <div className="flex items-start gap-2"><MapPin size={13} className="mt-0.5 flex-shrink-0" /> Vana-Narva mnt 3, uks 5/6,<br />Tallinn</div>
             </div>
           </div>
         </div>
         <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[15px]">
-          <span>© 2025 iPumps OÜ. Kõik õigused kaitstud.</span>
+          <span>© 2025 Pump OÜ. Kõik õigused kaitstud.</span>
           <div className="flex gap-4">
             <a href="#" className="hover:text-white transition-colors">Privaatsuspoliitika</a>
             <a href="#" className="hover:text-white transition-colors">Kasutustingimused</a>

@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
 
   // ── Build workbook ─────────────────────────────────────────────────────────
   const wb = new ExcelJS.Workbook()
-  wb.creator  = 'iPumps'
+  wb.creator  = 'Pump OÜ'
   wb.created  = new Date()
   wb.modified = new Date()
 

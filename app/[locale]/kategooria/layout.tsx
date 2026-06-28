@@ -25,11 +25,11 @@ export async function generateMetadata(
       .single()
 
     if (!category) {
-      return { title: 'Kategooria | iPumps' }
+      return { title: 'Kategooria | Pump OÜ' }
     }
 
     const name = category.name_et || slug
-    const title = category.meta_title || `${name} | iPumps`
+    const title = category.meta_title || `${name} | Pump OÜ`
     const description = category.meta_description || `${name} — vaata kõiki tooteid selles kategoorias.`
 
     const canonicalBase = TEGEVUSALA_SLUGS.has(slug) ? `/tooted/${slug}` : `/kategooria/${slug}`
@@ -48,7 +48,7 @@ export async function generateMetadata(
         title,
         description,
         url: canonical,
-        siteName: 'iPumps',
+        siteName: 'Pump OÜ',
         locale,
         type: 'website',
         images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],
@@ -57,7 +57,7 @@ export async function generateMetadata(
     }
   } catch (e) {
     console.error('[generateMetadata] kategooria layout error:', e)
-    return { title: 'Kategooria | iPumps' }
+    return { title: 'Kategooria | Pump OÜ' }
   }
 }
 

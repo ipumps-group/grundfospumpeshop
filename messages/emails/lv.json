@@ -1,9 +1,9 @@
 {
   "common": {
     "greeting": "Sveiki, {name}!",
-    "thanks": "Paldies, ka izvēlējāties iPumps.",
+    "thanks": "Paldies, ka izvēlējāties Pump OÜ.",
     "questions": "Jautājumi? Atbildiet uz šo e-pastu vai rakstiet uz {email}.",
-    "footer": "iPumps · {site}\nOficiālais Grundfos izplatītājs Igaunijā",
+    "footer": "Pump OÜ · {site}\nOficiālais Grundfos izplatītājs Igaunijā",
     "viewOrder": "Skatīt pasūtījumu",
     "total": "Kopā",
     "subtotal": "Starpsumma",

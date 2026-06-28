@@ -11,6 +11,7 @@ import {
 import CouponInput from '@/components/checkout/CouponInput'
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/auth-context'
+import { COMPANY } from '@/lib/config'
 
 // ─── TÜÜBID ─────────────────────────────────────────────────────────────────
 
@@ -157,10 +158,10 @@ export default function CheckoutPage() {
     if (deliveryMethod === 'pickup') {
       shippingObj = {
         ...shippingObj,
-        pickup_point_name: 'Vana-Narva mnt 3, uks 5/6, Tallinn',
-        pickup_point_address: 'Vana-Narva mnt 3',
-        pickup_point_city: 'Tallinn',
-        pickup_point_postal: '10115',
+        pickup_point_name: `${COMPANY.shopAddress.street}, uks 5/6, ${COMPANY.shopAddress.locality}`,
+        pickup_point_address: COMPANY.shopAddress.street,
+        pickup_point_city: COMPANY.shopAddress.locality,
+        pickup_point_postal: COMPANY.shopAddress.postalCode,
       }
     } else if (deliveryMethod === 'courier') {
       shippingObj = {

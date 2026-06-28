@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "siteName": "iPumps",
+    "siteName": "Pump OÜ",
     "home": {
-      "title": "Grundfos pumps and solutions – iPumps",
+      "title": "Grundfos pumps and solutions – Pump OÜ",
       "description": "Buy Grundfos MAGNA3, Alpha, SCALA and other pumps. 321 models in stock. Expert advice and installation service."
     },
     "products": {
-      "title": "All products – iPumps",
+      "title": "All products – Pump OÜ",
       "description": "Browse all Grundfos pumps. 321 models, prices with VAT, fast delivery."
     }
   },
@@ -21,14 +21,14 @@
     "reovesi": "Sewage pumps"
   },
   "tegevusaladTitle": {
-    "kute": "Heating pumps – {count} models in stock | iPumps",
-    "jahutus": "Cooling pumps – {count} models in stock | iPumps",
-    "sooja-tarbevee-tsirkulatsioonipump": "Hot water pumps – {count} models in stock | iPumps",
-    "puurkaevud": "Borewell pumps – {count} models in stock | iPumps",
-    "drenaaz": "Drainage pumps – {count} models in stock | iPumps",
-    "salvkaevud": "Well pumps – {count} models in stock | iPumps",
-    "rohutoste": "Pressure boost pumps – {count} models in stock | iPumps",
-    "reovesi": "Sewage pumps – {count} models in stock | iPumps"
+    "kute": "Heating pumps – {count} models in stock | Pump OÜ",
+    "jahutus": "Cooling pumps – {count} models in stock | Pump OÜ",
+    "sooja-tarbevee-tsirkulatsioonipump": "Hot water pumps – {count} models in stock | Pump OÜ",
+    "puurkaevud": "Borewell pumps – {count} models in stock | Pump OÜ",
+    "drenaaz": "Drainage pumps – {count} models in stock | Pump OÜ",
+    "salvkaevud": "Well pumps – {count} models in stock | Pump OÜ",
+    "rohutoste": "Pressure boost pumps – {count} models in stock | Pump OÜ",
+    "reovesi": "Sewage pumps – {count} models in stock | Pump OÜ"
   },
   "tegevusaladDesc": {
     "kute": "Grundfos heating pumps for homes and commercial buildings. High efficiency, quiet operation, long lifespan.",
@@ -42,19 +42,19 @@
   },
   "staticPages": {
     "kontakt": {
-      "title": "Contact – iPumps",
+      "title": "Contact – Pump OÜ",
       "description": "Contact us. We help you choose the right pump. Phone: +372 503 3978"
     },
     "privaatsuspoliitika": {
-      "title": "Privacy Policy – iPumps",
+      "title": "Privacy Policy – Pump OÜ",
       "description": "How we use and protect your personal data. Read more about our privacy policy."
     },
     "ostutingimused": {
-      "title": "Terms of Sale – iPumps",
+      "title": "Terms of Sale – Pump OÜ",
       "description": "Store terms of sale. Payment methods, delivery, returns. Everything you need to know."
     },
     "tagastamine": {
-      "title": "Returns – iPumps",
+      "title": "Returns – Pump OÜ",
       "description": "How to return products. 14-day return right, fast refund."
     }
   }

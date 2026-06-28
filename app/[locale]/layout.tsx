@@ -45,7 +45,7 @@ export async function generateMetadata(
       title,
       description,
       url: canonical,
-      siteName: 'iPumps',
+      siteName: 'Pump OÜ',
       locale: locale,
       type: 'website',
       images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],
@@ -105,7 +105,7 @@ async function OrganizationSchema() {
   const localBusiness = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'iPumps pood',
+    name: 'Pump OÜ',
     image: `${SITE_URL}/og-default.jpg`,
     url: SITE_URL,
     telephone: '+3725274403',

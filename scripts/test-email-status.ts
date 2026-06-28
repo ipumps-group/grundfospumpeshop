@@ -32,7 +32,7 @@ async function testStatusEmail() {
   const R = new resend.Resend(process.env.RESEND_API_KEY!)
   
   const emailResult = await R.emails.send({
-    from: 'iPumps OÜ <info@pumbapood.ee>',
+    from: 'Pump OÜ <info@pumbapood.ee>',
     to: 'test@outline.ee',
     subject: `Test - Tellimus #${orderId?.slice(-8)} staatuse uuendus`,
     html: '<h1>Test email</h1><p>This is a test.</p>'

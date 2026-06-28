@@ -170,7 +170,7 @@ export default function HaldusLehedPage() {
               value={settings.header_email}
               onChange={e => setSettings({ ...settings, header_email: e.target.value })}
               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-[15px] outline-none focus:border-[#003366]"
-              placeholder="info@ipumps.ee"
+              placeholder="info@pumbapood.ee"
             />
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function HaldusLehedPage() {
               value={settings.footer_company}
               onChange={e => setSettings({ ...settings, footer_company: e.target.value })}
               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-[15px] outline-none focus:border-[#003366]"
-              placeholder="iPumps OÜ"
+              placeholder="Pump OÜ"
             />
           </div>
           

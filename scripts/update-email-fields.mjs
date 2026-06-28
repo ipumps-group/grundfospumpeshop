@@ -16,7 +16,7 @@ async function updateEmailFields() {
   
   // Combine user and domain into full email
   const user = currentSettings.header_email_user || 'info'
-  const domain = currentSettings.header_email_domain || 'ipumps.ee'
+  const domain = currentSettings.header_email_domain || 'pumbapood.ee'
   const fullEmail = `${user}@${domain}`
   
   console.log('Current email:', fullEmail)

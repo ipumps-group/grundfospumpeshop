@@ -12,7 +12,7 @@ const settings = [
   { key: 'notif_order_confirmation', value: 'true' },
   { key: 'notif_status_update', value: 'true' },
   { key: 'notif_new_order_admin', value: 'true' },
-  { key: 'company_name', value: 'iPumps OÜ' },
+  { key: 'company_name', value: 'Pump OÜ' },
   { key: 'email_from', value: 'info@pumbapood.ee' },
   { key: 'email_admin', value: 'info@pumbapood.ee' },
 ]

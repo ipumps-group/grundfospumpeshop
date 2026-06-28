@@ -384,7 +384,7 @@
     "logout": "Izrakstīties",
     "passwordReset": "Paroles atiestatīšana",
     "resetSent": "Paroles atiestatīšanas saite ir nosūtīta uz jūsu e-pasta adresi.",
-    "welcomeBack": "Laipni lūdzam atpakaļ iPumps veikalā",
+    "welcomeBack": "Laipni lūdzam atpakaļ Pump OÜ veikalā",
     "continueWithGoogle": "Turpināt ar Google",
     "or": "vai",
     "emailLabel": "E-pasta adrese",
@@ -519,12 +519,12 @@
     "openInGoogleMaps": "Atvērt Google Maps"
   },
   "metadata": {
-    "siteName": "iPumps",
-    "home": { "title": "Grundfos sūkņi un risinājumi – iPumps", "description": "Pirkt Grundfos sūkņus. 321 modelis noliktavā. Konsultācijas." },
-    "products": { "title": "Visi produkti – iPumps", "description": "Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN." }
+    "siteName": "Pump OÜ",
+    "home": { "title": "Grundfos sūkņi un risinājumi – Pump OÜ", "description": "Pirkt Grundfos sūkņus. 321 modelis noliktavā. Konsultācijas." },
+    "products": { "title": "Visi produkti – Pump OÜ", "description": "Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN." }
   },
   "tegevusalad": { "kute": "Sildīšanas sūkņi", "jahutus": "Dzesēšanas sūkņi", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija", "puurkaevud": "Urbuma sūkņi", "drenaaz": "Drenāžas sūkņi", "salvkaevud": "Akas sūkņi", "rohutoste": "Spiediena sūkņi", "reovesi": "Notekūdeņu sūkņi" },
-  "tegevusaladTitle": { "kute": "Sildīšanas sūkņi – {count} modeļi | iPumps", "jahutus": "Dzesēšanas sūkņi – {count} | iPumps", "sooja-tarbevee-tsirkulatsioonipump": "Karstais ūdens – {count} | iPumps", "puurkaevud": "Urbuma sūkņi – {count} | iPumps", "drenaaz": "Drenāža – {count} | iPumps", "salvkaevud": "Akas sūkņi – {count} | iPumps", "rohutoste": "Spiediens – {count} | iPumps", "reovesi": "Notekūdeņi – {count} | iPumps" },
+  "tegevusaladTitle": { "kute": "Sildīšanas sūkņi – {count} modeļi | Pump OÜ", "jahutus": "Dzesēšanas sūkņi – {count} | Pump OÜ", "sooja-tarbevee-tsirkulatsioonipump": "Karstais ūdens – {count} | Pump OÜ", "puurkaevud": "Urbuma sūkņi – {count} | Pump OÜ", "drenaaz": "Drenāža – {count} | Pump OÜ", "salvkaevud": "Akas sūkņi – {count} | Pump OÜ", "rohutoste": "Spiediens – {count} | Pump OÜ", "reovesi": "Notekūdeņi – {count} | Pump OÜ" },
   "tegevusaladDesc": { "kute": "Grundfos sildīšanas sūkņi mājām.", "jahutus": "Dzesēšanas sūkņi sistēmām.", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija.", "puurkaevud": "Dziļie sūkņi urbumiem.", "drenaaz": "Drenāžas sūkņi pagrabiem.", "salvkaevud": "Akas sūkņi virsējiem ūdeņiem.", "rohutoste": "Spiediena sūkņi ūdens spiedienam.", "reovesi": "Notekūdeņu sūkņi." },
   "cookieConsent": {
     "message": "Mēs izmantojam sīkfailus vietnes darbībai un apmeklējumu statistikai.",

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { sendOrderConfirmation } from '@/lib/email';
-import { sendOrderEmail } from '@/lib/send-email';
+import { sendOrderConfirmation, sendOrderStatusUpdate } from '@/lib/email';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -119,7 +118,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (orderForPending && orderForPending.status === 'pending' && orderForPending.email) {
-      sendOrderEmail(orderForPending.id, 'statusUpdate', { newStatus: 'pending' }).catch(err =>
+      sendOrderStatusUpdate({ orderId: orderForPending.id, newStatus: 'pending' }).catch(err =>
         console.error('[montonio-webhook] Pending email failed', err)
       );
     }

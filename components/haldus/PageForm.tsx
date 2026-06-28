@@ -270,7 +270,7 @@ export default function PageForm({ initialData, mode }: { initialData?: PageData
                     placeholder={[
                       'Tallinn, Eesti',
                       '+372 5555 1234',
-                      'info@ipumps.ee',
+                      'info@pumbapood.ee',
                       'E-R 8:00–17:00',
                     ][i]}
                   />

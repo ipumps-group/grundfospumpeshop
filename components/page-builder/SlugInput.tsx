@@ -62,7 +62,7 @@ export default function SlugInput({ value, onChange, title, excludeId }: Props) 
       {checking && <p className="text-[12px] text-gray-400 mt-1">Kontrollin...</p>}
       {taken && <p className="text-[12px] text-red-500 mt-1">See slug on juba kasutusel.</p>}
       <p className="text-[12px] text-gray-400 mt-1">
-        Eelvaade: <span className="font-mono">ipumps.ee/leht/{value || '...'}</span>
+        Eelvaade: <span className="font-mono">pumbapood.ee/leht/{value || '...'}</span>
       </p>
     </div>
   )

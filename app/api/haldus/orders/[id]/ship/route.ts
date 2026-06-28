@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { sendOrderShipped } from '@/lib/email';
+import { sendOrderShipped, isNotifEnabled } from '@/lib/email';
 import {
   buildTrackingUrl,
   type Carrier,
@@ -157,6 +157,11 @@ export async function POST(
   // 6. Saada OrderShipped mail
   let emailResult: unknown = { skipped: true, reason: 'no_email' };
   if (order.email) {
+    // Respect notification toggle
+    if (!(await isNotifEnabled('notify_shipped'))) {
+      emailResult = { skipped: true, reason: 'notification_toggle_disabled' }
+      console.log('[ship] notify_shipped disabled, skipping email')
+    } else {
     const addr = (order.shipping_address ?? {}) as Record<string, unknown>;
     const deliveryAddress =
       body.deliveryAddressOverride ??
@@ -186,6 +191,7 @@ export async function POST(
     } catch (emailErr) {
       console.error('[ship] Email failed (non-blocking)', emailErr);
       emailResult = { skipped: false, error: String(emailErr) };
+    }
     }
   }
 

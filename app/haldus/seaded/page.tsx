@@ -18,20 +18,24 @@ const DEFAULT_SETTINGS: Settings = {
   company_vat:              '',
   company_address:          '',
   notify_pending:           'true',
+  notify_paid:              'true',
   notify_processing:        'true',
   notify_shipped:           'true',
   notify_delivered:         'true',
   notify_cancelled:         'true',
+  notify_failed:            'true',
   out_of_stock_visible:     'true',
   out_of_stock_purchasable: 'false',
 }
 
 const NOTIFICATION_STATUSES = [
   { key: 'notify_pending',    label: 'Ootel (tellimus vastu võetud)' },
+  { key: 'notify_paid',       label: 'Makstud' },
   { key: 'notify_processing', label: 'Töötlemisel' },
   { key: 'notify_shipped',    label: 'Saadetud' },
   { key: 'notify_delivered',  label: 'Kohale toimetatud' },
   { key: 'notify_cancelled',  label: 'Tühistatud' },
+  { key: 'notify_failed',     label: 'Ebaõnnestunud' },
 ]
 
 export default function SeadedPage() {
@@ -152,7 +156,7 @@ export default function SeadedPage() {
               value={settings.order_notification_email}
               onChange={e => set('order_notification_email', e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]"
-              placeholder="admin@ipumps.ee"
+              placeholder="admin@pumbapood.ee"
             />
           </div>
           <div>
@@ -165,7 +169,7 @@ export default function SeadedPage() {
               value={settings.sender_email}
               onChange={e => set('sender_email', e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]"
-              placeholder="tellimused@ipumps.ee"
+              placeholder="tellimused@pumbapood.ee"
             />
           </div>
         </div>
@@ -180,7 +184,7 @@ export default function SeadedPage() {
             <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Ärinimi</label>
             <input value={settings.company_name} onChange={e => set('company_name', e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]"
-              placeholder="iPumps OÜ" />
+              placeholder="Pump OÜ" />
           </div>
           <div>
             <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Registrikood</label>

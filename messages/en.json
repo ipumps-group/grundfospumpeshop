@@ -384,7 +384,7 @@
     "logout": "Log out",
     "passwordReset": "Password reset",
     "resetSent": "Password reset link has been sent to your email address.",
-    "welcomeBack": "Welcome back to iPumps store",
+    "welcomeBack": "Welcome back to Pump OÜ store",
     "continueWithGoogle": "Continue with Google",
     "or": "or",
     "emailLabel": "Email address",
@@ -519,13 +519,13 @@
     "openInGoogleMaps": "Open in Google Maps"
   },
   "metadata": {
-    "siteName": "iPumps",
+    "siteName": "Pump OÜ",
     "home": {
-      "title": "Grundfos pumps and solutions – iPumps",
+      "title": "Grundfos pumps and solutions – Pump OÜ",
       "description": "Buy Grundfos MAGNA3, Alpha, scALA and other pumps. 321 models in stock. Expert advice and installation."
     },
     "products": {
-      "title": "All products – iPumps",
+      "title": "All products – Pump OÜ",
       "description": "View all Grundfos pumps. 321 models, prices incl. VAT, fast delivery."
     }
   },
@@ -540,14 +540,14 @@
     "reovesi": "Sewage pumps"
   },
   "tegevusaladTitle": {
-    "kute": "Heating pumps – {count} models in stock | iPumps",
-    "jahutus": "Cooling pumps – {count} models in stock | iPumps",
-    "sooja-tarbevee-tsirkulatsioonipump": "Hot water circulation – {count} models in stock | iPumps",
-    "puurkaevud": "Borewell pumps – {count} models in stock | iPumps",
-    "drenaaz": "Drainage pumps – {count} models in stock | iPumps",
-    "salvkaevud": "Well pumps – {count} models in stock | iPumps",
-    "rohutoste": "Pressure pumps – {count} models in stock | iPumps",
-    "reovesi": "Sewage pumps – {count} models in stock | iPumps"
+    "kute": "Heating pumps – {count} models in stock | Pump OÜ",
+    "jahutus": "Cooling pumps – {count} models in stock | Pump OÜ",
+    "sooja-tarbevee-tsirkulatsioonipump": "Hot water circulation – {count} models in stock | Pump OÜ",
+    "puurkaevud": "Borewell pumps – {count} models in stock | Pump OÜ",
+    "drenaaz": "Drainage pumps – {count} models in stock | Pump OÜ",
+    "salvkaevud": "Well pumps – {count} models in stock | Pump OÜ",
+    "rohutoste": "Pressure pumps – {count} models in stock | Pump OÜ",
+    "reovesi": "Sewage pumps – {count} models in stock | Pump OÜ"
   },
   "tegevusaladDesc": {
     "kute": "Grundfos heating pumps for homes and commercial buildings. High efficiency, quiet operation, long lifespan.",

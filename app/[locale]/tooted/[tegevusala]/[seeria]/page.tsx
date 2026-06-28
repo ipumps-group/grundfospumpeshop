@@ -34,7 +34,7 @@ export async function generateMetadata(
       return { title: 'Tooted' }
     }
 
-    const title = series.meta_title || `${series.name} — ${area.name_et} | iPumps`
+    const title = series.meta_title || `${series.name} — ${area.name_et} | Pump OÜ`
     const description = series.meta_description || `${series.name} tooted ${area.name_et.toLowerCase()} kategoorias.`
     const canonical = `${SITE_URL}/${locale}/tooted/${tegevusala}/${seeria}`
 
@@ -51,7 +51,7 @@ export async function generateMetadata(
         title,
         description,
         url: canonical,
-        siteName: 'iPumps',
+        siteName: 'Pump OÜ',
         locale,
         type: 'website',
         images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],

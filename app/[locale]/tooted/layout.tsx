@@ -5,11 +5,11 @@ import { SITE_URL } from '@/lib/config'
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
 const METADATA_BY_LOCALE: Record<string, { title: string; description: string }> = {
-  et: { title: 'Kõik tooted – iPumps', description: 'Vaata kõiki Grundfos pumbad. 321 mudelit, hinnad koos käibemaksuga, kiire tarnimine.' },
-  en: { title: 'All products – iPumps', description: 'View all Grundfos pumps. 321 models, prices incl. VAT, fast delivery.' },
-  ru: { title: 'Все товары – iPumps', description: 'Смотрите все насосы Grundfos. 321 модель, цены с НДС, быстрая доставка.' },
-  lv: { title: 'Visi produkti – iPumps', description: 'Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN.' },
-  lt: { title: 'Visi produktai – iPumps', description: 'Peržiūrėkite visus Grundfos siurblius. 321 modelis, kainos su PVM.' },
+  et: { title: 'Kõik tooted – Pump OÜ', description: 'Vaata kõiki Grundfos pumbad. 321 mudelit, hinnad koos käibemaksuga, kiire tarnimine.' },
+  en: { title: 'All products – Pump OÜ', description: 'View all Grundfos pumps. 321 models, prices incl. VAT, fast delivery.' },
+  ru: { title: 'Все товары – Pump OÜ', description: 'Смотрите все насосы Grundfos. 321 модель, цены с НДС, быстрая доставка.' },
+  lv: { title: 'Visi produkti – Pump OÜ', description: 'Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN.' },
+  lt: { title: 'Visi produktai – Pump OÜ', description: 'Peržiūrėkite visus Grundfos siurblius. 321 modelis, kainos su PVM.' },
 }
 
 export async function generateMetadata(
@@ -32,7 +32,7 @@ export async function generateMetadata(
       title: meta.title,
       description: meta.description,
       url: canonical,
-      siteName: 'iPumps',
+      siteName: 'Pump OÜ',
       locale,
       type: 'website',
       images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],

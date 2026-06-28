@@ -4,7 +4,7 @@
  */
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pumbapood.ee'
-export const SITE_NAME = 'iPumps'
+export const SITE_NAME = 'Pump OÜ'
 
 export const LOCALES = ['et', 'en', 'ru', 'lv', 'lt'] as const
 export const DEFAULT_LOCALE = 'et' as const
@@ -14,7 +14,7 @@ export const COMPANY = {
   regNr: '16391391',
   vatId: 'EE102445343',
   phone: '+3725274403',
-  email: 'info@ipumps.ee',
+  email: 'info@pumbapood.ee',
   registeredAddress: {
     street: 'Vana-Narva mnt 3',
     locality: 'Maardu linn',

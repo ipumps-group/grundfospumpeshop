@@ -1,9 +1,9 @@
 {
   "common": {
     "greeting": "Sveiki, {name}!",
-    "thanks": "Ačiū, kad pasirinkote iPumps.",
+    "thanks": "Ačiū, kad pasirinkote Pump OÜ.",
     "questions": "Turite klausimų? Atsakykite į šį laišką arba rašykite adresu {email}.",
-    "footer": "iPumps · {site}\nOficialus Grundfos atstovas Estijoje",
+    "footer": "Pump OÜ · {site}\nOficialus Grundfos atstovas Estijoje",
     "viewOrder": "Peržiūrėti užsakymą",
     "total": "Iš viso",
     "subtotal": "Tarpinė suma",

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { sendOrderEmail } from '@/lib/send-email'
+import { sendOrderStatusUpdate } from '@/lib/email'
 
 // Only manager and superadmin may update order status
 async function getCallerRole(): Promise<string | null> {
@@ -95,7 +95,7 @@ export async function PATCH(
 
   // Send email notification to customer
   if (sendEmail) {
-    sendOrderEmail(id, 'statusUpdate', { newStatus: status, note }).catch(console.error)
+    sendOrderStatusUpdate({ orderId: id, newStatus: status, note }).catch(console.error)
   }
 
   return NextResponse.json({ ok: true })

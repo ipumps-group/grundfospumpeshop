@@ -92,7 +92,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const page = await getHomePage()
 
-  const title = (page?.meta_title || (page ? pick(page, 'title', locale) : null) || 'iPumps') ?? 'iPumps'
+  const title = (page?.meta_title || (page ? pick(page, 'title', locale) : null) || 'Pump OÜ') ?? 'Pump OÜ'
   const description = (page?.meta_description || (page ? pick(page, 'short_description', locale) : null)) ?? undefined
   const ogImg = page?.og_image_url || page?.image_url
 
@@ -109,7 +109,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       url: locale === 'et' ? SITE_URL : `${SITE_URL}/${locale}`,
-      siteName: 'iPumps',
+      siteName: 'Pump OÜ',
       locale,
       type: 'website',
       images: ogImg

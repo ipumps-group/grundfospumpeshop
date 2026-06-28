@@ -1,9 +1,9 @@
 {
   "common": {
     "greeting": "Здравствуйте, {name}!",
-    "thanks": "Спасибо, что выбрали iPumps.",
+    "thanks": "Спасибо, что выбрали Pump OÜ.",
     "questions": "Вопросы? Ответьте на это письмо или напишите на {email}.",
-    "footer": "iPumps · {site}\nОфициальный дилер Grundfos в Эстонии",
+    "footer": "Pump OÜ · {site}\nОфициальный дилер Grundfos в Эстонии",
     "viewOrder": "Посмотреть заказ",
     "total": "Итого",
     "subtotal": "Промежуточный итог",

@@ -1,9 +1,9 @@
 {
   "common": {
     "greeting": "Tere, {name}!",
-    "thanks": "Aitäh iPumpsi valimise eest.",
+    "thanks": "Aitäh Pump OÜi valimise eest.",
     "questions": "Küsimused? Vastake sellele e-mailile või kirjutage aadressil {email}.",
-    "footer": "iPumps · {site}\nGrundfosi ametlik edasimüüja Eestis",
+    "footer": "Pump OÜ · {site}\nGrundfosi ametlik edasimüüja Eestis",
     "viewOrder": "Vaata tellimust",
     "total": "Kokku",
     "subtotal": "Vahesumma",

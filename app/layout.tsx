@@ -17,27 +17,27 @@ const inter = Inter({
 
 const LOCALE_META: Record<string, { title: string; description: string; ogLocale: string }> = {
   et: {
-    title: 'iPumps — Grundfos pumbad Eestis',
+    title: 'Pump OÜ — Grundfos pumbad Eestis',
     description: 'Grundfos pumpade ametlik edasimüüja Eestis. 321 toodet laos — küte, puurkaevud, drenaaž, veeautomaatika.',
     ogLocale: 'et_EE',
   },
   en: {
-    title: 'iPumps — Grundfos pumps in Estonia',
+    title: 'Pump OÜ — Grundfos pumps in Estonia',
     description: 'Official Grundfos dealer in Estonia. 321 products in stock — heating, borewell, drainage, water automatics.',
     ogLocale: 'en_US',
   },
   ru: {
-    title: 'iPumps — насосы Grundfos в Эстонии',
+    title: 'Pump OÜ — насосы Grundfos в Эстонии',
     description: 'Официальный дилер Grundfos в Эстонии. 321 товар на складе — отопление, скважины, дренаж, водная автоматика.',
     ogLocale: 'ru_RU',
   },
   lv: {
-    title: 'iPumps — Grundfos sūkņi Igaunijā',
+    title: 'Pump OÜ — Grundfos sūkņi Igaunijā',
     description: 'Oficiālais Grundfos izplatītājs Igaunijā. 321 preces noliktavā — apkure, urbumi, drenāža, ūdens automātika.',
     ogLocale: 'lv_LV',
   },
   lt: {
-    title: 'iPumps — Grundfos siurbliai Estijoje',
+    title: 'Pump OÜ — Grundfos siurbliai Estijoje',
     description: 'Oficialus Grundfos atstovas Estijoje. 321 prekės sandėlyje — šildymas, gręžiniai, drenažas, vandens automatika.',
     ogLocale: 'lt_LT',
   },
@@ -49,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const meta = LOCALE_META[locale] || LOCALE_META.et
 
   return {
-    title: { default: meta.title, template: `%s | iPumps` },
+    title: { default: meta.title, template: `%s | Pump OÜ` },
     description: meta.description,
     icons: {
       icon: [
@@ -66,7 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: '/site.webmanifest',
     other: { 'theme-color': '#003366' },
     openGraph: {
-      siteName: 'iPumps',
+      siteName: 'Pump OÜ',
       locale: meta.ogLocale,
       type: 'website',
     },

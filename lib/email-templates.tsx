@@ -17,7 +17,7 @@ function layout(content: string) {
         <!-- Header -->
         <tr>
           <td style="background:${PRIMARY};padding:28px 32px;">
-            <div style="color:#fff;font-size:22px;font-weight:bold;letter-spacing:-0.5px;">iPumps</div>
+            <div style="color:#fff;font-size:22px;font-weight:bold;letter-spacing:-0.5px;">Pump OÜ</div>
             <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px;">Grundfos pumbad Eestis</div>
           </td>
         </tr>
@@ -27,7 +27,7 @@ function layout(content: string) {
         <tr>
           <td style="background:#f1f5f9;padding:20px 32px;border-top:1px solid #e2e8f0;">
             <p style="margin:0;font-size:13px;color:#64748b;">
-              iPumps — <a href="https://ipumps.ee" style="color:${PRIMARY};">ipumps.ee</a>
+              Pump OÜ — <a href="https://pumbapood.ee" style="color:${PRIMARY};">pumbapood.ee</a>
             </p>
           </td>
         </tr>
@@ -227,7 +227,7 @@ export function buildStatusUpdateHtml(d: StatusUpdateData): string {
     </div>` : ''}
 
     <p style="margin:0;font-size:14px;color:#64748b;">
-      Küsimuste korral võtke ühendust: <a href="mailto:info@ipumps.ee" style="color:${PRIMARY};">info@ipumps.ee</a>
+      Küsimuste korral võtke ühendust: <a href="mailto:info@pumbapood.ee" style="color:${PRIMARY};">info@pumbapood.ee</a>
     </p>`
 
   return layout(content)

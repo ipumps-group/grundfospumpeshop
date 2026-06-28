@@ -1,4 +1,5 @@
-import { Resend } from 'resend';
+import { Resend } from 'resend'
+import { COMPANY } from './config'
 
 let _resend: Resend | null = null;
 export function getResend(): Resend {
@@ -14,7 +15,7 @@ export function getResend(): Resend {
  * Formaat: "Kuvatav nimi <aadress@domeen>"
  * Domeen peab olema Resendis verifitseeritud.
  */
-export const EMAIL_FROM = `iPumps <${
+export const EMAIL_FROM = `${COMPANY.legalName} <${
   process.env.RESEND_FROM_EMAIL ?? 'noreply@pumbapood.ee'
 }>`;
 

@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "siteName": "iPumps",
+    "siteName": "Pump OÜ",
     "home": {
-      "title": "Grundfos sūkņi un risinājumi – iPumps",
+      "title": "Grundfos sūkņi un risinājumi – Pump OÜ",
       "description": "Pērc Grundfos MAGNA3, Alpha, SCALA un citus sūkņus. 531 modelis noliktavā. Ekspertu konsultācijas un uzstādīšana."
     },
     "products": {
-      "title": "Visi produkti – iPumps",
+      "title": "Visi produkti – Pump OÜ",
       "description": "Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN, ātra piegāde."
     }
   },
@@ -21,14 +21,14 @@
     "reovesi": "Notekūdeņu sūkņi"
   },
   "tegevusaladTitle": {
-    "kute": "Apkures sūkņi – {count} modeļi noliktavā | iPumps",
-    "jahutus": "Dzesēšanas sūkņi – {count} modeļi noliktavā | iPumps",
-    "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens sūkņi – {count} modeļi noliktavā | iPumps",
-    "puurkaevud": "Urbuma sūkņi – {count} modeļi noliktavā | iPumps",
-    "drenaaz": "Drenāžas sūkņi – {count} modeļi noliktavā | iPumps",
-    "salvkaevud": "Akas sūkņi – {count} modeļi noliktavā | iPumps",
-    "rohutoste": "Spiediena sūkņi – {count} modeļi noliktavā | iPumps",
-    "reovesi": "Notekūdeņu sūkņi – {count} modeļi noliktavā | iPumps"
+    "kute": "Apkures sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "jahutus": "Dzesēšanas sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "puurkaevud": "Urbuma sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "drenaaz": "Drenāžas sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "salvkaevud": "Akas sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "rohutoste": "Spiediena sūkņi – {count} modeļi noliktavā | Pump OÜ",
+    "reovesi": "Notekūdeņu sūkņi – {count} modeļi noliktavā | Pump OÜ"
   },
   "tegevusaladDesc": {
     "kute": "Grundfos apkures sūkņi mājām un komercēkām. Augsta efektivitāte, klusa darbība.",
@@ -42,19 +42,19 @@
   },
   "staticPages": {
     "kontakt": {
-      "title": "Kontakti – iPumps",
+      "title": "Kontakti – Pump OÜ",
       "description": "Sazinies ar mums. Palīdzēsim izvēlēties sūkni. Tālrunis: +372 503 3978"
     },
     "privaatsuspoliitika": {
-      "title": "Privātuma politika – iPumps",
+      "title": "Privātuma politika – Pump OÜ",
       "description": "Kā mēs izmantojam un aizsargājam jūsu personas datus."
     },
     "ostutingimused": {
-      "title": "Pirkuma nosacījumi – iPumps",
+      "title": "Pirkuma nosacījumi – Pump OÜ",
       "description": "Veikala pirkuma nosacījumi. Maksāšanas veidi, piegāde, atgriešana."
     },
     "tagastamine": {
-      "title": "Atgriešana – iPumps",
+      "title": "Atgriešana – Pump OÜ",
       "description": "Kā atgriezt preci. 14 dienu atgriešanas tiesības, ātra naudas atgriešana."
     }
   }

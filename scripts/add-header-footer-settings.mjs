@@ -12,12 +12,12 @@ async function setupSettingsTable() {
   const headerSettings = [
     { key: 'header_phone', value: '+372 503 3978' },
     { key: 'header_email_user', value: 'info' },
-    { key: 'header_email_domain', value: 'ipumps.ee' },
+    { key: 'header_email_domain', value: 'pumbapood.ee' },
     { key: 'header_opening_hours', value: 'E-R 8:00–17:00' },
   ]
   
   const footerSettings = [
-    { key: 'footer_company', value: 'iPumps OÜ' },
+    { key: 'footer_company', value: 'Pump OÜ' },
     { key: 'footer_address', value: 'Sepamäe tee 11-2' },
     { key: 'footer_city', value: '74009 Leppneeme küla, Viimsi vald, Harju maakond' },
     { key: 'footer_phone', value: '+372 503 3978' },

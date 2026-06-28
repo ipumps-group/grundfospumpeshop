@@ -1,5 +1,6 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
+import { COMPANY } from '@/lib/config'
 
 const styles = StyleSheet.create({
   page: { padding: 48, fontSize: 10, fontFamily: 'Helvetica', color: '#1a1a1a' },
@@ -31,6 +32,7 @@ const styles = StyleSheet.create({
 
 interface InvoiceOrder {
   id: string
+  order_number?: string | number | null
   created_at: string
   total: number
   subtotal?: number
@@ -58,7 +60,7 @@ function fmt(n: number) {
 }
 
 export function InvoicePDF({ order, items, customerName, customerEmail }: InvoiceProps) {
-  const invoiceNr = `INV-${order.id.slice(0, 8).toUpperCase()}`
+  const invoiceNr = order.order_number ? `INV-${order.order_number}` : `INV-${order.id.slice(0, 8).toUpperCase()}`
   const date = new Date(order.created_at).toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' })
   const subtotal = order.subtotal ?? items.reduce((s, it) => s + it.qty * it.price, 0)
   const vat = order.vat ?? order.total - subtotal
@@ -70,12 +72,12 @@ export function InvoicePDF({ order, items, customerName, customerEmail }: Invoic
         {/* Päis */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>iPumps OÜ</Text>
+            <Text style={styles.companyName}>{COMPANY.legalName}</Text>
             <Text style={styles.company}>
-              Reg: 12345678{'\n'}
-              KMKR: EE123456789{'\n'}
-              info@ipumps.ee{'\n'}
-              ipumps.ee
+              Reg: {COMPANY.regNr}{'\n'}
+              KMKR: {COMPANY.vatId}{'\n'}
+              info@pumbapood.ee{'\n'}
+              www.pumbapood.ee
             </Text>
           </View>
           <View>
@@ -136,7 +138,7 @@ export function InvoicePDF({ order, items, customerName, customerEmail }: Invoic
         </View>
 
         {/* Jalus */}
-        <Text style={styles.footer}>Täname ostu eest! · iPumps.ee · info@ipumps.ee</Text>
+        <Text style={styles.footer}>{COMPANY.legalName} · info@pumbapood.ee</Text>
       </Page>
     </Document>
   )

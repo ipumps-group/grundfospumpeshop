@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "siteName": "iPumps",
+    "siteName": "Pump OÜ",
     "home": {
-      "title": "Grundfos pumbad ja lahendused – iPumps",
+      "title": "Grundfos pumbad ja lahendused – Pump OÜ",
       "description": "Ostu Grundfos MAGNA3, Alpha, scALA ja teisi pumbad. 321 mudelit laos kohe tarniks. Ekspertnõustamine ja paigaldusteenus."
     },
     "products": {
-      "title": "Kõik tooted – iPumps",
+      "title": "Kõik tooted – Pump OÜ",
       "description": "Vaata kõiki Grundfos pumbad. 321 mudelit, hinnad koos käibemaksuga, kiire tarnimine."
     }
   },
@@ -21,14 +21,14 @@
     "reovesi": "Reovee pumbad"
   },
   "tegevusaladTitle": {
-    "kute": "Küttepumbad – {count} mudelit laos | iPumps",
-    "jahutus": "Jahutuspumbad – {count} mudelit laos | iPumps",
-    "sooja-tarbevee-tsirkulatsioonipump": "Sooja tarbevee pumbad – {count} mudelit laos | iPumps",
-    "puurkaevud": "Puurkaevu pumbad – {count} mudelit laos | iPumps",
-    "drenaaz": "Drenaaži pumbad – {count} mudelit laos | iPumps",
-    "salvkaevud": "Salvkaevu pumbad – {count} mudelit laos | iPumps",
-    "rohutoste": "Rõhutõste pumbad – {count} mudelit laos | iPumps",
-    "reovesi": "Reovee pumbad – {count} mudelit laos | iPumps"
+    "kute": "Küttepumbad – {count} mudelit laos | Pump OÜ",
+    "jahutus": "Jahutuspumbad – {count} mudelit laos | Pump OÜ",
+    "sooja-tarbevee-tsirkulatsioonipump": "Sooja tarbevee pumbad – {count} mudelit laos | Pump OÜ",
+    "puurkaevud": "Puurkaevu pumbad – {count} mudelit laos | Pump OÜ",
+    "drenaaz": "Drenaaži pumbad – {count} mudelit laos | Pump OÜ",
+    "salvkaevud": "Salvkaevu pumbad – {count} mudelit laos | Pump OÜ",
+    "rohutoste": "Rõhutõste pumbad – {count} mudelit laos | Pump OÜ",
+    "reovesi": "Reovee pumbad – {count} mudelit laos | Pump OÜ"
   },
   "tegevusaladDesc": {
     "kute": "Grundfos küttepumbad majadele ja ärihoonetele. Kõrge efektiivsus, vaikne töö, pikk eluiga.",
@@ -42,19 +42,19 @@
   },
   "staticPages": {
     "kontakt": {
-      "title": "Kontakt – iPumps",
+      "title": "Kontakt – Pump OÜ",
       "description": "Võta meiega ühendust. Nõustame sulle sobiva pumba valimisel. Telefon: +372 503 3978"
     },
     "privaatsuspoliitika": {
-      "title": "Privaatsuspoliitika – iPumps",
+      "title": "Privaatsuspoliitika – Pump OÜ",
       "description": "Kuidas me kasutame ja kaitstame sinu isikuandmeid. Loe lähemalt meie privaatsuspoliitikast."
     },
     "ostutingimused": {
-      "title": "Ostutingimused – iPumps",
+      "title": "Ostutingimused – Pump OÜ",
       "description": "Poodi ostutingimused. Makseviisid, tarnimine, tagastusõigus. Kõik, mida pead teadma."
     },
     "tagastamine": {
-      "title": "Tagastamine – iPumps",
+      "title": "Tagastamine – Pump OÜ",
       "description": "Kuidas toodet tagastada. 14-päevane tagastusõigus, kiire raha tagastus."
     }
   }

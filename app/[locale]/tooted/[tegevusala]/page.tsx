@@ -50,7 +50,7 @@ export async function generateMetadata(
     const tKey = SLUG_TO_TITLE[area.slug] || SLUG_TO_TITLE[tegevusala]
     const catName = tKey ? tCat(tKey as any) : area.name_et
 
-    const title = locale !== 'et' ? `${catName} | iPumps` : (area.meta_title || `${area.name_et} | iPumps`)
+    const title = locale !== 'et' ? `${catName} | Pump OÜ` : (area.meta_title || `${area.name_et} | Pump OÜ`)
     const description = area.meta_description || `${area.name_et} — vaata kõiki tooteid selles kategoorias.`
     const canonical = `${SITE_URL}/${locale}/tooted/${tegevusala}`
 
@@ -67,7 +67,7 @@ export async function generateMetadata(
         title,
         description,
         url: canonical,
-        siteName: 'iPumps',
+        siteName: 'Pump OÜ',
         locale,
         type: 'website',
         images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],

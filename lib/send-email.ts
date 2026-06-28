@@ -1,3 +1,9 @@
+/**
+ * @deprecated Use lib/email.ts instead — this file is no longer in use.
+ * Kept temporarily for reference. All callers migrated to sendOrderStatusUpdate(),
+ * sendNewOrderAdmin() etc. in lib/email.ts.
+ */
+
 import { supabaseAdmin } from './supabase-admin'
 import { getResend } from './resend'
 import {
@@ -6,6 +12,7 @@ import {
   buildNewOrderAdminHtml,
   statusSubject,
 } from './email-templates'
+import { COMPANY } from './config'
 
 type EmailType = 'orderConfirmation' | 'statusUpdate' | 'newOrderAdmin'
 
@@ -93,7 +100,7 @@ const logEntry: Record<string, unknown> = { order_id: orderId, type }
     }>
 
     // Hardcoded for now to test
-    const fromName = 'iPumps OÜ'
+    const fromName = COMPANY.legalName
     const fromAddress = 'info@pumbapood.ee'
     const adminEmail = 'info@pumbapood.ee'
     const from = `${fromName} <${fromAddress}>`
@@ -119,7 +126,7 @@ const logEntry: Record<string, unknown> = { order_id: orderId, type }
       const { data, error } = await getResend().emails.send({
         from,
         to: customerEmail,
-        subject: `Tellimus #${orderRef} vastu võetud — iPumps`,
+        subject: `Tellimus #${orderRef} vastu võetud — Pump OÜ`,
         html,
       })
 
@@ -141,7 +148,7 @@ const logEntry: Record<string, unknown> = { order_id: orderId, type }
         return
       }
 
-      const subject = `Tellimus #${orderRef} — ${statusSubject(options.newStatus)} — iPumps`
+      const subject = `Tellimus #${orderRef} — ${statusSubject(options.newStatus)} — Pump OÜ`
 
       console.log('[sendOrderEmail] Building HTML for statusUpdate')
       const html = buildStatusUpdateHtml({

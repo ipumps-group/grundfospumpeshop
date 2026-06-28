@@ -32,7 +32,7 @@ export async function generateMetadata(
     const descField = `short_description_${locale}` as keyof typeof product
     const description = (product[descField] as string | null) || product.short_description_et || ''
 
-    const title = `${product.name} | iPumps`
+    const title = `${product.name} | Pump OÜ`
     const canonical = `${SITE_URL}/${locale}/toode/${slug}`
 
     return {
@@ -48,7 +48,7 @@ export async function generateMetadata(
         title,
         description,
         url: canonical,
-        siteName: 'iPumps',
+        siteName: 'Pump OÜ',
         locale,
         type: 'website',
         images: product.image_url ? [{ url: product.image_url, width: 1200, height: 630 }] : [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],
@@ -63,7 +63,7 @@ export async function generateMetadata(
     }
   } catch (e) {
     console.error('[generateMetadata] product page error:', e)
-    return { title: 'Toode | iPumps' }
+    return { title: 'Toode | Pump OÜ' }
   }
 }
 

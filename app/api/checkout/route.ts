@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { sendOrderEmail } from '@/lib/send-email'
+import { sendNewOrderAdmin } from '@/lib/email'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -341,7 +341,7 @@ export async function POST(req: NextRequest) {
 
     // Send admin notification about new order (fire-and-forget)
     // Customer pending email is sent by Montonio webhook when payment is ABANDONED/VOIDED
-    sendOrderEmail(orderId, 'newOrderAdmin').catch(console.error)
+    sendNewOrderAdmin(orderId).catch(console.error)
 
     return NextResponse.json({ payment_url: data.paymentUrl, ref: orderNumber })
   } catch (err) {

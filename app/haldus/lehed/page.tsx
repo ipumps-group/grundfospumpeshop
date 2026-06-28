@@ -164,7 +164,7 @@ export default function HaldusLehedPage() {
                 <div>
                   <label className="block text-[13px] text-gray-500 mb-1">Ettevõte</label>
                   <input value={settings.footer_company} onChange={e => setSettings({...settings, footer_company: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[15px] outline-none focus:border-[#003366]" placeholder="iPumps OÜ" />
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[15px] outline-none focus:border-[#003366]" placeholder="Pump OÜ" />
                 </div>
                 <div>
                   <label className="block text-[13px] text-gray-500 mb-1">Aadress</label>

@@ -176,7 +176,7 @@ export async function generateMetadata(
       title,
       description: description ?? undefined,
       url: canonical,
-      siteName: 'iPumps',
+      siteName: 'Pump OÜ',
       locale: locale,
       type: 'website',
       images: ogImg ? [{ url: ogImg, width: 1200, height: 630 }] : [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],

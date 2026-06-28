@@ -64,10 +64,12 @@ export async function GET(
   }
 
   const orderRef = (order.montonio_order_id ?? order.id).toString().slice(-8).toUpperCase()
+  const orderNumber = order.order_number ?? undefined
 
   const pdfBytes = await generateInvoicePDF(
     {
       id: orderId,
+      order_number: orderNumber,
       created_at: order.created_at,
       total: order.total,
       reference: orderRef,

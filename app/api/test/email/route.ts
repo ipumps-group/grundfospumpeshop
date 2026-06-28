@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendOrderEmail } from '@/lib/send-email'
+import { sendOrderStatusUpdate } from '@/lib/email'
 import { requireAdmin } from '@/lib/api-auth'
 import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   console.log('[test-email] Received:', { orderId, type, status })
   
   try {
-    await sendOrderEmail(orderId, 'statusUpdate', { newStatus: status })
+    await sendOrderStatusUpdate({ orderId, newStatus: status })
     return NextResponse.json({ ok: true, message: 'Email sent' })
   } catch (err: any) {
     console.error('[test-email] Error:', err)

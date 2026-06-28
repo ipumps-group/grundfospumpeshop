@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "siteName": "iPumps",
+    "siteName": "Pump OÜ",
     "home": {
-      "title": "Grundfos siurbliai ir sprendimai – iPumps",
+      "title": "Grundfos siurbliai ir sprendimai – Pump OÜ",
       "description": "Pirkite Grundfos MAGNA3, Alpha, SCALA ir kitus siurblius. 321 modelis sandelyje. Ekspertines konsultacijos ir montavimo paslaugos."
     },
     "products": {
-      "title": "Visi produktai – iPumps",
+      "title": "Visi produktai – Pump OÜ",
       "description": "Perziurekite visus Grundfos siurblius. 321 modelis, kainos su PVM, greitas pristatymas."
     }
   },
@@ -21,14 +21,14 @@
     "reovesi": "Nuotekų siurbliai"
   },
   "tegevusaladTitle": {
-    "kute": "Silumo siurbliai – {count} modeliai sandelyje | iPumps",
-    "jahutus": "Salinimo siurbliai – {count} modeliai sandelyje | iPumps",
-    "sooja-tarbevee-tsirkulatsioonipump": "Karsto vandens siurbliai – {count} modeliai sandelyje | iPumps",
-    "puurkaevud": "Gilinimo siurbliai – {count} modeliai sandelyje | iPumps",
-    "drenaaz": "Drenazu siurbliai – {count} modeliai sandelyje | iPumps",
-    "salvkaevud": "Siurbliai šuliniams – {count} modeliai sandelyje | iPumps",
-    "rohutoste": "Slėgio kėlimo siurbliai – {count} modeliai sandelyje | iPumps",
-    "reovesi": "Nuotekų siurbliai – {count} modeliai sandelyje | iPumps"
+    "kute": "Silumo siurbliai – {count} modeliai sandelyje | Pump OÜ",
+    "jahutus": "Salinimo siurbliai – {count} modeliai sandelyje | Pump OÜ",
+    "sooja-tarbevee-tsirkulatsioonipump": "Karsto vandens siurbliai – {count} modeliai sandelyje | Pump OÜ",
+    "puurkaevud": "Gilinimo siurbliai – {count} modeliai sandelyje | Pump OÜ",
+    "drenaaz": "Drenazu siurbliai – {count} modeliai sandelyje | Pump OÜ",
+    "salvkaevud": "Siurbliai šuliniams – {count} modeliai sandelyje | Pump OÜ",
+    "rohutoste": "Slėgio kėlimo siurbliai – {count} modeliai sandelyje | Pump OÜ",
+    "reovesi": "Nuotekų siurbliai – {count} modeliai sandelyje | Pump OÜ"
   },
   "tegevusaladDesc": {
     "kute": "Grundfos silumo siurbliai namams ir komerciniams pastatams. Aukštas efektyvumas, tylus darbas.",
@@ -42,19 +42,19 @@
   },
   "staticPages": {
     "kontakt": {
-      "title": "Kontaktai – iPumps",
+      "title": "Kontaktai – Pump OÜ",
       "description": "Susisiekite su mumis. Padėsime pasirinkti siurblį. Telefonas: +372 503 3978"
     },
     "privaatsuspoliitika": {
-      "title": "Privatumo politika – iPumps",
+      "title": "Privatumo politika – Pump OÜ",
       "description": "Kaip naudojame ir saugome jūsų asmens duomenis."
     },
     "ostutingimused": {
-      "title": "Pirkimo salygos – iPumps",
+      "title": "Pirkimo salygos – Pump OÜ",
       "description": "Parduotuvės pirkimo salygos. Mokėjimo būdai, pristatymas, grąžinimas."
     },
     "tagastamine": {
-      "title": "Grąžinimas – iPumps",
+      "title": "Grąžinimas – Pump OÜ",
       "description": "Kaip grąžinti prekę. 14 dienų grąžinimo teisė, greitas pinigų grąžinimas."
     }
   }

@@ -384,7 +384,7 @@
     "logout": "Выход",
     "passwordReset": "Восстановление пароля",
     "resetSent": "Ссылка для восстановления пароля отправлена на ваш адрес электронной почты.",
-    "welcomeBack": "Добро пожаловать обратно в магазин iPumps",
+    "welcomeBack": "Добро пожаловать обратно в магазин Pump OÜ",
     "continueWithGoogle": "Продолжить через Google",
     "or": "или",
     "emailLabel": "Адрес электронной почты",
@@ -519,13 +519,13 @@
     "openInGoogleMaps": "Открыть в Google Maps"
   },
   "metadata": {
-    "siteName": "iPumps",
+    "siteName": "Pump OÜ",
     "home": {
-      "title": "Насосы Grundfos и решения – iPumps",
+      "title": "Насосы Grundfos и решения – Pump OÜ",
       "description": "Купите насосы Grundfos MAGNA3, Alpha, scALA и другие. 321 модель в наличии. Консультации и установка."
     },
     "products": {
-      "title": "Все товары – iPumps",
+      "title": "Все товары – Pump OÜ",
       "description": "Смотрите все насосы Grundfos. 321 модель, цены с НДС, быстрая доставка."
     }
   },
@@ -540,14 +540,14 @@
     "reovesi": "Канализационные насосы"
   },
   "tegevusaladTitle": {
-    "kute": "Отопительные насосы – {count} моделей в наличии | iPumps",
-    "jahutus": "Охлаждающие насосы – {count} моделей в наличии | iPumps",
-    "sooja-tarbevee-tsirkulatsioonipump": "Горячая вода – {count} моделей в наличии | iPumps",
-    "puurkaevud": "Скважинные насосы – {count} моделей в наличии | iPumps",
-    "drenaaz": "Дренажные насосы – {count} моделей в наличии | iPumps",
-    "salvkaevud": "Колодезные насосы – {count} моделей в наличии | iPumps",
-    "rohutoste": "Повысительные насосы – {count} моделей в наличии | iPumps",
-    "reovesi": "Канализационные насосы – {count} моделей в наличии | iPumps"
+    "kute": "Отопительные насосы – {count} моделей в наличии | Pump OÜ",
+    "jahutus": "Охлаждающие насосы – {count} моделей в наличии | Pump OÜ",
+    "sooja-tarbevee-tsirkulatsioonipump": "Горячая вода – {count} моделей в наличии | Pump OÜ",
+    "puurkaevud": "Скважинные насосы – {count} моделей в наличии | Pump OÜ",
+    "drenaaz": "Дренажные насосы – {count} моделей в наличии | Pump OÜ",
+    "salvkaevud": "Колодезные насосы – {count} моделей в наличии | Pump OÜ",
+    "rohutoste": "Повысительные насосы – {count} моделей в наличии | Pump OÜ",
+    "reovesi": "Канализационные насосы – {count} моделей в наличии | Pump OÜ"
   },
   "tegevusaladDesc": {
     "kute": "Отопительные насосы Grundfos для домов. Высокая эффективность, тихая работа.",
