@@ -76,6 +76,8 @@ export function InvoicePDF({ order, items, customerName, customerEmail }: Invoic
             <Text style={styles.company}>
               Reg: {COMPANY.regNr}{'\n'}
               KMKR: {COMPANY.vatId}{'\n'}
+              {COMPANY.shopAddress.street}, {COMPANY.shopAddress.locality}{'\n'}
+              {COMPANY.shopAddress.postalCode} {COMPANY.shopAddress.region}{'\n'}
               info@pumbapood.ee{'\n'}
               www.pumbapood.ee
             </Text>
