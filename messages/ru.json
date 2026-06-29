@@ -367,7 +367,13 @@
     "cityPlaceholder": "Город",
     "postalCodeLabel": "Почтовый индекс",
     "enterAddress": "Пожалуйста, введите адрес",
-    "enterCity": "Пожалуйста, введите город"
+    "enterCity": "Пожалуйста, введите город",
+    "createAccount": "Создать аккаунт",
+    "createAccountDesc": "Создайте аккаунт, чтобы просматривать и управлять заказами",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "passwordMinLength": "Минимум 6 символов",
+    "passwordMismatch": "Пароли не совпадают"
   },
   "account": {
     "login": "Вход",

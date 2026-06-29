@@ -367,7 +367,13 @@
     "cityPlaceholder": "Pilsēta",
     "postalCodeLabel": "Pasta indekss",
     "enterAddress": "Lūdzu, ievadiet adresi",
-    "enterCity": "Lūdzu, ievadiet pilsētu"
+    "enterCity": "Lūdzu, ievadiet pilsētu",
+    "createAccount": "Izveidot kontu",
+    "createAccountDesc": "Izveidojiet kontu, lai skatītu un pārvaldītu pasūtījumus",
+    "password": "Parole",
+    "confirmPassword": "Apstiprināt paroli",
+    "passwordMinLength": "Vismaz 6 rakstzīmes",
+    "passwordMismatch": "Paroles nesakrīt"
   },
   "account": {
     "login": "Pierakstīties",

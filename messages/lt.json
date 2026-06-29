@@ -367,7 +367,13 @@
     "cityPlaceholder": "Miestas",
     "postalCodeLabel": "Pašto kodas",
     "enterAddress": "Prašome įvesti adresą",
-    "enterCity": "Prašome įvesti miestą"
+    "enterCity": "Prašome įvesti miestą",
+    "createAccount": "Sukurti paskyrą",
+    "createAccountDesc": "Sukurkite paskyrą, kad galėtumėte peržiūrėti ir valdyti užsakymus",
+    "password": "Slaptažodis",
+    "confirmPassword": "Patvirtinti slaptažodį",
+    "passwordMinLength": "Bent 6 simboliai",
+    "passwordMismatch": "Slaptažodžiai nesutampa"
   },
   "account": {
     "login": "Prisijungti",

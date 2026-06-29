@@ -95,7 +95,7 @@ export async function PATCH(
 
   // Send email notification to customer
   if (sendEmail) {
-    sendOrderStatusUpdate({ orderId: id, newStatus: status, note }).catch(console.error)
+    await sendOrderStatusUpdate({ orderId: id, newStatus: status, note })
   }
 
   return NextResponse.json({ ok: true })

@@ -56,6 +56,8 @@ interface CheckoutBody {
   coupon_id?: string
   items: CartItem[]
   delivery_method?: string
+  create_account?: boolean
+  password?: string
   tracking?: {
     advertising_consent?: boolean
     fbp?: string
@@ -116,7 +118,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Vigane päringu keha' }, { status: 400 })
   }
 
-  const { customer, shipping, notes, coupon_id, items, delivery_method, tracking } = body
+  const { customer, shipping, notes, coupon_id, items, delivery_method, create_account, password, tracking } = body
 
   if (!customer?.first_name || !customer?.last_name || !customer?.email ||
       !customer?.phone || !items?.length || !shipping?.carrier) {
@@ -249,6 +251,36 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // ── Konto loomine (kui soovitud) ─────────────────────────────────────────────
+  if (create_account && password && password.length >= 6) {
+    try {
+      const { data: newUser, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+        email: customer.email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: `${customer.first_name} ${customer.last_name}` },
+      })
+
+      if (createErr) {
+        console.warn('[checkout] Account creation failed (non-blocking):', createErr.message)
+        // Kui e-mail juba olemas, siis proovime leida olemasoleva kasutaja ja linkida tellimus
+        if (createErr.message?.includes('already') || createErr.status === 422) {
+          const { data: existing } = await supabaseAdmin.auth.admin.listUsers()
+          const match = existing?.users?.find(u => u.email?.toLowerCase() === customer.email.toLowerCase())
+          if (match) {
+            await supabaseAdmin.from('orders').update({ user_id: match.id, updated_at: new Date().toISOString() }).eq('id', orderId)
+            console.log('[checkout] Linked order to existing user:', match.id)
+          }
+        }
+      } else if (newUser?.user) {
+        await supabaseAdmin.from('orders').update({ user_id: newUser.user.id, updated_at: new Date().toISOString() }).eq('id', orderId)
+        console.log('[checkout] Account created and linked to order:', newUser.user.id)
+      }
+    } catch (err) {
+      console.error('[checkout] Account creation error (non-blocking):', err)
+    }
+  }
+
   // ── 2. Loo Montonio makselink ──────────────────────────────────────────────
 
   console.log('Montonio config:', {
@@ -353,7 +385,7 @@ export async function POST(req: NextRequest) {
 
     // Send admin notification about new order (fire-and-forget)
     // Customer pending email is sent by Montonio webhook when payment is ABANDONED/VOIDED
-    sendNewOrderAdmin(orderId).catch(console.error)
+    await sendNewOrderAdmin(orderId)
 
     return NextResponse.json({ payment_url: data.paymentUrl, ref: orderNumber })
   } catch (err) {

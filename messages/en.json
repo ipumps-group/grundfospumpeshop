@@ -367,7 +367,13 @@
     "cityPlaceholder": "City",
     "postalCodeLabel": "Postal code",
     "enterAddress": "Please enter an address",
-    "enterCity": "Please enter a city"
+    "enterCity": "Please enter a city",
+    "createAccount": "Create account",
+    "createAccountDesc": "Create an account to view and manage your orders",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "passwordMinLength": "At least 6 characters",
+    "passwordMismatch": "Passwords do not match"
   },
   "account": {
     "login": "Log in",

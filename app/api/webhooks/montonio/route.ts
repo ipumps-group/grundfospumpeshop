@@ -120,9 +120,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (orderForPending && orderForPending.status === 'pending' && orderForPending.email) {
-      sendOrderStatusUpdate({ orderId: orderForPending.id, newStatus: 'pending' }).catch(err =>
-        console.error('[montonio-webhook] Pending email failed', err)
-      );
+      await sendOrderStatusUpdate({ orderId: orderForPending.id, newStatus: 'pending' });
     }
     console.log(
       `[montonio-webhook] Status ${payload.paymentStatus} for ${payload.merchantReference} — pending email sent`

@@ -369,7 +369,13 @@
     "cityPlaceholder": "Linn",
     "postalCodeLabel": "Postiindeks",
     "enterAddress": "Palun sisestage aadress",
-    "enterCity": "Palun sisestage linn"
+    "enterCity": "Palun sisestage linn",
+    "createAccount": "Loo konto",
+    "createAccountDesc": "Konto loomisel näed oma tellimuste ajalugu ja saad neid hallata",
+    "password": "Parool",
+    "confirmPassword": "Kinnita parool",
+    "passwordMinLength": "Vähemalt 6 tähemärki",
+    "passwordMismatch": "Paroolid ei kattu"
   },
   "account": {
     "login": "Logi sisse",
