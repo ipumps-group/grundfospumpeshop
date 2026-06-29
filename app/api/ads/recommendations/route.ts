@@ -23,6 +23,17 @@ export async function POST(request: NextRequest) {
     const { start, end } = getDateRangePreset('last_30_days')
     const prev = getPreviousPeriod(start, end)
 
+    // Fetch existing open recommendation titles for deduplication
+    const { data: existingRecs } = await supabaseAdmin
+      .from('recommendations')
+      .select('title, category, platform')
+      .eq('company_id', companyId)
+      .eq('status', 'open')
+
+    const existingTitles = new Set(
+      (existingRecs || []).map((r: any) => `${r.platform || ''}:${r.category || ''}:${r.title}`.toLowerCase()),
+    )
+
     const results: any[] = []
 
     for (const platform of ['google_ads', 'meta_ads'] as const) {
@@ -50,8 +61,12 @@ export async function POST(request: NextRequest) {
         comparison: comparison || [],
       })
 
-      // Save each recommendation
+      // Save each recommendation, skipping duplicates
+      let savedCount = 0
       for (const rec of analysis.recommendations || []) {
+        const dedupKey = `${platform}:${rec.category || 'general'}:${rec.title}`.toLowerCase()
+        if (existingTitles.has(dedupKey)) continue
+
         await createRecommendation({
           company_id: companyId,
           title: rec.title,
@@ -65,12 +80,15 @@ export async function POST(request: NextRequest) {
           confidence_score: rec.confidenceScore || 70,
           status: 'open',
         })
+        existingTitles.add(dedupKey)
+        savedCount++
       }
 
       results.push({
         platform,
         summary: analysis.summary,
-        recommendationsCount: (analysis.recommendations || []).length,
+        recommendationsCount: savedCount,
+        totalGenerated: (analysis.recommendations || []).length,
         problemsCount: (analysis.problems || []).length,
         opportunitiesCount: (analysis.opportunities || []).length,
       })

@@ -82,10 +82,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'et'
 
-  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-18154845685'
-  const ga4Id = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID || 'G-KD26VEJVWY'
-  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || '2133761077401963'
-  const gtmId = process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || 'GTM-MN86P7WH'
+  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
+  const ga4Id = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID
+  const gtmId = process.env.NEXT_PUBLIC_GTM_CONTAINER_ID
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -94,50 +93,28 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://connect.facebook.net" />
 
-        <Script id="gtm-head" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        {(gtmId && adsId && ga4Id) ? (
+          <>
+            <Script id="gtm-head" strategy="afterInteractive">
+              {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${gtmId}');`}
-        </Script>
+            </Script>
 
-        <Script id="gtag-base" strategy="afterInteractive">
-          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+            <Script id="gtag-base" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
 gtag('js',new Date());gtag('config','${ga4Id}',{send_page_view:false});
 gtag('config','${adsId}',{send_page_view:false});`}
-        </Script>
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${adsId}`} strategy="afterInteractive" />
-
-        <Script id="meta-pixel-init" strategy="afterInteractive">
-          {`!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window,document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','${metaPixelId}');`}
-        </Script>
-
-        <Script id="consent-driven-tracking" strategy="lazyOnload">
-          {`(function(){
-try{
-var raw=localStorage.getItem('pumbapood_consent');
-if(!raw)return;
-var c=JSON.parse(raw);
-if(!c.state||!c.state.advertising)return;
-}catch(e){return;}
-if(window.fbq)fbq('track','PageView');
-if(window.gtag){gtag('event','page_view');gtag('consent','update',{ad_storage:'granted',analytics_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});}
-})();`}
-        </Script>
+            </Script>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${adsId}`} strategy="afterInteractive" />
+          </>
+        ) : null}
       </head>
       <body className={inter.className}>
-        <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`} height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe></noscript>
-        <noscript><img height="1" width="1" style={{display:'none'}} alt="" src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} /></noscript>
+        {gtmId ? <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`} height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe></noscript> : null}
         <ConsentProvider>
           {children}
         </ConsentProvider>

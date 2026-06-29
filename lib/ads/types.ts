@@ -481,3 +481,78 @@ export interface MetricCardData {
   change: number
   trend: 'up' | 'down' | 'neutral'
 }
+
+export interface SearchTerm {
+  id: string
+  account_id: string
+  campaign_id: string | null
+  query_text: string
+  match_type: string | null
+  impressions: number
+  clicks: number
+  ctr: number
+  cpc: number
+  spend: number
+  conversions: number
+  conversion_value: number
+  cost_per_conversion: number
+  roas: number
+  date_range_start: string
+  date_range_end: string
+  raw_data: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface Keyword {
+  id: string
+  account_id: string
+  campaign_id: string | null
+  keyword_text: string
+  match_type: string | null
+  status: string | null
+  cpc_bid_micros: number
+  quality_score: number | null
+  impressions: number
+  clicks: number
+  ctr: number
+  cpc: number
+  spend: number
+  conversions: number
+  conversion_value: number
+  impression_share: number
+  date_range_start: string
+  date_range_end: string
+  raw_data: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface AuctionInsight {
+  id: string
+  account_id: string
+  campaign_id: string | null
+  competitor_domain: string
+  impression_share: number
+  avg_position: number
+  overlap_rate: number
+  position_above_rate: number
+  top_of_page_rate: number
+  outranking_share: number
+  date_range_start: string
+  date_range_end: string
+  raw_data: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface BudgetAlert {
+  id: string
+  account_id: string
+  campaign_id: string
+  alert_type: 'overspend' | 'underspend' | 'budget_capped' | 'budget_exhausted' | 'roas_drop' | 'cpa_spike'
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  message: string
+  current_value: number
+  threshold_value: number | null
+  is_active: boolean
+  acknowledged_at: string | null
+  created_at: string
+}

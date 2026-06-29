@@ -12,6 +12,7 @@ import CouponInput from '@/components/checkout/CouponInput'
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/auth-context'
 import { COMPANY } from '@/lib/config'
+import { hasAdvertisingConsent, readCookie } from '@/lib/tracking-consent'
 
 // ─── TÜÜBID ─────────────────────────────────────────────────────────────────
 
@@ -186,6 +187,12 @@ export default function CheckoutPage() {
             ...(company.trim() && { company: company.trim() }),
           },
           user_id: user?.id || null,
+          tracking: {
+            advertising_consent: hasAdvertisingConsent(),
+            fbp: readCookie('_fbp'),
+            fbc: readCookie('_fbc'),
+            event_source_url: window.location.href,
+          },
           shipping: shippingObj,
           delivery_method: deliveryMethod,
           notes:      notes.trim() || undefined,

@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { getDailyInsights, getAggregatedInsights, getPeriodComparison } from '@/lib/ads/admin-queries'
+import { requireAdmin } from '@/lib/api-auth'
 
 export async function GET(request: NextRequest) {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
+
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type') || 'daily'
   const companyId = searchParams.get('companyId')

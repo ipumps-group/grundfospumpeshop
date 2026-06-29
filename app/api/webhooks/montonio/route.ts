@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendOrderConfirmation, sendOrderStatusUpdate } from '@/lib/email';
+import { sendMetaEvent } from '@/lib/meta-capi';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,7 @@ interface MontonioPayload {
 }
 
 interface OrderItemRow {
+  product_id: number | null;
   product_name: string;
   quantity: number;
   unit_price: number | string;
@@ -142,8 +144,9 @@ export async function POST(req: NextRequest) {
     .select(
       `
       id, order_number, status, email, customer_name, locale,
-      total, discount_amount, shipping_address,
-      order_items ( product_name, quantity, unit_price )
+      total, discount_amount, shipping_address, phone, advertising_consent,
+      meta_fbp, meta_fbc, meta_event_source_url, meta_purchase_event_id, meta_purchase_sent_at,
+      order_items ( product_id, product_name, quantity, unit_price )
     `
     )
     .eq('order_number', payload.merchantReference)
@@ -159,7 +162,8 @@ export async function POST(req: NextRequest) {
   }
 
   // 7. Idempotentsus — Montonio võib retry'da
-  if (['paid', 'shipped', 'delivered'].includes(order.status)) {
+  const alreadyProcessed = ['paid', 'shipped', 'delivered'].includes(order.status);
+  if (alreadyProcessed && order.meta_purchase_sent_at) {
     console.log(
       `[montonio-webhook] Order ${order.order_number} already processed (${order.status})`
     );
@@ -167,19 +171,53 @@ export async function POST(req: NextRequest) {
   }
 
   // 8. Uuenda staatust → 'paid'
-  const { error: updErr } = await supabaseAdmin
-    .from('orders')
-    .update({
-      status: 'paid',
-      paid_at: new Date().toISOString(),
-      payment_uuid: payload.paymentUuid,
-      payment_method: payload.paymentMethod ?? null,
-    })
-    .eq('id', order.id);
+  if (!alreadyProcessed) {
+    const { error: updErr } = await supabaseAdmin
+      .from('orders')
+      .update({
+        status: 'paid',
+        paid_at: new Date().toISOString(),
+        payment_uuid: payload.paymentUuid,
+        payment_method: payload.paymentMethod ?? null,
+      })
+      .eq('id', order.id);
 
-  if (updErr) {
-    console.error('[montonio-webhook] Order update failed', updErr);
-    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    if (updErr) {
+      console.error('[montonio-webhook] Order update failed', updErr);
+      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    }
+  }
+
+  if (order.meta_purchase_event_id && !order.meta_purchase_sent_at) {
+    try {
+      const items = (order.order_items as OrderItemRow[]).map(item => ({
+        id: String(item.product_id || item.product_name),
+        quantity: item.quantity,
+        item_price: Number((Number(item.unit_price) * 1.24).toFixed(2)),
+      }))
+
+      const sent = await sendMetaEvent({
+        eventName: 'Purchase',
+        eventId: order.meta_purchase_event_id,
+        eventSourceUrl: order.meta_event_source_url,
+        email: order.advertising_consent ? order.email : null,
+        phone: order.advertising_consent ? order.phone : null,
+        fbp: order.meta_fbp,
+        fbc: order.meta_fbc,
+        value: Number(order.total),
+        currency: payload.currency || 'EUR',
+        orderId: order.order_number,
+        contents: items,
+      });
+      if (sent) {
+        await supabaseAdmin.from('orders')
+          .update({ meta_purchase_sent_at: new Date().toISOString() })
+          .eq('id', order.id)
+          .is('meta_purchase_sent_at', null);
+      }
+    } catch (trackingError) {
+      console.error('[montonio-webhook] Meta Purchase failed (non-blocking)', trackingError);
+    }
   }
 
   // Sildu payment_event order_id'ga (audit trail)
@@ -187,6 +225,10 @@ export async function POST(req: NextRequest) {
     .from('payment_events')
     .update({ order_id: order.id })
     .eq('payment_uuid', payload.paymentUuid);
+
+  if (alreadyProcessed) {
+    return NextResponse.json({ received: true, alreadyProcessed: true });
+  }
 
   // 9. Saada OrderConfirmation mail
   if (!order.email) {

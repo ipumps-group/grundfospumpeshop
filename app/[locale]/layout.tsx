@@ -8,6 +8,7 @@ import LocaleDetector from '@/components/LocaleDetector'
 import JsonLd from '@/components/seo/JsonLd'
 import { AuthProvider } from '@/lib/auth-context'
 import GoogleAdsTracker from '@/components/GoogleAdsTracker'
+import ConsentTracking from '@/components/ConsentTracking'
 import CookieConsent from '@/components/CookieConsent'
 import { NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
@@ -180,6 +181,7 @@ export default async function LocaleLayout({
       {/* Detects system language on first visit via navigator.language */}
       <LocaleDetector />
       <AuthProvider>
+        <ConsentTracking />
         <GoogleAdsTracker />
         <Header siteSettings={siteSettings} />
         <main>{children}</main>

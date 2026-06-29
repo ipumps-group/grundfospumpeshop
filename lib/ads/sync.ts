@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createSyncLog, updateSyncLog, getAdAccount, upsertSyncState, getSyncState } from './admin-queries'
-import type { Platform, SyncResult, SyncLog } from './types'
+import { createSyncLog, updateSyncLog, getAdAccount, upsertSyncState } from './admin-queries'
+import type { Platform, SyncResult } from './types'
 import * as google from './google-ads'
 import * as meta from './meta-ads'
 import * as ga4 from './ga4'
@@ -11,10 +11,11 @@ export interface SyncOptions {
   dateStart?: string
   dateEnd?: string
   syncType?: 'manual' | 'scheduled' | 'webhook'
+  includeKeywords?: boolean
 }
 
 export async function runSync(options: SyncOptions): Promise<SyncResult> {
-  const { accountId, platform, dateStart, dateEnd, syncType = 'manual' } = options
+  const { accountId, platform, dateStart, dateEnd, syncType = 'manual', includeKeywords = false } = options
 
   const now = new Date()
   const end = dateEnd || now.toISOString().split('T')[0]
@@ -43,13 +44,41 @@ export async function runSync(options: SyncOptions): Promise<SyncResult> {
     // Platform-specific sync
     if (platform === 'google_ads') {
       const customerId = account.platform_account_id
-      rowsImported += (await google.fetchCampaigns(accountId, customerId)).length
-      rowsImported += (await google.fetchAdGroups(accountId, customerId)).length
+
+      // Fetch campaigns and ad groups in parallel
+      const [campaigns, adGroups] = await Promise.all([
+        google.fetchCampaigns(accountId, customerId),
+        google.fetchAdGroups(accountId, customerId),
+      ])
+      rowsImported += campaigns.length + adGroups.length
+
+      // Ads depend on ad groups (need campaign_id lookup)
       rowsImported += (await google.fetchAds(accountId, customerId)).length
-      rowsImported += await google.fetchPerformanceMetrics(accountId, customerId, start, end)
+
+      // Performance metrics and keywords can run in parallel
+      const perfPromise = google.fetchPerformanceMetrics(accountId, customerId, start, end)
+      const keywordPromise = includeKeywords ? (async () => {
+        try {
+          const keywords = await import('./keywords')
+          const [stResult, kwResult] = await Promise.all([
+            keywords.fetchSearchTerms(accountId, customerId, start, end),
+            keywords.fetchKeywords(accountId, customerId, start, end),
+          ])
+          return stResult.savedCount + kwResult.length
+        } catch (e: any) {
+          errors.push(`Keywords sync failed: ${e.message}`)
+          return 0
+        }
+      })() : Promise.resolve(0)
+
+      const [perfRows, keywordRows] = await Promise.all([perfPromise, keywordPromise])
+      rowsImported += perfRows + keywordRows
     } else if (platform === 'meta_ads') {
-      rowsImported += (await meta.fetchCampaigns(accountId)).length
-      rowsImported += (await meta.fetchAdSets(accountId)).length
+      const [mc, ms] = await Promise.all([
+        meta.fetchCampaigns(accountId),
+        meta.fetchAdSets(accountId),
+      ])
+      rowsImported += mc.length + ms.length
       rowsImported += (await meta.fetchAds(accountId)).length
       rowsImported += await meta.fetchPerformanceMetrics(accountId, start, end)
     } else if (platform === 'ga4') {
@@ -69,15 +98,16 @@ export async function runSync(options: SyncOptions): Promise<SyncResult> {
 
     if (logId) {
       await updateSyncLog(logId, {
-        status: 'completed',
+        status: errors.length > 0 ? 'partial' : 'completed',
         completed_at: new Date().toISOString(),
         duration_seconds: durationSeconds,
         rows_imported: rowsImported,
+        error_message: errors.length > 0 ? errors.join('; ') : null,
       })
     }
 
     return {
-      success: true,
+      success: errors.length === 0,
       platform,
       rowsImported,
       durationSeconds,
@@ -112,9 +142,25 @@ export async function runFullSync(accountId: string): Promise<SyncResult[]> {
   const results: SyncResult[] = []
   const platforms: Platform[] = ['google_ads', 'meta_ads', 'ga4']
 
-  for (const platform of platforms) {
-    const result = await runSync({ accountId, platform, syncType: 'manual' })
-    results.push(result)
+  // Run platforms in parallel for full sync
+  const platformResults = await Promise.allSettled(
+    platforms.map(platform =>
+      runSync({ accountId, platform, syncType: 'manual', includeKeywords: platform === 'google_ads' }),
+    ),
+  )
+
+  for (const result of platformResults) {
+    if (result.status === 'fulfilled') {
+      results.push(result.value)
+    } else {
+      results.push({
+        success: false,
+        platform: 'google_ads',
+        rowsImported: 0,
+        durationSeconds: 0,
+        errors: [result.reason?.message || 'Unknown error'],
+      })
+    }
   }
 
   return results

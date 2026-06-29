@@ -1,4 +1,8 @@
+import { hasAdvertisingConsent } from '@/lib/tracking-consent'
+
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '2133761077401963'
+
+const pendingEvents: Array<{ name: string; params: Record<string, unknown>; eventId?: string }> = []
 
 declare global {
   interface Window {
@@ -7,15 +11,27 @@ declare global {
   }
 }
 
-function fbq(...args: unknown[]) {
-  if (typeof window === 'undefined') return
-  if (typeof window.fbq === 'function') {
-    window.fbq(...args)
+function fbq(eventName: string, params: Record<string, unknown>, eventId?: string): boolean {
+  if (!hasAdvertisingConsent()) return false
+  if (typeof window.fbq !== 'function') {
+    pendingEvents.push({ name: eventName, params, eventId })
+    return true
+  }
+  if (eventId) window.fbq('track', eventName, params, { eventID: eventId })
+  else window.fbq('track', eventName, params)
+  return true
+}
+
+export function flushMetaEvents() {
+  if (!hasAdvertisingConsent() || typeof window.fbq !== 'function') return
+  for (const event of pendingEvents.splice(0)) {
+    if (event.eventId) window.fbq('track', event.name, event.params, { eventID: event.eventId })
+    else window.fbq('track', event.name, event.params)
   }
 }
 
 export function trackMetaPageView() {
-  fbq('track', 'PageView')
+  return fbq('PageView', {})
 }
 
 export function trackMetaViewContent(params: {
@@ -32,7 +48,7 @@ export function trackMetaViewContent(params: {
   if (params.content_category) safe.content_category = params.content_category
   if (params.value !== undefined) safe.value = params.value
   safe.currency = params.currency || 'EUR'
-  fbq('track', 'ViewContent', safe)
+  return fbq('ViewContent', safe)
 }
 
 export function trackMetaAddToCart(params: {
@@ -49,7 +65,7 @@ export function trackMetaAddToCart(params: {
   if (params.value !== undefined) safe.value = params.value
   safe.currency = params.currency || 'EUR'
   if (params.contents?.length) safe.contents = params.contents
-  fbq('track', 'AddToCart', safe)
+  return fbq('AddToCart', safe)
 }
 
 export function trackMetaInitiateCheckout(params: {
@@ -58,6 +74,7 @@ export function trackMetaInitiateCheckout(params: {
   num_items?: number
   value?: number
   currency?: string
+  event_id?: string
 }) {
   const safe: Record<string, unknown> = {}
   if (params.content_ids?.length) safe.content_ids = params.content_ids
@@ -65,7 +82,7 @@ export function trackMetaInitiateCheckout(params: {
   if (params.num_items !== undefined) safe.num_items = params.num_items
   if (params.value !== undefined) safe.value = params.value
   safe.currency = params.currency || 'EUR'
-  fbq('track', 'InitiateCheckout', safe)
+  return fbq('InitiateCheckout', safe, params.event_id)
 }
 
 export function trackMetaPurchase(params: {
@@ -75,6 +92,7 @@ export function trackMetaPurchase(params: {
   value?: number
   currency?: string
   transaction_id?: string
+  event_id?: string
 }) {
   const safe: Record<string, unknown> = {}
   if (params.content_ids?.length) safe.content_ids = params.content_ids
@@ -83,15 +101,16 @@ export function trackMetaPurchase(params: {
   if (params.value !== undefined) safe.value = params.value
   safe.currency = params.currency || 'EUR'
   if (params.transaction_id) safe.transaction_id = params.transaction_id
-  fbq('track', 'Purchase', safe)
+  return fbq('Purchase', safe, params.event_id)
 }
 
 export function trackMetaLead(params?: {
   value?: number
   currency?: string
+  event_id?: string
 }) {
   const safe: Record<string, unknown> = {}
   if (params?.value !== undefined) safe.value = params.value
   safe.currency = params?.currency || 'EUR'
-  fbq('track', 'Lead', safe)
+  return fbq('Lead', safe, params?.event_id)
 }

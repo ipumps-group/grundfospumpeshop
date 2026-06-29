@@ -27,23 +27,24 @@ function getCartSubtotal(): number {
 
 export default function GoogleAdsTracker() {
   const prevSubtotal = useRef(0)
-  const prevItemIds = useRef<Set<number>>(new Set())
+  const prevQuantities = useRef<Map<number, number>>(new Map())
 
   useEffect(() => {
     const initial = getCartItems()
     prevSubtotal.current = initial.reduce((s, i) => s + i.price * i.qty, 0)
-    prevItemIds.current = new Set(initial.map(i => i.id))
+    prevQuantities.current = new Map(initial.map(i => [i.id, i.qty]))
 
     const handler = () => {
       const current = getCartSubtotal()
       const currentItems = getCartItems()
-      const currentIds = new Set(currentItems.map(i => i.id))
-
       const delta = current - prevSubtotal.current
       if (delta > 0) {
-        const newItems = currentItems.filter(i => !prevItemIds.current.has(i.id))
-        const contentIds = newItems.map(i => String(i.id))
-        const contents = newItems.map(i => ({ id: String(i.id), quantity: i.qty }))
+        const changedItems = currentItems.filter(i => i.qty > (prevQuantities.current.get(i.id) || 0))
+        const contentIds = changedItems.map(i => String(i.id))
+        const contents = changedItems.map(i => ({
+          id: String(i.id),
+          quantity: i.qty - (prevQuantities.current.get(i.id) || 0),
+        }))
 
         trackAddToCart(delta)
         trackMetaAddToCart({
@@ -55,7 +56,7 @@ export default function GoogleAdsTracker() {
       }
 
       prevSubtotal.current = current
-      prevItemIds.current = currentIds
+      prevQuantities.current = new Map(currentItems.map(i => [i.id, i.qty]))
     }
 
     window.addEventListener('cart_updated', handler)

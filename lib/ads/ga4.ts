@@ -108,13 +108,30 @@ export async function fetchTrafficMetrics(
     const date = dims[0]?.value
     if (!date) continue
 
+    const sessions = parseInt(metrics[0]?.value || '0')
+    const totalUsers = parseInt(metrics[1]?.value || '0')
+    const newUsers = parseInt(metrics[2]?.value || '0')
+    const screenPageViews = parseInt(metrics[5]?.value || '0')
+    const bounceRate = parseFloat(metrics[4]?.value || '0')
+    const avgSessionDuration = parseFloat(metrics[7]?.value || '0')
+
     await upsertDailyInsight({
       date: `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`,
       platform: 'ga4',
       account_id: accountId,
-      impressions: parseInt(metrics[0]?.value || '0'), // sessions as proxy
-      clicks: parseInt(metrics[3]?.value || '0'),     // session duration
-      raw_data: { row, type: 'traffic' },
+      impressions: screenPageViews,
+      clicks: sessions,
+      ctr: 0,
+      raw_data: {
+        row,
+        type: 'traffic',
+        sessions,
+        totalUsers,
+        newUsers,
+        screenPageViews,
+        bounceRate,
+        avgSessionDuration,
+      },
     })
   }
 

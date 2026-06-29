@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { logApiError, upsertCampaign, upsertAdGroup, upsertAd, upsertDailyInsight, upsertCreative } from './admin-queries'
+import { logApiError, upsertCampaign, upsertAdGroup, upsertDailyInsight } from './admin-queries'
 import type { Campaign, AdGroup, Ad } from './types'
 
 const GOOGLE_ADS_API_VERSION = 'v24'
@@ -16,8 +16,14 @@ function getConfig() {
   }
 }
 
-// ─── OAUTH ──────────────────────────────────────────────
+// ─── OAUTH with caching ────────────────────────────────
+let cachedToken: { token: string; expiresAt: number } | null = null
+
 export async function getAccessToken(): Promise<string> {
+  if (cachedToken && Date.now() < cachedToken.expiresAt - 60000) {
+    return cachedToken.token
+  }
+
   const config = getConfig()
   if (!config.clientId || !config.clientSecret || !config.refreshToken) {
     throw new Error('Google Ads OAuth credentials not configured')
@@ -42,10 +48,17 @@ export async function getAccessToken(): Promise<string> {
   }
 
   const data = await res.json()
+  cachedToken = {
+    token: data.access_token,
+    expiresAt: Date.now() + (data.expires_in || 3600) * 1000,
+  }
   return data.access_token
 }
 
 // ─── GAQL QUERY HELPER ─────────────────────────────────
+const MAX_RETRIES = 3
+const INITIAL_BACKOFF_MS = 1000
+
 async function queryGoogleAds(accessToken: string, query: string, customerId: string): Promise<any[]> {
   const config = getConfig()
   const url = `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${customerId}/googleAds:search`
@@ -59,27 +72,72 @@ async function queryGoogleAds(accessToken: string, query: string, customerId: st
     headers['login-customer-id'] = config.loginCustomerId
   }
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ query }),
-  })
+  let lastError: Error | null = null
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ query, pageSize: 10000 }),
+      })
 
-  if (!res.ok) {
-    const errBody = await res.text()
-    await logApiError({
-      platform: 'google_ads',
-      endpoint: url,
-      request_body: { query },
-      response_body: { status: res.status, body: errBody },
-      status_code: res.status,
-      error_message: errBody,
-    })
-    throw new Error(`Google Ads API error (${res.status}): ${errBody}`)
+      if (res.status === 429) {
+        const retryAfter = res.headers.get('Retry-After')
+        const delay = retryAfter ? parseInt(retryAfter) * 1000 : INITIAL_BACKOFF_MS * Math.pow(2, attempt)
+        await new Promise(r => setTimeout(r, delay))
+        continue
+      }
+
+      if (!res.ok) {
+        const errBody = await res.text()
+        const statusCode = res.status
+        if (statusCode >= 500) {
+          lastError = new Error(`Google Ads API error (${statusCode}): ${errBody}`)
+          await new Promise(r => setTimeout(r, INITIAL_BACKOFF_MS * Math.pow(2, attempt)))
+          continue
+        }
+        await logApiError({
+          platform: 'google_ads',
+          endpoint: url,
+          request_body: { query },
+          response_body: { status: res.status, body: errBody },
+          status_code: res.status,
+          error_message: errBody,
+        })
+        throw new Error(`Google Ads API error (${res.status}): ${errBody}`)
+      }
+
+      const data = await res.json()
+      const allResults = data.results || []
+
+      let nextPageToken = data.nextPageToken
+      while (nextPageToken) {
+        const nextRes = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ query, pageSize: 10000, pageToken: nextPageToken }),
+        })
+        if (!nextRes.ok) {
+          const errBody = await nextRes.text()
+          throw new Error(`Google Ads API pagination error (${nextRes.status}): ${errBody}`)
+        }
+        const nextData = await nextRes.json()
+        if (nextData.results) allResults.push(...nextData.results)
+        nextPageToken = nextData.nextPageToken || null
+      }
+
+      return allResults
+    } catch (err) {
+      lastError = err as Error
+      if (attempt < MAX_RETRIES - 1) {
+        await new Promise(r => setTimeout(r, INITIAL_BACKOFF_MS * Math.pow(2, attempt)))
+        continue
+      }
+      throw err
+    }
   }
 
-  const data = await res.json()
-  return data.results || []
+  throw lastError || new Error('Google Ads API query failed after retries')
 }
 
 // ─── CAMPAIGNS ─────────────────────────────────────────
@@ -251,10 +309,17 @@ export async function fetchPerformanceMetrics(
       metrics.clicks,
       metrics.ctr,
       metrics.average_cpc,
+      metrics.average_cpm,
       metrics.cost_micros,
       metrics.conversions,
       metrics.conversions_value,
-      metrics.cost_per_conversion
+      metrics.cost_per_conversion,
+      metrics.impression_share,
+      metrics.search_impression_share,
+      metrics.search_click_share,
+      metrics.search_budget_lost_impression_share,
+      metrics.search_rank_lost_impression_share,
+      metrics.quality_score
     FROM ad_group_ad
     WHERE segments.date BETWEEN '${dateStart}' AND '${dateEnd}'
       AND campaign.status != 'REMOVED'
@@ -262,6 +327,8 @@ export async function fetchPerformanceMetrics(
 
   const results = await queryGoogleAds(accessToken, gaql, customerId)
   const campaignCache = new Map<string, string>()
+  const adGroupCache = new Map<string, string>()
+  const adCache = new Map<string, string>()
 
   for (const row of results) {
     const campId = row.campaign?.id?.toString()
@@ -287,22 +354,28 @@ export async function fetchPerformanceMetrics(
 
     let dbAdGroupId: string | null = null
     if (adGroupId) {
-      const { data: dbAg } = await supabaseAdmin
-        .from('ad_groups')
-        .select('id')
-        .eq('platform_ad_group_id', adGroupId)
-        .maybeSingle()
-      if (dbAg) dbAdGroupId = dbAg.id
+      if (!adGroupCache.has(adGroupId)) {
+        const { data: dbAg } = await supabaseAdmin
+          .from('ad_groups')
+          .select('id')
+          .eq('platform_ad_group_id', adGroupId)
+          .maybeSingle()
+        adGroupCache.set(adGroupId, dbAg?.id || '')
+      }
+      dbAdGroupId = adGroupCache.get(adGroupId) || null
     }
 
     let dbAdId: string | null = null
     if (adId) {
-      const { data: dbAd } = await supabaseAdmin
-        .from('ads')
-        .select('id')
-        .eq('platform_ad_id', adId)
-        .maybeSingle()
-      if (dbAd) dbAdId = dbAd.id
+      if (!adCache.has(adId)) {
+        const { data: dbAd } = await supabaseAdmin
+          .from('ads')
+          .select('id')
+          .eq('platform_ad_id', adId)
+          .maybeSingle()
+        adCache.set(adId, dbAd?.id || '')
+      }
+      dbAdId = adCache.get(adId) || null
     }
 
     const costMicros = Number(m?.costMicros || 0)
@@ -323,14 +396,22 @@ export async function fetchPerformanceMetrics(
       impressions,
       clicks,
       ctr: Number(m?.ctr || 0),
-      cpc: clicks > 0 ? spend / clicks : 0,
-      cpm: impressions > 0 ? (spend / impressions) * 1000 : 0,
+      cpc: Number(m?.averageCpc || 0) / 1_000_000,
+      cpm: Number(m?.averageCpm || 0) / 1_000_000,
       conversions,
       conversion_value: conversionValue,
-      cost_per_conversion: conversions > 0 ? spend / conversions : 0,
+      cost_per_conversion: Number(m?.costPerConversion || 0) / 1_000_000,
       roas: spend > 0 ? conversionValue / spend : 0,
       video_views: Number(m?.videoViews || 0),
-      raw_data: row,
+      raw_data: {
+        ...row,
+        impression_share: Number(m?.impressionShare || 0),
+        search_impression_share: Number(m?.searchImpressionShare || 0),
+        search_click_share: Number(m?.searchClickShare || 0),
+        search_budget_lost_impression_share: Number(m?.searchBudgetLostImpressionShare || 0),
+        search_rank_lost_impression_share: Number(m?.searchRankLostImpressionShare || 0),
+        quality_score: Number(m?.qualityScore || 0),
+      },
     })
   }
 

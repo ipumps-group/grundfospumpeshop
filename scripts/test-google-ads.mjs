@@ -1,9 +1,26 @@
-import { config } from 'dotenv'
-import { fileURLToPath } from 'url'
+import { readFileSync } from 'fs'
 import { dirname, resolve } from 'path'
+import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-config({ path: resolve(__dirname, '..', '.env.local') })
+const envPath = resolve(__dirname, '..', '.env.local')
+try {
+  const content = readFileSync(envPath, 'utf-8')
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const eqIdx = trimmed.indexOf('=')
+      if (eqIdx > 0) {
+        const key = trimmed.slice(0, eqIdx)
+        let val = trimmed.slice(eqIdx + 1)
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) val = val.slice(1, -1)
+        process.env[key] = val
+      }
+    }
+  }
+} catch {
+  console.log('⚠ .env.local not found, using process.env')
+}
 
 async function main() {
   console.log('\n=== GOOGLE ADS CONNECTION TEST ===\n')

@@ -6,6 +6,7 @@ import { Send, CheckCircle } from 'lucide-react'
 import { trackContactFormSubmit } from '@/lib/google-ads'
 import { trackMetaLead } from '@/lib/meta-pixel'
 import { useTranslations } from 'next-intl'
+import { hasAdvertisingConsent, readCookie } from '@/lib/tracking-consent'
 
 export default function ContactForm({ pageId }: { pageId?: string }) {
   const t = useTranslations('contactForm')
@@ -42,7 +43,23 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
 
     setSent(true)
     trackContactFormSubmit()
-    trackMetaLead()
+    const eventId = crypto.randomUUID()
+    trackMetaLead({ event_id: eventId })
+    if (hasAdvertisingConsent()) {
+      fetch('/api/tracking/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_id: eventId,
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          event_source_url: window.location.href,
+          advertising_consent: true,
+          fbp: readCookie('_fbp'),
+          fbc: readCookie('_fbc'),
+        }),
+      }).catch(error => console.error('[lead-tracking]', error))
+    }
   }
 
   if (sent) {

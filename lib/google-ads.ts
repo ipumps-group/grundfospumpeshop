@@ -1,10 +1,23 @@
-export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-18154845685'
-export const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID || 'G-KD26VEJVWY'
+import { hasAdvertisingConsent } from '@/lib/tracking-consent'
 
-const PURCHASE_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL || 'JPeXCOO5gbscEPXr89BD'
-const CONTACT_FORM_SUBMIT_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONTACT_LABEL || 'aobnCOa5gbscEPXr89BD'
-const BEGIN_CHECKOUT_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_LABEL || '2AHFCOm5gbscEPXr89BD'
-const ADD_TO_CART_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_ATC_LABEL || 'bu4ZCOy5gbscEPXr89BD'
+export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
+export const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID
+
+const PURCHASE_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL
+const CONTACT_FORM_SUBMIT_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONTACT_LABEL
+const BEGIN_CHECKOUT_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_LABEL
+const ADD_TO_CART_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_ATC_LABEL
+const VIEW_ITEM_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_VIEW_ITEM_LABEL
+const SEARCH_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_SEARCH_LABEL
+const LEAD_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL
+
+const isConfigured = !!(
+  GOOGLE_ADS_ID &&
+  PURCHASE_LABEL &&
+  CONTACT_FORM_SUBMIT_LABEL &&
+  BEGIN_CHECKOUT_LABEL &&
+  ADD_TO_CART_LABEL
+)
 
 declare global {
   interface Window {
@@ -20,51 +33,128 @@ function gtag(...args: unknown[]) {
   }
 }
 
-function hasConsent(): boolean {
-  try {
-    const stored = localStorage.getItem('pumbapood_consent')
-    if (!stored) return false
-    const parsed = JSON.parse(stored)
-    return parsed.state?.advertising === true
-  } catch {
+function safeGtag(...args: unknown[]): boolean {
+  if (!hasAdvertisingConsent() || typeof window.gtag !== 'function' || !isConfigured) {
+    if (!isConfigured) console.warn('[Google Ads] Not configured — missing env variables')
     return false
   }
+  gtag(...args)
+  return true
 }
 
-function safeGtag(...args: unknown[]) {
-  if (!hasConsent()) return
+function analyticsGtag(...args: unknown[]): boolean {
+  if (typeof window.gtag !== 'function') return false
   gtag(...args)
+  return true
+}
+
+export function trackViewItem(item?: { id: string; name?: string; price?: number; category?: string }) {
+  const conversionSent = safeGtag('event', 'conversion', {
+    send_to: VIEW_ITEM_LABEL ? `${GOOGLE_ADS_ID}/${VIEW_ITEM_LABEL}` : undefined,
+    value: item?.price ?? 0,
+    currency: 'EUR',
+  })
+  analyticsGtag('event', 'view_item', {
+    currency: 'EUR',
+    value: item?.price ?? 0,
+    items: item ? [{ item_id: item.id, item_name: item.name, price: item.price, item_category: item.category }] : undefined,
+  })
+  return conversionSent
+}
+
+export function trackViewItemList(items?: Array<{ id: string; name?: string; price?: number }>) {
+  analyticsGtag('event', 'view_item_list', {
+    currency: 'EUR',
+    items: items?.map(i => ({ item_id: i.id, item_name: i.name, price: i.price })),
+  })
+}
+
+export function trackSearch(searchTerm?: string) {
+  const conversionSent = safeGtag('event', 'conversion', {
+    send_to: SEARCH_LABEL ? `${GOOGLE_ADS_ID}/${SEARCH_LABEL}` : undefined,
+    value: 0,
+    currency: 'EUR',
+  })
+  analyticsGtag('event', 'search', { search_term: searchTerm || '' })
+  return conversionSent
+}
+
+export function trackSelectItem(item?: { id: string; name?: string; price?: number }) {
+  analyticsGtag('event', 'select_item', {
+    currency: 'EUR',
+    items: item ? [{ item_id: item.id, item_name: item.name, price: item.price }] : undefined,
+  })
 }
 
 export function trackAddToCart(value?: number) {
-  safeGtag('event', 'conversion', {
+  const conversionSent = safeGtag('event', 'conversion', {
     send_to: `${GOOGLE_ADS_ID}/${ADD_TO_CART_LABEL}`,
     value: value ?? 0,
     currency: 'EUR',
   })
+  analyticsGtag('event', 'add_to_cart', { value: value ?? 0, currency: 'EUR' })
+  return conversionSent
+}
+
+export function trackRemoveFromCart(value?: number) {
+  analyticsGtag('event', 'remove_from_cart', { value: value ?? 0, currency: 'EUR' })
 }
 
 export function trackBeginCheckout(value?: number) {
-  safeGtag('event', 'conversion', {
+  const conversionSent = safeGtag('event', 'conversion', {
     send_to: `${GOOGLE_ADS_ID}/${BEGIN_CHECKOUT_LABEL}`,
     value: value ?? 0,
     currency: 'EUR',
   })
+  analyticsGtag('event', 'begin_checkout', { value: value ?? 0, currency: 'EUR' })
+  return conversionSent
 }
 
 export function trackContactFormSubmit() {
-  safeGtag('event', 'conversion', {
+  const conversionSent = safeGtag('event', 'conversion', {
     send_to: `${GOOGLE_ADS_ID}/${CONTACT_FORM_SUBMIT_LABEL}`,
     value: 1.0,
     currency: 'EUR',
   })
+  analyticsGtag('event', 'generate_lead', { value: 1.0, currency: 'EUR' })
+  return conversionSent
 }
 
-export function trackPurchase(value?: number, transactionId?: string) {
-  safeGtag('event', 'conversion', {
+export function trackLead(value?: number) {
+  const conversionSent = safeGtag('event', 'conversion', {
+    send_to: LEAD_LABEL ? `${GOOGLE_ADS_ID}/${LEAD_LABEL}` : undefined,
+    value: value ?? 1.0,
+    currency: 'EUR',
+  })
+  analyticsGtag('event', 'generate_lead', { value: value ?? 1.0, currency: 'EUR' })
+  return conversionSent
+}
+
+export function trackPurchase(
+  value?: number,
+  transactionId?: string,
+  items?: Array<{ id: string; quantity: number; item_price?: number }>,
+): boolean {
+  const conversionSent = safeGtag('event', 'conversion', {
     send_to: `${GOOGLE_ADS_ID}/${PURCHASE_LABEL}`,
     value: value ?? 0,
     currency: 'EUR',
     transaction_id: transactionId,
+    items: items?.map(item => ({
+      item_id: item.id,
+      quantity: item.quantity,
+      price: item.item_price,
+    })),
   })
+  analyticsGtag('event', 'purchase', {
+    transaction_id: transactionId,
+    value: value ?? 0,
+    currency: 'EUR',
+    items: items?.map(item => ({
+      item_id: item.id,
+      quantity: item.quantity,
+      price: item.item_price,
+    })),
+  })
+  return conversionSent
 }

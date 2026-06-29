@@ -56,6 +56,12 @@ interface CheckoutBody {
   coupon_id?: string
   items: CartItem[]
   delivery_method?: string
+  tracking?: {
+    advertising_consent?: boolean
+    fbp?: string
+    fbc?: string
+    event_source_url?: string
+  }
 }
 
 // ─── POST /api/checkout ───────────────────────────────────────────────────────
@@ -110,7 +116,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Vigane päringu keha' }, { status: 400 })
   }
 
-  const { customer, shipping, notes, coupon_id, items, delivery_method } = body
+  const { customer, shipping, notes, coupon_id, items, delivery_method, tracking } = body
 
   if (!customer?.first_name || !customer?.last_name || !customer?.email ||
       !customer?.phone || !items?.length || !shipping?.carrier) {
@@ -151,6 +157,7 @@ export async function POST(req: NextRequest) {
 
   const grandTotal  = Number(((subtotal - discountAmount) * (1 + VAT_RATE)).toFixed(2))
   const merchantRef = `IPUMPS-${Date.now()}`
+  const metaPurchaseEventId = crypto.randomUUID()
 
   // ── 1. Salvesta tellimus DB-sse ────────────────────────────────────────────
 
@@ -180,6 +187,11 @@ export async function POST(req: NextRequest) {
       customer_name:    `${customer.first_name} ${customer.last_name}`,
       locale:           'et', // TODO: get from request context
       phone:            customer.phone,
+      advertising_consent: tracking?.advertising_consent === true,
+      meta_fbp:         tracking?.fbp?.slice(0, 255) || null,
+      meta_fbc:         tracking?.fbc?.slice(0, 255) || null,
+      meta_event_source_url: tracking?.event_source_url?.slice(0, 2048) || null,
+      meta_purchase_event_id: metaPurchaseEventId,
       montonio_order_id: merchantRef,
       shipping_address: shippingAddress,
       ...(couponCode && { coupon_code: couponCode, discount_amount: discountAmount }),

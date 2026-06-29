@@ -15,6 +15,27 @@ vi.stubGlobal('localStorage', {
 beforeEach(() => {
   mockGtag.mockClear()
   mockFbq.mockClear()
+  vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify({
+    v: 1,
+    state: { advertising: true, analytics: true, functional: true },
+  }))
+})
+
+describe('advertising consent', () => {
+  it('does not send Google or Meta events without advertising consent', async () => {
+    vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify({
+      v: 1,
+      state: { advertising: false, analytics: true, functional: true },
+    }))
+    const { trackAddToCart } = await import('@/lib/google-ads')
+    const { trackMetaAddToCart } = await import('@/lib/meta-pixel')
+
+    trackAddToCart(10)
+    trackMetaAddToCart({ value: 10, currency: 'EUR' })
+
+    expect(mockGtag).not.toHaveBeenCalled()
+    expect(mockFbq).not.toHaveBeenCalled()
+  })
 })
 
 describe('trackAddToCart', () => {
@@ -119,6 +140,22 @@ describe('Meta Pixel events', () => {
       currency: 'EUR',
       transaction_id: 'ORDER-456',
     }))
+  })
+
+  it('passes the shared event ID for browser/server deduplication', async () => {
+    const { trackMetaPurchase } = await import('@/lib/meta-pixel')
+    trackMetaPurchase({
+      value: 299.99,
+      currency: 'EUR',
+      transaction_id: 'ORDER-456',
+      event_id: 'event-456',
+    })
+    expect(mockFbq).toHaveBeenCalledWith(
+      'track',
+      'Purchase',
+      expect.any(Object),
+      { eventID: 'event-456' },
+    )
   })
 
   it('trackMetaLead fires Lead with currency EUR', async () => {

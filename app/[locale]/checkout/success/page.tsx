@@ -8,6 +8,16 @@ import { useTranslations } from 'next-intl'
 import { trackPurchase } from '@/lib/google-ads'
 import { trackMetaPurchase } from '@/lib/meta-pixel'
 
+interface ConfirmedPurchase {
+  confirmed: boolean
+  transaction_id: string
+  event_id?: string
+  value: number
+  currency: string
+  contents: { id: string; quantity: number; item_price?: number }[]
+  num_items: number
+}
+
 function SuccessContent() {
   const t = useTranslations('checkout')
   const tCart = useTranslations('cart')
@@ -16,27 +26,44 @@ function SuccessContent() {
 
   useEffect(() => {
     if (!ref) return
-    const key = 'pumbapood_tracked_purchase'
-    try {
-      if (sessionStorage.getItem(key)) return
-      sessionStorage.setItem(key, '1')
-    } catch {}
-    const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('pumbapood_last_checkout_value') : null
-    const value = raw ? Number(raw) : undefined
-    const contentsRaw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('pumbapood_last_checkout_items') : null
-    let contents: { id: string; quantity: number }[] = []
-    let numItems = 0
-    try {
-      if (contentsRaw) {
-        const parsed = JSON.parse(contentsRaw)
-        if (Array.isArray(parsed)) {
-          contents = parsed.map((i: { id: number; qty: number }) => ({ id: String(i.id), quantity: i.qty }))
-          numItems = parsed.reduce((s: number, i: { qty: number }) => s + i.qty, 0)
+    let cancelled = false
+
+    async function confirmAndTrack() {
+      for (let attempt = 0; attempt < 6 && !cancelled; attempt += 1) {
+        const response = await fetch(`/api/tracking/purchase?ref=${encodeURIComponent(ref)}`, { cache: 'no-store' })
+        if (response.ok) {
+          const purchase = await response.json() as ConfirmedPurchase
+          if (purchase.confirmed) {
+            const googleKey = `pumbapood_google_purchase_${ref}`
+            const metaKey = `pumbapood_meta_purchase_${ref}`
+
+            if (!localStorage.getItem(googleKey) && trackPurchase(
+              purchase.value,
+              purchase.transaction_id,
+              purchase.contents,
+            )) {
+              localStorage.setItem(googleKey, '1')
+            }
+            if (!localStorage.getItem(metaKey) && trackMetaPurchase({
+              value: purchase.value,
+              currency: purchase.currency,
+              transaction_id: purchase.transaction_id,
+              event_id: purchase.event_id,
+              contents: purchase.contents,
+              content_ids: purchase.contents.map(item => item.id),
+              num_items: purchase.num_items,
+            })) {
+              localStorage.setItem(metaKey, '1')
+            }
+            return
+          }
         }
+        await new Promise(resolve => window.setTimeout(resolve, 2000))
       }
-    } catch {}
-    trackPurchase(value, ref)
-    trackMetaPurchase({ value, currency: 'EUR', transaction_id: ref, contents, num_items: numItems || undefined })
+    }
+
+    confirmAndTrack().catch(error => console.error('[purchase-tracking]', error))
+    return () => { cancelled = true }
   }, [ref])
 
   return (
