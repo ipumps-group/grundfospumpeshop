@@ -13,8 +13,13 @@ function getConfig() {
 // GA4 Data API v1
 const GA4_BASE = 'https://analyticsdata.googleapis.com/v1beta'
 
+let cachedGa4Token: { token: string; expiresAt: number } | null = null
+
 async function getAccessToken(): Promise<string> {
-  // Reuse Google OAuth tokens if available
+  if (cachedGa4Token && Date.now() < cachedGa4Token.expiresAt - 60000) {
+    return cachedGa4Token.token
+  }
+
   const clientId = process.env.GOOGLE_ADS_CLIENT_ID
   const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET
   const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN
@@ -36,8 +41,15 @@ async function getAccessToken(): Promise<string> {
     body: params.toString(),
   })
 
-  if (!res.ok) throw new Error(`Failed to get GA4 access token: ${await res.text()}`)
+  if (!res.ok) {
+    cachedGa4Token = null
+    throw new Error(`Failed to get GA4 access token: ${await res.text()}`)
+  }
   const data = await res.json()
+  cachedGa4Token = {
+    token: data.access_token,
+    expiresAt: Date.now() + (data.expires_in || 3600) * 1000,
+  }
   return data.access_token
 }
 

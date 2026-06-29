@@ -1,41 +1,65 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getAdAccounts, getAdAccount } from '@/lib/ads/supabase'
+import { getAdAccounts } from '@/lib/ads/supabase'
 import { StatusBadge } from '@/components/ads/status-badge'
 import { cn } from '@/lib/ads/utils'
 import type { AdAccount, IntegrationStatus } from '@/lib/ads/types'
 import {
   RefreshCw, CheckCircle2, XCircle, AlertCircle, ExternalLink,
-  Key, Eye, EyeOff,
+  Key, Eye, EyeOff, Play,
 } from 'lucide-react'
+
+interface ConfigStatus {
+  connected: boolean
+  vars: Record<string, boolean>
+  doc: string
+}
+
+const ENV_LABELS: Record<string, string> = {
+  GOOGLE_ADS_DEVELOPER_TOKEN: 'Google Ads Developer Token',
+  GOOGLE_ADS_CLIENT_ID: 'Google Ads OAuth Client ID',
+  GOOGLE_ADS_CLIENT_SECRET: 'Google Ads OAuth Client Secret',
+  GOOGLE_ADS_REFRESH_TOKEN: 'Google Ads Refresh Token',
+  GOOGLE_ADS_CUSTOMER_ID: 'Google Ads Customer ID (no dashes)',
+  GOOGLE_ADS_LOGIN_CUSTOMER_ID: 'Google Ads MCC Login ID (optional)',
+  META_GRAPH_API_VERSION: 'Meta Graph API Version',
+  META_APP_SECRET: 'Meta App Secret',
+  META_ACCESS_TOKEN: 'Meta System User Token',
+  META_AD_ACCOUNT_ID: 'Meta Ad Account ID (with act_ prefix)',
+  META_BUSINESS_ID: 'Meta Business ID (optional)',
+  META_PAGE_ID: 'Meta Page ID (optional)',
+  GA4_PROPERTY_ID: 'GA4 Property ID',
+  OPENAI_API_KEY: 'OpenAI API Key',
+}
+
+const PLATFORM_LABELS: Record<string, string> = {
+  google_ads: 'Google Ads',
+  meta_ads: 'Meta Ads',
+  ga4: 'GA4',
+  openai: 'OpenAI',
+}
 
 export default function IntegrationsPage() {
   const [accounts, setAccounts] = useState<AdAccount[]>([])
   const [loading, setLoading] = useState(true)
+  const [configStatus, setConfigStatus] = useState<Record<string, ConfigStatus> | null>(null)
   const [status, setStatus] = useState<IntegrationStatus | null>(null)
   const [showTokens, setShowTokens] = useState(false)
   const [testingPlatform, setTestingPlatform] = useState<string | null>(null)
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; steps: any[] }>>({})
 
-  const envVars = [
-    { key: 'GOOGLE_ADS_DEVELOPER_TOKEN', label: 'Google Ads Developer Token', doc: 'https://developers.google.com/google-ads/api/docs/get-started/dev-token' },
-    { key: 'GOOGLE_ADS_CLIENT_ID', label: 'Google Ads OAuth Client ID', doc: 'https://console.cloud.google.com/apis/credentials' },
-    { key: 'GOOGLE_ADS_CLIENT_SECRET', label: 'Google Ads OAuth Client Secret', doc: '' },
-    { key: 'GOOGLE_ADS_REFRESH_TOKEN', label: 'Google Ads Refresh Token', doc: 'https://developers.google.com/identity/protocols/oauth2/web-server#offline' },
-    { key: 'GOOGLE_ADS_CUSTOMER_ID', label: 'Google Ads Customer ID (no dashes)', doc: '' },
-    { key: 'GOOGLE_ADS_LOGIN_CUSTOMER_ID', label: 'Google Ads MCC Login ID (optional)', doc: '' },
-    { key: 'META_GRAPH_API_VERSION', label: 'Meta Graph API Version', doc: 'https://developers.facebook.com/docs/graph-api/changelog' },
-    { key: 'META_APP_ID', label: 'Meta App ID', doc: '' },
-    { key: 'META_APP_SECRET', label: 'Meta App Secret', doc: '' },
-    { key: 'META_ACCESS_TOKEN', label: 'Meta System User Token', doc: 'https://developers.facebook.com/docs/marketing-api/access' },
-    { key: 'META_AD_ACCOUNT_ID', label: 'Meta Ad Account ID (with act_ prefix)', doc: '' },
-    { key: 'META_BUSINESS_ID', label: 'Meta Business ID', doc: '' },
-    { key: 'META_PAGE_ID', label: 'Meta Page ID', doc: '' },
-    { key: 'META_PIXEL_ID', label: 'Meta Pixel ID', doc: '' },
-    { key: 'GA4_PROPERTY_ID', label: 'GA4 Property ID', doc: 'https://developers.google.com/analytics/devguides/reporting/data/v1' },
-    { key: 'OPENAI_API_KEY', label: 'OpenAI API Key', doc: 'https://platform.openai.com/api-keys' },
-  ] as const
+  const loadConfigStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/ads/config-status')
+      if (res.ok) {
+        const data = await res.json()
+        setConfigStatus(data)
+      }
+    } catch (err) {
+      console.error('Config status load error:', err)
+    }
+  }, [])
 
   const checkConnection = useCallback(async () => {
     const st: IntegrationStatus = {
@@ -44,47 +68,37 @@ export default function IntegrationsPage() {
       ga4: { connected: false, error: null, lastSync: null, propertyId: null },
     }
 
-    // Checks are best-effort on client side — full validation via API routes
-    st.google_ads.connected = !!(
-      process.env.NEXT_PUBLIC_GOOGLE_ADS_CLIENT_ID ||
-      process.env.GOOGLE_ADS_DEVELOPER_TOKEN
-    )
-
-    st.meta_ads.connected = !!process.env.NEXT_PUBLIC_META_ACCESS_TOKEN ||
-      !!process.env.META_ACCESS_TOKEN
-
-    if (process.env.NEXT_PUBLIC_GA4_PROPERTY_ID || process.env.GA4_PROPERTY_ID) {
-      st.ga4.connected = true
-      st.ga4.propertyId = process.env.GA4_PROPERTY_ID || process.env.NEXT_PUBLIC_GA4_PROPERTY_ID || null
+    if (configStatus) {
+      st.google_ads.connected = configStatus.google_ads?.connected ?? false
+      st.meta_ads.connected = configStatus.meta_ads?.connected ?? false
+      st.ga4.connected = configStatus.ga4?.connected ?? false
+      st.ga4.propertyId = process.env.NEXT_PUBLIC_GA4_PROPERTY_ID || null
     }
 
-    // Get last sync times from accounts
     for (const acc of accounts) {
       const platform = acc.platform?.slug
-      if (platform === 'google_ads') {
-        st.google_ads.lastSync = acc.last_sync_at
-      } else if (platform === 'meta_ads') {
-        st.meta_ads.lastSync = acc.last_sync_at
-      }
+      if (platform === 'google_ads') st.google_ads.lastSync = acc.last_sync_at
+      else if (platform === 'meta_ads') st.meta_ads.lastSync = acc.last_sync_at
     }
 
     setStatus(st)
-  }, [accounts])
+  }, [accounts, configStatus])
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       const { data } = await getAdAccounts()
       if (data) setAccounts(data)
+      await loadConfigStatus()
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [loadConfigStatus])
 
   useEffect(() => { load() }, [load])
-  useEffect(() => { if (accounts.length) checkConnection() }, [accounts, checkConnection])
+  useEffect(() => { if (accounts.length > 0 || configStatus) checkConnection() }, [accounts, configStatus, checkConnection])
 
   const testConnection = async (platform: string) => {
     setTestingPlatform(platform)
@@ -99,9 +113,20 @@ export default function IntegrationsPage() {
     }
   }
 
-  const envStatus = (key: string) => {
-    const val = process.env[key as keyof typeof process.env] || process.env[`NEXT_PUBLIC_${key}` as keyof typeof process.env]
-    return !!val
+  const quickSync = async (platform: string) => {
+    setTestingPlatform(`sync-${platform}`)
+    try {
+      await fetch('/api/ads/sync/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform, syncType: 'manual' }),
+      })
+      await load()
+    } catch (err: any) {
+      console.error(err)
+    } finally {
+      setTestingPlatform(null)
+    }
   }
 
   return (
@@ -112,7 +137,7 @@ export default function IntegrationsPage() {
           <p className="text-sm text-gray-500 mt-1">Connect your ad platforms and configure API credentials</p>
         </div>
         <button
-          onClick={() => { load(); checkConnection() }}
+          onClick={() => { load() }}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
         >
@@ -125,6 +150,7 @@ export default function IntegrationsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {(['google_ads', 'meta_ads', 'ga4'] as const).map(platform => {
           const s = status?.[platform]
+          const cs = configStatus?.[platform]
           return (
             <div key={platform} className={cn(
               'bg-white rounded-xl border p-5',
@@ -165,6 +191,16 @@ export default function IntegrationsPage() {
                   {testingPlatform === platform ? <RefreshCw className="w-3 h-3 animate-spin" /> : null}
                   {testingPlatform === platform ? 'Testing...' : 'Test Connection'}
                 </button>
+                {cs?.connected && (
+                  <button
+                    onClick={() => quickSync(platform)}
+                    disabled={testingPlatform === `sync-${platform}`}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    <Play className="w-3 h-3" />
+                    {testingPlatform === `sync-${platform}` ? 'Syncing...' : 'Sync Now'}
+                  </button>
+                )}
                 {testResults[platform] && (
                   <div className="mt-2 bg-gray-50 rounded-lg p-2 max-h-40 overflow-y-auto text-xs">
                     {testResults[platform].steps?.filter((s: any) => !s.step.startsWith('  ')).map((s: any, i: number) => (
@@ -195,27 +231,25 @@ export default function IntegrationsPage() {
           </button>
         </div>
         <div className="divide-y divide-gray-100">
-          {envVars.map(env => {
-            const isSet = envStatus(env.key)
+          {Object.entries(ENV_LABELS).map(([key, label]) => {
+            if (!configStatus) return null
+            // Find which platform this var belongs to
+            let isSet = false
+            for (const status of Object.values(configStatus)) {
+              if (key in status.vars && status.vars[key]) {
+                isSet = true
+                break
+              }
+            }
             return (
-              <div key={env.key} className="px-5 py-3 flex items-center justify-between">
+              <div key={key} className="px-5 py-3 flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">{env.label}</span>
-                    {env.doc && (
-                      <a href={env.doc} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
+                    <span className="text-sm font-medium text-gray-900">{label}</span>
                   </div>
-                  <code className="text-xs text-gray-400">{env.key}</code>
+                  <code className="text-xs text-gray-400">{key}</code>
                 </div>
                 <div className="flex items-center gap-3">
-                  {showTokens ? (
-                    <code className="text-xs text-gray-600 max-w-[200px] truncate">
-                      {process.env[env.key as keyof typeof process.env] || process.env[`NEXT_PUBLIC_${env.key}` as keyof typeof process.env] || '(empty)'}
-                    </code>
-                  ) : null}
                   {isSet ? (
                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
                   ) : (
@@ -248,28 +282,6 @@ export default function IntegrationsPage() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* TODOs */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-        <h3 className="font-semibold text-amber-800 mb-2">TODO: API Credentials &amp; Permissions</h3>
-        <ul className="list-disc list-inside text-sm text-amber-700 space-y-1">
-          <li><strong>Google Ads</strong> (API v24): Apply for Developer Token at <a href="https://developers.google.com/google-ads/api/docs/get-started/dev-token" target="_blank" className="underline">Google Ads Dev Center</a></li>
-          <li>Google Ads: Set up OAuth 2.0 Web Application client in <a href="https://console.cloud.google.com/apis/credentials" target="_blank" className="underline">Google Cloud Console</a></li>
-          <li>Google Ads: Generate refresh token via <a href="https://developers.google.com/oauthplayground" target="_blank" className="underline">OAuth Playground</a> with scope <code>https://www.googleapis.com/auth/adwords</code></li>
-          <li>Google Ads: Add authorized redirect URI <code>https://developers.google.com/oauthplayground</code> to the OAuth client</li>
-          <li>Google Ads: Ensure the Google account is added as a <strong>Test user</strong> in OAuth consent screen if app is in Testing mode</li>
-          <li>Google Ads: Use <code>GOOGLE_ADS_CUSTOMER_ID</code> (no dashes) for the ad account, <code>GOOGLE_ADS_LOGIN_CUSTOMER_ID</code> only when accessing through an MCC</li>
-          <li><strong>Meta</strong> (Graph API v25.0): Create a System User in Business Settings → Users → System Users</li>
-          <li>Meta: Assign the System User to the Ad Account, Page, and App with <code>ads_management</code>, <code>ads_read</code>, <code>read_insights</code>, <code>business_management</code>, <code>pages_manage_ads</code></li>
-          <li>Meta: Generate a long-lived token from the System User. Include <code>META_APP_SECRET</code> for <code>appsecret_proof</code></li>
-          <li>Meta: <code>META_AD_ACCOUNT_ID</code> must include the <code>act_</code> prefix (e.g. <code>act_2215256342558034</code>)</li>
-          <li>Meta: The app must be <strong>Live/Public</strong> to create ads (Development mode blocks creative creation)</li>
-          <li><strong>GA4</strong>: Uses the same Google OAuth as Google Ads — ensure the Google account has GA4 access</li>
-          <li><strong>OpenAI</strong>: Get an API key from <a href="https://platform.openai.com/api-keys" target="_blank" className="underline">platform.openai.com</a></li>
-          <li>Supabase: Enable the <code>service_role</code> key and run the migration SQL (<code>migrations/001_ads_schema.sql</code>)</li>
-          <li>Deploy to Vercel and set all environment variables in Vercel dashboard</li>
-        </ul>
       </div>
     </div>
   )

@@ -68,7 +68,7 @@ function getCart(): CartItem[] {
 export default function CheckoutPage() {
   const t    = useTranslations('checkout')
   const tNav = useTranslations('nav')
-  const { user } = useAuth()
+  const { user, signIn } = useAuth()
 
   const [items, setItems]         = useState<CartItem[]>([])
   const [mounted, setMounted]     = useState(false)
@@ -215,13 +215,28 @@ export default function CheckoutPage() {
         }),
       })
 
-      const data = await res.json() as { payment_url?: string; error?: string; detail?: string }
+      const data = await res.json() as { payment_url?: string; error?: string; detail?: string; created_account?: boolean }
 
       if (!res.ok || !data.payment_url) {
         const msg = data.detail ? `${data.error}: ${data.detail}` : (data.error || t('orderFailed'))
         setApiError(msg)
         setLoading(false)
         return
+      }
+
+      // Save purchase data for success page tracking
+      try {
+        const contents = items.map(i => ({ id: String(i.id), qty: i.qty }))
+        sessionStorage.setItem('pumbapood_last_checkout_value', String(total))
+        sessionStorage.setItem('pumbapood_last_checkout_items', JSON.stringify(contents))
+      } catch {}
+
+      // Sign in if account was just created
+      if (data.created_account && createAccount && password) {
+        const { error: signInErr } = await signIn(email, password)
+        if (signInErr) {
+          console.warn('[checkout] Auto sign-in after account creation failed:', signInErr.message)
+        }
       }
 
       localStorage.removeItem('ipumps_cart')

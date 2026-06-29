@@ -30,7 +30,10 @@ async function metaFetch(path: string, params: Record<string, string> = {}): Pro
 
   const url = new URL(`${getBaseUrl()}${path}`)
   url.searchParams.set('access_token', cfg.accessToken)
-  if (cfg.appSecret) url.searchParams.set('appsecret_proof', cfg.appSecret)
+  if (cfg.appSecret) {
+    const proof = createHmac('sha256', cfg.appSecret).update(cfg.accessToken!).digest('hex')
+    url.searchParams.set('appsecret_proof', proof)
+  }
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
 
   const res = await fetch(url.toString())

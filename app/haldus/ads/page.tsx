@@ -1,17 +1,19 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { MetricCard } from '@/components/ads/metric-card'
 import { StatusBadge } from '@/components/ads/status-badge'
-import { SparkChart, BarChart } from '@/components/ads/chart'
-import { getDateRangePreset, getPreviousPeriod, daysAgo, today, cn } from '@/lib/ads/utils'
+import { getDateRangePreset, getPreviousPeriod, cn } from '@/lib/ads/utils'
 import type { AggregatedInsight, PeriodComparison, Recommendation, ChangeLog, SyncLog } from '@/lib/ads/types'
-import { RefreshCw, AlertTriangle, TrendingUp, TrendingDown, BarChart3, Bug } from 'lucide-react'
+import { RefreshCw, AlertTriangle, TrendingUp, TrendingDown, Play, Filter } from 'lucide-react'
 
 type RangePreset = 'today' | 'yesterday' | 'last_7_days' | 'last_30_days'
+type PlatformFilter = 'all' | 'google_ads' | 'meta_ads'
 
 export default function AdsDashboard() {
   const [range, setRange] = useState<RangePreset>('last_7_days')
+  const [platform, setPlatform] = useState<PlatformFilter>('all')
   const [loading, setLoading] = useState(true)
   const [aggregated, setAggregated] = useState<AggregatedInsight[]>([])
   const [comparison, setComparison] = useState<PeriodComparison[]>([])
@@ -27,7 +29,6 @@ export default function AdsDashboard() {
       const { start, end } = getDateRangePreset(range)
       const prev = getPreviousPeriod(start, end)
 
-      // Fetch init data (bypasses RLS — uses admin client on server)
       const initRes = await fetch('/api/ads/init')
       const initData = await initRes.json()
       const cid = initData.companyId || ''
@@ -37,18 +38,19 @@ export default function AdsDashboard() {
       setRecentChanges(initData.changeLogs || [])
       setSyncLogs(initData.syncLogs || [])
 
-      // Fetch aggregated insights via API
-      const aggRes = await fetch(`/api/ads/insights?type=aggregated&companyId=${cid}&dateStart=${start}&dateEnd=${end}`)
+      const p = platform !== 'all' ? platform : undefined
+
+      const aggRes = await fetch(`/api/ads/insights?type=aggregated&companyId=${cid}&dateStart=${start}&dateEnd=${end}${p ? `&platform=${p}` : ''}`)
       if (aggRes.ok) { const d = await aggRes.json(); setAggregated(d || []) }
 
-      const compRes = await fetch(`/api/ads/insights?type=comparison&companyId=${cid}&dateStart=${start}&dateEnd=${end}&prevStart=${prev.start}&prevEnd=${prev.end}`)
+      const compRes = await fetch(`/api/ads/insights?type=comparison&companyId=${cid}&dateStart=${start}&dateEnd=${end}&prevStart=${prev.start}&prevEnd=${prev.end}${p ? `&platform=${p}` : ''}`)
       if (compRes.ok) { const d = await compRes.json(); setComparison(d || []) }
     } catch (err) {
       console.error('Dashboard load error:', err)
     } finally {
       setLoading(false)
     }
-  }, [range])
+  }, [range, platform])
 
   useEffect(() => { loadData() }, [loadData])
 
@@ -68,6 +70,8 @@ export default function AdsDashboard() {
   const metaMetrics = aggregated.filter(a => a.platform === 'meta_ads')
   const googleTotal = googleMetrics.reduce((s, a) => s + a.total_spend, 0)
   const metaTotal = metaMetrics.reduce((s, a) => s + a.total_spend, 0)
+  const hasData = aggregated.length > 0
+  const lastSync = syncLogs.length > 0 ? syncLogs[0] : null
 
   return (
     <div className="space-y-6">
@@ -75,9 +79,23 @@ export default function AdsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Ads Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Real-time overview of all advertising performance</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {hasData
+              ? `Showing ${platform === 'all' ? 'Google Ads + Meta Ads' : platform === 'google_ads' ? 'Google Ads' : 'Meta Ads'} metrics`
+              : 'No ad data yet — run a sync to get started'}
+            {lastSync && <span className="ml-2 text-xs text-gray-400">· Last sync: {new Date(lastSync.started_at).toLocaleString()}</span>}
+          </p>
         </div>
         <div className="flex items-center gap-3">
+          <select
+            value={platform}
+            onChange={e => setPlatform(e.target.value as PlatformFilter)}
+            className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Platforms</option>
+            <option value="google_ads">Google Ads</option>
+            <option value="meta_ads">Meta Ads</option>
+          </select>
           <select
             value={range}
             onChange={e => setRange(e.target.value as RangePreset)}
@@ -99,24 +117,54 @@ export default function AdsDashboard() {
         </div>
       </div>
 
-      {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
-        <MetricCard label="Total Spend" value={totals.spend} format="currency" loading={loading} change={getComp('spend')?.change_pct} />
-        <MetricCard label="Conversions" value={totals.conversions} loading={loading} change={getComp('conversions')?.change_pct} />
-        <MetricCard label="CPA" value={totals.conversions > 0 ? totals.spend / totals.conversions : 0} format="currency" loading={loading} />
-        <MetricCard label="ROAS" value={totals.spend > 0 ? totals.revenue / totals.spend : 0} format="ratio" loading={loading} />
-        <MetricCard label="Revenue" value={totals.revenue} format="currency" loading={loading} change={getComp('revenue')?.change_pct} />
-        <MetricCard label="Leads" value={totals.leads} loading={loading} change={getComp('leads')?.change_pct} />
-        <MetricCard label="Purchases" value={totals.purchases} loading={loading} change={getComp('purchases')?.change_pct} />
-      </div>
+      {/* Zero state */}
+      {!hasData && !loading && (
+        <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
+          <div className="text-5xl mb-4">📊</div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">No Ad Data Available</h2>
+          <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
+            Your dashboard is empty because no ad platform data has been synced yet.
+            Go to the Sync page to import campaigns and performance metrics from Google Ads and Meta Ads.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Link
+              href="/haldus/ads/sync"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+            >
+              <Play className="w-4 h-4" />
+              Go to Sync
+            </Link>
+            <Link
+              href="/haldus/ads/settings/integrations"
+              className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+            >
+              Configure Integrations
+            </Link>
+          </div>
+        </div>
+      )}
 
-      {/* Second row metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard label="Impressions" value={totals.impressions} loading={loading} change={getComp('impressions')?.change_pct} />
-        <MetricCard label="Clicks" value={totals.clicks} loading={loading} change={getComp('clicks')?.change_pct} />
-        <MetricCard label="CTR" value={totals.impressions > 0 ? totals.clicks / totals.impressions : 0} format="percentage" loading={loading} />
-        <MetricCard label="CPC" value={totals.clicks > 0 ? totals.spend / totals.clicks : 0} format="currency" loading={loading} />
-      </div>
+      {/* Metric Cards */}
+      {hasData && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+            <MetricCard label="Total Spend" value={totals.spend} format="currency" loading={loading} change={getComp('spend')?.change_pct} />
+            <MetricCard label="Conversions" value={totals.conversions} loading={loading} change={getComp('conversions')?.change_pct} />
+            <MetricCard label="CPA" value={totals.conversions > 0 ? totals.spend / totals.conversions : 0} format="currency" loading={loading} />
+            <MetricCard label="ROAS" value={totals.spend > 0 ? totals.revenue / totals.spend : 0} format="ratio" loading={loading} />
+            <MetricCard label="Revenue" value={totals.revenue} format="currency" loading={loading} change={getComp('revenue')?.change_pct} />
+            <MetricCard label="Leads" value={totals.leads} loading={loading} change={getComp('leads')?.change_pct} />
+            <MetricCard label="Purchases" value={totals.purchases} loading={loading} change={getComp('purchases')?.change_pct} />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <MetricCard label="Impressions" value={totals.impressions} loading={loading} change={getComp('impressions')?.change_pct} />
+            <MetricCard label="Clicks" value={totals.clicks} loading={loading} change={getComp('clicks')?.change_pct} />
+            <MetricCard label="CTR" value={totals.impressions > 0 ? totals.clicks / totals.impressions : 0} format="percentage" loading={loading} />
+            <MetricCard label="CPC" value={totals.clicks > 0 ? totals.spend / totals.clicks : 0} format="currency" loading={loading} />
+          </div>
+        </>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Platform Comparison */}
@@ -127,6 +175,8 @@ export default function AdsDashboard() {
               <div className="h-4 bg-gray-200 rounded w-3/4" />
               <div className="h-4 bg-gray-200 rounded w-1/2" />
             </div>
+          ) : !hasData ? (
+            <div className="text-center py-4 text-gray-400 text-sm">No spend data yet</div>
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -151,7 +201,7 @@ export default function AdsDashboard() {
           )}
         </div>
 
-        {/* Alerts & Recommendations */}
+        {/* Recommendations */}
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900">Latest Recommendations</h3>
@@ -196,7 +246,12 @@ export default function AdsDashboard() {
               ))}
             </div>
           ) : syncLogs.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-sm">No syncs yet. Go to Sync page.</div>
+            <div className="text-center py-6 text-gray-400 text-sm space-y-2">
+              <p>No syncs yet.</p>
+              <Link href="/haldus/ads/sync" className="text-blue-600 hover:underline text-xs">
+                Go to Sync →
+              </Link>
+            </div>
           ) : (
             <div className="space-y-3">
               {syncLogs.slice(0, 3).map(log => (
