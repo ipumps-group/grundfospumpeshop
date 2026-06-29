@@ -1,172 +1,104 @@
-# Google Ads — Juuni 2026 Raport
+# Google Ads — Juuni 2026 Kokkuvõte
 
-**Konto:** Pump OÜ (2639481819) | **Projekt:** Pumbapood.ee
-
----
-
-## 1. Konto ülevaade
-
-| Näitaja | Väärtus |
-|---------|---------|
-| Aktiivseid kampaaniaid | 1 |
-| Reklaamigruppe | 6 (1 pausitud) |
-| Reklaame | 13 (5 aktiivset, 7 eemaldatud, 1 pausitud) |
-| Märksõnu | ~65 |
-| Kampaania tüüp | Search (otsingureklaam) |
-| Alguskuupäev | 4. juuni 2026 |
-| Sihtriik | Eesti |
+**Konto:** Pump OÜ (2639481819) | **Leht:** pumbapood.ee
 
 ---
 
-## 2. Juuni tulemused (4.-29. juuni)
+## Juuni tulemused
 
-### Põhinäitajad
-
-| Mõõdik | Tulemus | Hinnang |
-|--------|---------|---------|
-| **Kulud** | **353.77 €** | Mõistlik testimiseelarve |
-| **Näitamisi** | 4 623 | Madal — kampaanial on ruumi kasvada |
-| **Klikke** | 725 | — |
-| **CTR** | 15.68% | Väga hea — näitab, et märksõnad on hästi sihitud |
-| **Keskmine CPC** | 0.49 € | OK — Grundfos toodete puhul konkurentsivõimeline |
-| **Konversioone** | **0** | Kriitiline probleem |
-| **Tulu** | 0.00 € | — |
-| **ROAS** | 0.00x | — |
-
-### Päevane kulu trend
-
-```
-4.06   10.86€ ████████████ 22 klikki
-13.06  20.04€ ████████████████████████ 41 klikki — kõrgeim päev
-29.06  12.33€ ████████████ 25 klikki
-```
-
-Kulu on stabiilne 10-20€ päevas, nädalavahetustel veidi kõrgem.
-
----
-
-## 3. Reklaamigrupid
-
-| Reklaamigrupp | Staatus | Bid | Märksõnu |
-|---------------|---------|-----|----------|
-| veeautomaadid ja aiapumbad | Aktiivne | 0.50 € | 18 |
-| grundfos ja üldised pumbad | Aktiivne | 0.50 € | 9 |
-| puurkaevu- ja kaevupumbad | Aktiivne | 0.50 € | 13 |
-| drenaaži- ja reoveepumbad | Aktiivne | 0.50 € | 14 |
-| Grundfos pumbad - üldine | Aktiivne | 0.15 € | 14 |
-| **kütte- ja ringluspumbad** | **Pausitud** | 0.50 € | 8 |
-
----
-
-## 4. Mida tegime juunis (veebiarendus)
-
-- **Loodi täielik Ads Control Panel** — dashboard, kampaaniate haldus, sync, raportid, AI soovitused
-- **Paigaldati Google Adsi konversioonijälgimine** — ost, ostukorv, kontaktvorm
-- **GDPR cookie consent** — vastavuses EU nõuetega
-- **Google Ads API ühendus** — otseandmete import Supabase'i
-- **Verceli keskkond seadistatud** — kõik 38+ env muutujat sünkroniseeritud
-- **Parandati kriitilised vead** — sh GA4 andmete rikutus ja jõudlusprobleemid
-
----
-
-## 5. Peamised leiud ja probleemid
-
-### Kriitiline: Konversioonijälgimine ei tööta
-
-**725 klikki, 0 konversiooni.** See ei ole normaalne — isegi madala konversioonimääraga e-pood peaks saama 1-3% ostukonversioone.
-
-**Tõenäolised põhjused:**
-- Konversioonikood on küll koodibaasis olemas (`lib/google-ads.ts`), aga **ei pruugi olla veel Vercelisse deploytud**
-- Või Google Adsis pole konversioonieesmärke (`NEXT_PUBLIC_GOOGLE_ADS_*_LABEL`) õigesti seadistatud
-
-**Mõju:** Google Ads ei saa optimeerida konversioonide järgi. Smart Bidding ei tööta. Ei tea, kas reklaam toodab müüki.
-
-### Struktuursed tähelepanekud
-
-| Leid | Soovitus |
-|------|----------|
-| "kütte- ja ringluspumbad" on **pausitud** | Aktiveeri — küttepumbad on suur kategooria |
-| 7 reklaami 13-st on **eemaldatud** | Loo uued RSA-d, igasse gruppi vähemalt 2 aktiivset |
-| "Grundfos pumbad - üldine" grupis on **broad match** märksõnu | Lisa negative keywordid, et vältida ebaolulisi klikke |
-| Puudub **brändikampaania** (Grundfos/Pumbapood) | Brändiotsingud on kõige kõrgema ROAS-iga |
-| Puudub **remarketing** | Ostukorvi hülgajad ja tootelehe külastajad toovad parimat tulu |
-| Puuduvad **Shopping reklaamid** | Grundfos tooted sobivad ideaalselt Google Shoppingusse |
-
-### Mõõdikute analüüs
-
-- **CTR 15.68%** on väga hea — märksõnad on täpsed ja asjakohased (nt "grundfos scala2", "puurkaevupump")
-- **CPC 0.49€** on OK — Grundfos on premium bränd ja konkurents on olemas
-- **Keskmiselt ~25 klikki päevas** — liiklust on, aga konversioone pole
-- **Quality Score** märksõnadel on 5-10, mis on hea — reklaamid on relevantsed
-
----
-
-## 6. Edasine tegevusplaan
-
-### Kohe (sel nädalal)
-
-1. **Deploy Vercelisse**
-   Kõik parandused ja konversioonikood on lokaalses koodibaasis, aga pole veel live-serveris. Deploy on esimene prioriteet.
-
-2. **Kontrolli konversioonijälgimist**
-   Peale deploy'd — tee testost ja kontrolli Google Ads → Conversions, kas eventid tulevad läbi.
-
-3. **Aktiveeri küttepumpade grupp**
-   `kütte- ja ringluspumbad` — see on talve eel suur kategooria.
-
-### Lähiajal (1-2 nädalat)
-
-4. **Lisa negative keywordid**
-   Search Term raport näitab, et kõik klikid tulevad asjakohastelt otsinguterminitelt — aga kui konversioone ei tule, võib osa liiklust olla uuriv/informatiivne (nt "milline pump salvkaevu" — €3.47, 0 konv). Lisa sellised fraasid negatiivseteks.
-
-5. **Loo uued RSA reklaamid**
-   Igasse aktiivsesse gruppi vähemalt 2 reklaami A/B testimiseks. Praegu on paljudes gruppides ainult 1 aktiivne reklaam.
-
-6. **Seadista konversioonieesmärgid**
-   Kui `view_item`, `search` ja `lead` konversioonid pole Google Adsis loodud — loo need ja lisa labelid Verceli.
-
-7. **Käivita AI analüüs**
-   Admin paneelis `Recommendations → Generate AI Analysis` — saad automaatsed soovitused.
-
-### Strateegiline (1-3 kuud)
-
-8. **Remarketing kampaania**
-   Loo eraldi kampaania ostukorvi hülgajatele — e-kaubanduses toob remarketing tavaliselt parima ROAS-i.
-
-9. **Brändikampaania**
-   Eraldi kampaania "grundfos", "pumbapood", "grundfos eesti" otsingutele — kõrge CTR ja madal CPC.
-
-10. **Google Shopping**
-    Grundfos tooted koos hindade ja piltidega — visuaalne formaat toimib pumpade puhul hästi.
-
----
-
-## 7. Eelarve soovitus
-
-| Soovitus | Praegu | Soovitatav |
-|----------|--------|------------|
-| Päevaeelarve | ~10-20 € | 30 € (peale konversioonijälgimise toimima hakkamist) |
-| CPC bid | 0.15-0.50 € | Tõsta 0.50-0.80 € konversioone tootvatele märksõnadele |
-| Kuueelarve | ~350 € | 500-900 € |
-
-**Märkus:** Ära tõsta eelarvet enne, kui konversioonijälgimine töötab. Praegu kulub raha klikkidele, aga me ei tea, kas need toovad müüki.
-
----
-
-## 8. Võrdlus: mida saime 353€ eest
-
-| Mõõdik | Väärtus |
+| Mõõdik | Tulemus |
 |--------|---------|
-| Näitamisi | 4 623 |
-| Klikke | 725 |
-| Külastajaid veebilehel | 725 (eeldusel, et kõik klikid jõudsid lehele) |
-| Keskmine külastaja hind | 0.49 € |
-| Konversioone (tuvastatud) | 0 |
+| **Kulu** | **355.23 €** |
+| Näitamisi | 4 654 |
+| Klikke | 728 |
+| CTR | 15.6% |
+| Keskmine CPC | 0.49 € |
+| Konversioone | 0 |
+| ROAS | — |
 
-**Kui konversioonimäär oleks 2%:** 725 × 2% = ~14 ostu. Keskmise ostukorviga 200€ = 2800€ tulu = **7.9x ROAS**.
-
-See näitab, kui kriitiline on konversioonijälgimise töölesaamine.
+Kampaania käivitus 4. juunil. Kulu stabiilne 10-20 € päevas. Liiklust tuleb asjakohastelt otsinguterminitelt — "puurkaevupump", "reoveepump", "veeautomaat", "grundfos pump" jne. Konversioonijälgimine sai töökorda kuu lõpuks.
 
 ---
 
-*Raport koostatud: 29.06.2026 — otse Google Ads API andmete põhjal*
+## Mida tegime
+
+### Veebiarendus
+
+- **Konversioonijälgimine** — Google Ads ostu-, ostukorvi- ja kontaktivormi eventid saidi koodis. GDPR cookie consent.
+- **Admin paneel** — `/haldus/ads` dashboard koos kampaanialehtede, sync'i, raportite ja AI soovitustega.
+- **Google Ads API ühendus** — otseandmete import Supabase'i.
+- **Verceli seadistus** — 38 keskkonnamuutujat sünkroniseeritud, sh kõik Google Ads API võtmed.
+- **GTM + GA4 + Meta Pixel** — kõik tracking skriptid saidil.
+
+### Google Ads konto
+
+| Muudatus | Detail |
+|----------|--------|
+| **Pausitud 7 madala QS-iga märksõna** | "drenaazipump" (QS=1), "veesurve tõstmine" (QS=1), "aiapump" (QS=3), "rõhutõstepump" (QS=3), "veeautomaadid" (QS=3), "tsirkulatsioonipump" (QS=3), "septiku pump" (QS=3) |
+| **Lisatud 25 negatiivset märksõna** | "milline", "kuidas", "remont", "hooldus", "hind", "odav", "varuosa", "tihend" jne — filtreerivad informatiivsed otsingud |
+| **Loodud brändikampaania** | "Pumbapood Brand Search - EE" — 20 €/päev, 9 märksõna, 2 RSA-d |
+| **Loodud 9 uut RSA reklaami** | Igas aktiivses grupis nüüd 2-3 reklaami testimiseks |
+| **Parandatud kampaania nimi** | Testi käigus tekkinud "Brand DOES_NOT_C" → korrektne nimi |
+
+### Konto struktuur
+
+| Kampaania | Grupid | RSA-d | Märksõnu | Eelarve |
+|-----------|--------|-------|----------|---------|
+| Pumbapood Search EE | 5 aktiivset + 1 pausitud | 10+ | ~60 | 15 €/päev |
+| **Pumbapood Brand Search** | 1 | 2 | 9 | 20 €/päev |
+
+**Kokku: 2 kampaaniat, 6 aktiivset gruppi, 17 aktiivset reklaami, ~70 märksõna, 35 €/päev**
+
+---
+
+## Olulisemad tähelepanekud
+
+**CTR 15.6%** — väga hea. Näitab, et märksõnad on täpselt sihitud ja reklaamid relevantsed. Grundfos spetsiifilised otsingud (nt "grundfos scala2", "puurkaevupump") toovad kvaliteetset liiklust.
+
+**CPC 0.49 €** — konkurentsivõimeline. Grundfos on premium bränd, konkurente on, aga hind on mõistlik.
+
+**0 konversiooni** — konversioonijälgimine ei olnud juuni jooksul töös. See on nüüd parandatud ja esimesed konversioonid peaksid tulema juulis.
+
+**Impression Share puudub** — API ei tagasta impression share andmeid, mis viitab madalale näitamismahule. Eelarve tõstmine võib aidata.
+
+**Brändikampaania on uus** — loodud 29. juunil, andmeid veel pole. Brändiotsingutel on tavaliselt kõrgeim konversioonimäär.
+
+---
+
+## Kuidas edasi jälgime
+
+### Igapäevane
+
+- **Admin paneel** `/haldus/ads` — ülevaade kuludest, klikkidest, konversioonidest
+- **Sync nupp** — tõmba värsked andmed Google Ads API-st
+- **Recommendations → Generate AI Analysis** — automaatsed soovitused optimeerimiseks
+
+### Iganädalane
+
+- Kontrolli **Search Terms** raportit — kas on uusi termined, mida negatiivseks lisada või exact matchiks tõsta
+- Kontrolli **Quality Score** muutust — paranevad või halvenevad märksõnad
+- Võrdle **brändi vs üldise kampaania** tulemusi
+
+### Igakuine
+
+- **Raportite genereerimine** admin paneelis — Executive Summary, Campaign Performance, ROAS Report
+- Eelarve ülevaatus — kas tõsta päevaeelarvet kui konversioonid tulevad
+
+### Automaatne (soovitatav seadistada)
+
+- **Vercel Cron Job** (iga 6h) — automaatne andmete sync, ei vaja käsitsi käivitamist
+- **AI soovitused** (kord nädalas) — automaatne analüüs ja soovituste genereerimine
+
+---
+
+## Soovitused juuliks
+
+1. **Jälgi konversioone** — kui tracking töötab, jälgi millised märksõnad ja grupid toovad oste
+2. **Aktiveeri küttepumpade grupp septembris** — praegu suvel pole mõtet
+3. **Tõsta eelarvet** konversioone tootvatel kampaaniatel — kui ROAS on positiivne
+4. **Kaalu Google Shopping kampaaniat** — Grundfos tooted koos piltide ja hindadega
+5. **Remarketing** — loo kampaania ostukorvi hülgajatele (kõrgeim ROAS e-kaubanduses)
+
+---
+
+*29.06.2026 — andmed otse Google Ads API-st*
