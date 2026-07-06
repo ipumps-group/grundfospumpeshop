@@ -24,9 +24,15 @@ interface Product {
 // ─── Constants (slugs only — labels come from translations) ──────────────────
 
 const TEGEVUSALAD = [
-  { nameKey: 'heating',  slug: 'kute',   id: 'heating' },
-  { nameKey: 'cooling',  slug: 'kute',   id: 'cooling' },
-  { nameKey: 'drainage', slug: 'drenaa', id: 'drainage' },
+  { nameKey: 'heating',           slug: 'kuttepumbad',                          id: 'heating' },
+  { nameKey: 'cooling',           slug: 'kuttepumbad',                          id: 'cooling' },
+  { nameKey: 'circulation',       slug: 'tsirkulatsioonipumbad-soe-tarbevesi',  id: 'circulation' },
+  { nameKey: 'borewell',          slug: 'puurkaevupumbad',                      id: 'borewell' },
+  { nameKey: 'wells',             slug: 'salvkaevupumbad',                      id: 'wells' },
+  { nameKey: 'jpWaterAutomatics', slug: 'veeautomaadid',                        id: 'jpWaterAutomatics' },
+  { nameKey: 'pressure',          slug: 'rohutostepumbad',                      id: 'pressure' },
+  { nameKey: 'drainage',          slug: 'drenaazipumbad',                       id: 'drainage' },
+  { nameKey: 'sewage',            slug: 'reoveepumbad',                         id: 'sewage' },
 ]
 
 const TEMP_OPTIONS = [
@@ -78,26 +84,6 @@ function parseIpWater(v: string): number | null {
   // Match IPxx where second char is digit or X
   const m = v.match(/IP[X\d](\d)/i)
   return m ? parseInt(m[1]) : null
-}
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-// Alias: drenaaz ↔ drenaa (DB slug mismatch)
-const URL_TO_DB: Record<string, string> = { drenaaz: 'drenaa' }
-
-async function getDescendantSlugs(rootSlug: string): Promise<string[]> {
-  const dbRoot = URL_TO_DB[rootSlug] ?? rootSlug
-  const { data } = await supabase.from('categories').select('slug, parent_slug')
-  if (!data) return [dbRoot]
-  const result = [dbRoot]
-  const queue  = [dbRoot]
-  while (queue.length) {
-    const cur = queue.shift()!
-    for (const c of data) {
-      if (c.parent_slug === cur) { result.push(c.slug); queue.push(c.slug) }
-    }
-  }
-  return result
 }
 
 function addToCart(product: Product) {
@@ -207,7 +193,7 @@ export default function PumpCalculator() {
   const tCat = useTranslations('categories')
 
   // ── Form state ────────────────────────────────────────────────────────────
-  const [tegevusala, setTegevusala] = useState('kute')
+  const [tegevusala, setTegevusala] = useState('kuttepumbad')
   const [minHead,    setMinHead]    = useState('10')
   const [flowMode,   setFlowMode]   = useState<'direct' | 'area'>('direct')
   const [flowInput,  setFlowInput]  = useState('')
@@ -249,17 +235,17 @@ export default function PumpCalculator() {
       : flowInput ? parseFloat(flowInput) : null
 
     // 1 ── Category filter → product IDs
-    const slugs = await getDescendantSlugs(tegevusala)
-    const { data: catLinks } = await supabase
-      .from('product_categories')
-      .select('product_id')
-      .in('category_slug', slugs)
+    const { data: areaProducts } = await supabase
+      .from('products')
+      .select('id')
+      .eq('primary_activity_area_slug', tegevusala)
+      .eq('published', true)
 
-    if (!catLinks || catLinks.length === 0) {
+    if (!areaProducts || areaProducts.length === 0) {
       setProducts([]); setTotal(0); setLoading(false); return
     }
 
-    let productIds = [...new Set(catLinks.map(r => r.product_id as number))]
+    let productIds = areaProducts.map(r => r.id as number)
 
     // 2 ── Technical spec filtering via product_attributes
     const headVal = minHead ? parseFloat(minHead) : null
@@ -268,7 +254,7 @@ export default function PumpCalculator() {
 
     // Collect only the attribute names needed for active filters
     const neededAttrs: string[] = []
-    if (headVal !== null) neededAttrs.push('Tõstekõrgus maks.')
+    if (headVal !== null) { neededAttrs.push('Tõstekõrgus nom.'); neededAttrs.push('Tõstekõrgus maks.'); neededAttrs.push('Tõstekõrgus') }
     if (flowVal !== null) { neededAttrs.push('Max voolukiirus'); neededAttrs.push('Nimijõudlus') }
     if (phase) neededAttrs.push('Nimipinge')
     if (tempVal !== null) neededAttrs.push('Vedeliku temperatuurivahemik')
@@ -293,38 +279,41 @@ export default function PumpCalculator() {
         productIds = productIds.filter(id => {
           const attrs = attrMap.get(id) ?? []
           const get = (re: RegExp) => attrs.find(a => re.test(a.name))
+          const getAll = (re: RegExp) => attrs.filter(a => re.test(a.name))
 
-          // ── Max head: "Tõstekõrgus maks." ─────────────────────────────
+          // ── Head: check nom., maks., generic — use highest value
           // Values: "15 dm", "4 m" — convert to metres, compare to user metres
           if (headVal !== null) {
-            const a = get(/tõstekõrgus\s*maks/i)
-            if (a) {
+            const headAttrs = getAll(/tõstekõrgus/i)
+            if (headAttrs.length === 0) return false
+            let best: number | null = null
+            for (const a of headAttrs) {
               const v = parseHeadM(a.value)
-              if (v !== null && v < headVal) return false
+              if (v !== null && (best === null || v > best)) best = v
             }
+            if (best !== null && best < headVal) return false
           }
 
-          // ── Max flow: "Max voolukiirus" / "Nimijõudlus" ──────────────
+          // ── Flow: "Max voolukiirus" / "Nimijõudlus" ──────────────
           if (flowVal !== null) {
             const a = get(/max\s+voolukiirus/i) || get(/nimijõudlus/i)
-            if (a) {
-              const v = parseFlowM3h(a.value)
-              if (v !== null && v < flowVal) return false
-            }
+            if (!a) return false
+            const v = parseFlowM3h(a.value)
+            if (v !== null && v < flowVal) return false
           }
 
           // ── Phase: "Nimipinge" ─────────────────────────────────────────
           // Values: "1 x 230 V", "3 x 400 V"
           if (phase) {
             const a = get(/nimipinge/i)
-            if (a) {
-              const pumpPhase = parsePhase(a.value)
-              if (pumpPhase && pumpPhase !== phase) return false
-            }
+            if (!a) return false
+            const pumpPhase = parsePhase(a.value)
+            if (pumpPhase && pumpPhase !== phase) return false
           }
 
           // ── Max liquid temp: "Vedeliku temperatuurivahemik" ───────────
           // Values: "2 .. 110 °C", "-10 .. 95 °C" — take max (last number)
+          // Note: lenient — missing attribute is ok (not all products list this)
           if (tempVal !== null) {
             const a = get(/vedeliku\s+temperatuurivahemik/i)
             if (a) {
@@ -336,6 +325,7 @@ export default function PumpCalculator() {
           // ── IP class: "Kaitseklass (IEC 34-5)" ────────────────────────
           // Outdoor requires water protection digit ≥ 4 (splash resistant)
           // Values: "IP44", "IP68", "IPX4D", "IPX2D"
+          // Note: lenient — missing attribute is ok (not all products list IP)
           if (location === 'outdoor') {
             const a = get(/kaitseklass/i)
             if (a) {

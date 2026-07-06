@@ -14,7 +14,7 @@ import LocationMap from '@/components/LocationMap'
 const languages = ['ET', 'EN', 'LV', 'LT', 'PL', 'RU']
 
 const categories = [
-  { name: 'Kütte', icon: Flame, count: 155, slug: 'kuttepumbad', color: 'from-[#01a0dc]/20 to-red-500/10', key: 'heating' },
+  { name: 'Küte', icon: Flame, count: 155, slug: 'kuttepumbad', color: 'from-[#01a0dc]/20 to-red-500/10', key: 'heating' },
   { name: 'Tsirkulatsioon', icon: Thermometer, count: 48, slug: 'tsirkulatsioonipumbad-soe-tarbevesi', color: 'from-amber-500/20 to-[#01a0dc]/10', key: 'circulation' },
   { name: 'Puurkaev', icon: Drill, count: 43, slug: 'puurkaevupumbad', color: 'from-stone-500/20 to-gray-500/10', key: 'borewell' },
   { name: 'Salvkaev', icon: CircleDot, count: 22, slug: 'salvkaevupumbad', color: 'from-green-500/20 to-emerald-500/10', key: 'wells' },
