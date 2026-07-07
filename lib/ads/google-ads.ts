@@ -78,7 +78,7 @@ async function queryGoogleAds(accessToken: string, query: string, customerId: st
       const res = await fetch(url, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ query, pageSize: 10000 }),
+        body: JSON.stringify({ query }),
       })
 
       if (res.status === 429) {
@@ -115,7 +115,7 @@ async function queryGoogleAds(accessToken: string, query: string, customerId: st
         const nextRes = await fetch(url, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ query, pageSize: 10000, pageToken: nextPageToken }),
+          body: JSON.stringify({ query, pageToken: nextPageToken }),
         })
         if (!nextRes.ok) {
           const errBody = await nextRes.text()
@@ -313,13 +313,7 @@ export async function fetchPerformanceMetrics(
       metrics.cost_micros,
       metrics.conversions,
       metrics.conversions_value,
-      metrics.cost_per_conversion,
-      metrics.impression_share,
-      metrics.search_impression_share,
-      metrics.search_click_share,
-      metrics.search_budget_lost_impression_share,
-      metrics.search_rank_lost_impression_share,
-      metrics.quality_score
+      metrics.cost_per_conversion
     FROM ad_group_ad
     WHERE segments.date BETWEEN '${dateStart}' AND '${dateEnd}'
       AND campaign.status != 'REMOVED'
@@ -403,15 +397,7 @@ export async function fetchPerformanceMetrics(
       cost_per_conversion: Number(m?.costPerConversion || 0) / 1_000_000,
       roas: spend > 0 ? conversionValue / spend : 0,
       video_views: Number(m?.videoViews || 0),
-      raw_data: {
-        ...row,
-        impression_share: Number(m?.impressionShare || 0),
-        search_impression_share: Number(m?.searchImpressionShare || 0),
-        search_click_share: Number(m?.searchClickShare || 0),
-        search_budget_lost_impression_share: Number(m?.searchBudgetLostImpressionShare || 0),
-        search_rank_lost_impression_share: Number(m?.searchRankLostImpressionShare || 0),
-        quality_score: Number(m?.qualityScore || 0),
-      },
+      raw_data: { ...row },
     })
   }
 

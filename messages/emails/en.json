@@ -54,5 +54,18 @@
     "itemsHeading": "In your cart",
     "returnButton": "Return to cart",
     "footerNote": "If you've already completed your order, please ignore this email."
+  },
+  "prepaymentInvoice": {
+    "preview": "Prepayment invoice for order {orderNumber} — {total}",
+    "subject": "Prepayment invoice for order {orderNumber}",
+    "heading": "Prepayment Invoice",
+    "intro": "Thank you for your order! Attached is the prepayment invoice for order <strong>{orderNumber}</strong>. Please pay within 7 days. We will process your order once payment is received.",
+    "itemsHeading": "Ordered items",
+    "paymentHeading": "Payment information",
+    "bankLabel": "Bank",
+    "ibanLabel": "IBAN",
+    "dueDateLabel": "Due date",
+    "amountLabel": "Amount",
+    "referenceLabel": "Reference number"
   }
 }

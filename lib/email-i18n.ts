@@ -65,6 +65,19 @@ export interface EmailMessages {
     returnButton: string;
     footerNote: string;
   };
+  prepaymentInvoice: {
+    preview: string;
+    subject: string;
+    heading: string;
+    intro: string;
+    itemsHeading: string;
+    paymentHeading: string;
+    bankLabel: string;
+    ibanLabel: string;
+    dueDateLabel: string;
+    amountLabel: string;
+    referenceLabel: string;
+  };
 }
 
 const SUPPORTED: EmailLocale[] = ['et', 'en', 'ru', 'lv', 'lt'];

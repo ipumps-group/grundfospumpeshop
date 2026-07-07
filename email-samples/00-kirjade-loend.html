@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pumbapood — e-kirjade mallid</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; background: #f8fafc; }
+  h1 { color: #003366; font-size: 24px; }
+  h2 { color: #003366; font-size: 16px; margin-top: 28px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+  .section { margin-bottom: 8px; }
+  .item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+  .item:hover { background: #f1f5f9; margin: 0 -8px; padding: 10px 8px; border-radius: 6px; }
+  .num { width: 32px; height: 32px; background: #003366; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
+  .info { flex: 1; }
+  .info strong { display: block; font-size: 14px; }
+  .info span { font-size: 12px; color: #64748b; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-rich { background: #dbeafe; color: #1d4ed8; }
+  .badge-simple { background: #f1f5f9; color: #64748b; }
+  .badge-admin { background: #fef3c7; color: #92400e; }
+  a { color: #003366; text-decoration: none; }
+  .trigger { font-size: 12px; color: #64748b; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<h1>Pumbapood — e-kirjade mallid</h1>
+<p style="color:#64748b; font-size:14px;">Allolevad HTML-failid sisaldavad kirjade täpset visuaali ja teksti, nagu klient neid näeb.</p>
+
+<h2>▸ Kliendile — automaatsed</h2>
+
+<div class="item">
+  <div class="num">1</div>
+  <div class="info">
+    <strong><a href="01-tellimuse-kinnitus-makstud.html">Tellimuse kinnitus (makse kinnitatud)</a></strong>
+    <span>Teema: "Tellimus ABC123 kinnitatud"</span>
+    <div class="trigger">Saadetakse: Montonio webhook (PAID) — kohe pärast edukat makset</div>
+  </div>
+  <div class="badge badge-rich">React Email</div>
+</div>
+
+<div class="item">
+  <div class="num">2</div>
+  <div class="info">
+    <strong><a href="02-tellimus-ootab-makset.html">Tellimus ootab makset</a></strong>
+    <span>Teema: "Tellimus #ABC123 — ootab makset — iPumps"</span>
+    <div class="trigger">Saadetakse: Montonio webhook (ABANDONED) — kui klient katkestab makse</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<h2>▸ Kliendile — staatuse muutused (admin muudab)</h2>
+
+<div class="item">
+  <div class="num">3</div>
+  <div class="info">
+    <strong><a href="03-tellimus-makstud.html">Makse kinnitatud</a></strong>
+    <span>Teema: "Tellimus #ABC123 — makse kinnitatud — iPumps"</span>
+    <div class="trigger">Saadetakse: Admin määrab staatuse "Makstud" (käsitsi)</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<div class="item">
+  <div class="num">4</div>
+  <div class="info">
+    <strong><a href="04-tellimus-tootlemisel.html">Tellimus töötlemisel</a></strong>
+    <span>Teema: "Tellimus #ABC123 — on töötlemisel — iPumps"</span>
+    <div class="trigger">Saadetakse: Admin määrab staatuse "Töötlemisel"</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<div class="item">
+  <div class="num">5</div>
+  <div class="info">
+    <strong><a href="05-tellimus-saadetud-rikkalik.html">Tellimus saadetud (rikkalik — jälgimisnumbriga)</a></strong>
+    <span>Teema: "📦 Tellimus ABC123 on teel"</span>
+    <div class="trigger">Saadetakse: Admin nupp "Saada teele" (POST /ship)</div>
+  </div>
+  <div class="badge badge-rich">React Email</div>
+</div>
+
+<div class="item">
+  <div class="num">6</div>
+  <div class="info">
+    <strong><a href="06-tellimus-saadetud-lihtsam.html">Tellimus saadetud (lihtsam — staatuse muutmisel)</a></strong>
+    <span>Teema: "Tellimus #ABC123 — on saadetud — iPumps"</span>
+    <div class="trigger">Saadetakse: Admin muudab staatuse "Saadetud" dropdownist</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<div class="item">
+  <div class="num">7</div>
+  <div class="info">
+    <strong><a href="07-tellimus-kohale-toimetatud.html">Tellimus kohale toimetatud</a></strong>
+    <span>Teema: "Tellimus #ABC123 — on kohale toimetatud — iPumps"</span>
+    <div class="trigger">Saadetakse: Admin määrab staatuse "Kohale toimetatud"</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<div class="item">
+  <div class="num">8</div>
+  <div class="info">
+    <strong><a href="08-tellimus-tuhistatud.html">Tellimus tühistatud</a></strong>
+    <span>Teema: "Tellimus #ABC123 — on tühistatud — iPumps"</span>
+    <div class="trigger">Saadetakse: Admin määrab staatuse "Tühistatud"</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<div class="item">
+  <div class="num">9</div>
+  <div class="info">
+    <strong><a href="09-tellimus-ebaonnestus.html">Tellimus ebaõnnestus</a></strong>
+    <span>Teema: "Tellimus #ABC123 — ebaõnnestus — iPumps"</span>
+    <div class="trigger">Saadetakse: Admin määrab staatuse "Ebaõnnestunud"</div>
+  </div>
+  <div class="badge badge-simple">Plain HTML</div>
+</div>
+
+<h2>▸ Kliendile — muud</h2>
+
+<div class="item">
+  <div class="num">10</div>
+  <div class="info">
+    <strong><a href="10-raha-tagastatud.html">Raha tagastatud</a></strong>
+    <span>Teema: "Tellimuse ABC123 raha on tagastatud"</span>
+    <div class="trigger">Saadetakse: käsitsi/manuaalne tagastus</div>
+  </div>
+  <div class="badge badge-rich">React Email</div>
+</div>
+
+<div class="item">
+  <div class="num">11</div>
+  <div class="info">
+    <strong><a href="11-ostukorvi-meeldetuletus.html">Ostukorvi meeldetuletus</a></strong>
+    <span>Teema: "Unustasid midagi ostukorvi?"</span>
+    <div class="trigger">Saadetakse: taustaprotsessis mahajäetud ostukorvidele</div>
+  </div>
+  <div class="badge badge-rich">React Email</div>
+</div>
+
+<h2>▸ Adminile</h2>
+
+<div class="item">
+  <div class="num">12</div>
+  <div class="info">
+    <strong><a href="12-admin-uus-tellimus.html">Uus tellimus (admini teavitus)</a></strong>
+    <span>Teema: "Uus tellimus #ABC123"</span>
+    <div class="trigger">Saadetakse: iga uue tellimuse loomisel checkout'ist</div>
+  </div>
+  <div class="badge badge-admin">Admin</div>
+</div>
+
+<p style="margin-top:32px; font-size:12px; color:#94a3b8;">Kõik failid on iseseisvad HTML-dokumendid — ava brauseris vaatamiseks.</p>
+
+</body>
+</html>

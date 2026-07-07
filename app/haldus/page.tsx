@@ -86,7 +86,7 @@ export default function HaldusDashboard() {
             ) : (
               <div className="divide-y divide-gray-50">
                 {recent.map(o => (
-                  <div key={o.id} className="flex flex-wrap items-center gap-3 px-6 py-4">
+                  <Link key={o.id} href={`/haldus/tellimused/${o.id}`} className="flex flex-wrap items-center gap-3 px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer">
                     <div className="flex-1 min-w-[160px]">
                       <div className="font-medium text-gray-900 text-[15px]">
                         #{o.montonio_order_id || o.id.slice(0, 8).toUpperCase()}
@@ -99,7 +99,7 @@ export default function HaldusDashboard() {
                     <div className="font-semibold text-gray-900 text-[15px] min-w-[70px] text-right">
                       {o.total.toFixed(2)} €
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

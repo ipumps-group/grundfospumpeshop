@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  if (order.meta_purchase_event_id && !order.meta_purchase_sent_at) {
+  if (order.advertising_consent && order.meta_purchase_event_id && !order.meta_purchase_sent_at) {
     try {
       const items = (order.order_items as OrderItemRow[]).map(item => ({
         id: String(item.product_id || item.product_name),
@@ -198,8 +198,8 @@ export async function POST(req: NextRequest) {
         eventName: 'Purchase',
         eventId: order.meta_purchase_event_id,
         eventSourceUrl: order.meta_event_source_url,
-        email: order.advertising_consent ? order.email : null,
-        phone: order.advertising_consent ? order.phone : null,
+        email: order.email,
+        phone: order.phone,
         fbp: order.meta_fbp,
         fbc: order.meta_fbc,
         value: Number(order.total),

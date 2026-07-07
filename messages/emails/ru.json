@@ -54,5 +54,18 @@
     "itemsHeading": "В вашей корзине",
     "returnButton": "Вернуться в корзину",
     "footerNote": "Если вы уже оформили заказ, проигнорируйте это письмо."
+  },
+  "prepaymentInvoice": {
+    "preview": "Предварительный счёт к заказу {orderNumber} — {total}",
+    "subject": "Предварительный счёт к заказу {orderNumber}",
+    "heading": "Предварительный счёт",
+    "intro": "Спасибо за заказ! Прилагается предварительный счёт на заказ <strong>{orderNumber}</strong>. Пожалуйста, оплатите в течение 7 дней. Мы обработаем заказ после получения оплаты.",
+    "itemsHeading": "Заказанные товары",
+    "paymentHeading": "Информация об оплате",
+    "bankLabel": "Банк",
+    "ibanLabel": "IBAN",
+    "dueDateLabel": "Срок оплаты",
+    "amountLabel": "Сумма",
+    "referenceLabel": "Номер ссылки"
   }
 }

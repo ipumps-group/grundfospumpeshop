@@ -14,6 +14,7 @@ interface ConfigStatus {
   connected: boolean
   vars: Record<string, boolean>
   doc: string
+  note?: string
 }
 
 const ENV_LABELS: Record<string, string> = {
@@ -165,6 +166,11 @@ export default function IntegrationsPage() {
                 )}
               </div>
               <div className="space-y-2 text-sm">
+                {cs?.note && (
+                  <div className="text-xs text-amber-600 bg-amber-50 rounded-lg px-2 py-1.5">
+                    {cs.note}
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-500">Status</span>
                   <span className={cn('font-medium', s?.connected ? 'text-green-600' : 'text-gray-400')}>

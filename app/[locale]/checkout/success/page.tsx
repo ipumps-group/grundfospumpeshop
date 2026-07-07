@@ -8,6 +8,17 @@ import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/auth-context'
 import { trackPurchase } from '@/lib/google-ads'
 import { trackMetaPurchase } from '@/lib/meta-pixel'
+import { hasAdvertisingConsent } from '@/lib/tracking-consent'
+
+interface ConfirmedPurchase {
+  confirmed: true
+  transaction_id: string
+  event_id: string
+  value: number
+  currency: string
+  contents: Array<{ id: string; quantity: number; item_price?: number }>
+  num_items: number
+}
 
 function SuccessContent() {
   const t = useTranslations('checkout')
@@ -20,37 +31,58 @@ function SuccessContent() {
   useEffect(() => {
     if (!ref) return
 
-    try {
-      const value = Number(sessionStorage.getItem('pumbapood_last_checkout_value') || '0')
-      const itemsJson = sessionStorage.getItem('pumbapood_last_checkout_items')
-      const contents: { id: string; quantity: number }[] = itemsJson ? JSON.parse(itemsJson) : []
-      const numItems = contents.reduce((s, c) => s + c.quantity, 0)
+    let cancelled = false
+    let confirmedPurchase: ConfirmedPurchase | null = null
 
-      if (value > 0) {
-        const googleKey = `pumbapood_google_purchase_${ref}`
-        const metaKey = `pumbapood_meta_purchase_${ref}`
+    const sendPurchase = (purchase: ConfirmedPurchase) => {
+      if (!hasAdvertisingConsent()) return
+      const googleKey = `pumbapood_google_purchase_${purchase.transaction_id}`
+      const metaKey = `pumbapood_meta_purchase_${purchase.transaction_id}`
 
-        if (!localStorage.getItem(googleKey)) {
-          trackPurchase(value, ref, contents)
-          localStorage.setItem(googleKey, '1')
-        }
-        if (!localStorage.getItem(metaKey)) {
-          trackMetaPurchase({
-            value,
-            currency: 'EUR',
-            transaction_id: ref,
-            contents,
-            content_ids: contents.map(c => c.id),
-            num_items: numItems,
-          })
-          localStorage.setItem(metaKey, '1')
-        }
-
-        sessionStorage.removeItem('pumbapood_last_checkout_value')
-        sessionStorage.removeItem('pumbapood_last_checkout_items')
+      if (!localStorage.getItem(googleKey) && trackPurchase(purchase.value, purchase.transaction_id, purchase.contents)) {
+        localStorage.setItem(googleKey, '1')
       }
-    } catch (err) {
-      console.error('[purchase-tracking]', err)
+      if (!localStorage.getItem(metaKey) && trackMetaPurchase({
+        value: purchase.value,
+        currency: purchase.currency,
+        transaction_id: purchase.transaction_id,
+        event_id: purchase.event_id,
+        contents: purchase.contents,
+        content_ids: purchase.contents.map(item => item.id),
+        num_items: purchase.num_items,
+      })) {
+        localStorage.setItem(metaKey, '1')
+      }
+    }
+
+    const verifyAndTrack = async () => {
+      for (let attempt = 0; attempt < 10 && !cancelled; attempt++) {
+        try {
+          const response = await fetch(`/api/tracking/purchase?ref=${encodeURIComponent(ref)}`, { cache: 'no-store' })
+          if (response.ok) {
+            const data = await response.json() as ConfirmedPurchase | { confirmed: false }
+            if (data.confirmed) {
+              confirmedPurchase = data
+              sendPurchase(data)
+              return
+            }
+          }
+        } catch (err) {
+          console.error('[purchase-tracking]', err)
+        }
+        await new Promise(resolve => window.setTimeout(resolve, 2000))
+      }
+    }
+
+    const onConsentChanged = () => {
+      if (confirmedPurchase) sendPurchase(confirmedPurchase)
+    }
+    window.addEventListener('consent_changed', onConsentChanged)
+    void verifyAndTrack()
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('consent_changed', onConsentChanged)
     }
   }, [ref])
 

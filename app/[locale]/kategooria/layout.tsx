@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
@@ -33,7 +33,7 @@ export async function generateMetadata(
     const description = category.meta_description || `${name} — vaata kõiki tooteid selles kategoorias.`
 
     const canonicalBase = TEGEVUSALA_SLUGS.has(slug) ? `/tooted/${slug}` : `/kategooria/${slug}`
-    const canonical = `${SITE_URL}/${locale}${canonicalBase}`
+    const canonical = localizedUrl(canonicalBase, locale)
 
     return {
       title,
@@ -41,7 +41,7 @@ export async function generateMetadata(
       alternates: {
         canonical,
         languages: Object.fromEntries(
-          LOCALES.map(l => [l, `${SITE_URL}/${l}${canonicalBase}`])
+          LOCALES.map(l => [l, localizedUrl(canonicalBase, l)])
         ),
       },
       openGraph: {

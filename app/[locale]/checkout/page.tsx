@@ -6,7 +6,7 @@ import { trackMetaInitiateCheckout } from '@/lib/meta-pixel'
 import Link from 'next/link'
 import {
   ChevronRight, Lock, Loader2, AlertCircle,
-  Package, ShieldCheck, Truck
+  Package, ShieldCheck, Truck, Building2, FileText
 } from 'lucide-react'
 import CouponInput from '@/components/checkout/CouponInput'
 import { useTranslations } from 'next-intl'
@@ -73,21 +73,34 @@ export default function CheckoutPage() {
   const [items, setItems]         = useState<CartItem[]>([])
   const [mounted, setMounted]     = useState(false)
 
+  // Contact
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName]   = useState('')
   const [email, setEmail]         = useState('')
   const [phone, setPhone]         = useState('')
-  const [company, setCompany]     = useState('')
-  const [notes, setNotes]         = useState('')
 
-  const [createAccount, setCreateAccount] = useState(false)
+  // Company
+  const [wantCompanyInvoice, setWantCompanyInvoice] = useState(false)
+  const [company, setCompany]           = useState('')
+  const [companyRegNr, setCompanyRegNr] = useState('')
+  const [companyVat, setCompanyVat]     = useState('')
+  const [companyCountry, setCompanyCountry] = useState('EE')
+  const [companyStreet, setCompanyStreet] = useState('')
+  const [companyCity, setCompanyCity]     = useState('')
+  const [companyCounty, setCompanyCounty] = useState('')
+  const [companyPostal, setCompanyPostal] = useState('')
+
+  // Delivery differs
+  const [deliveryAddressDiffers, setDeliveryAddressDiffers] = useState(false)
+
+  const [notes, setNotes]         = useState('')
+  const [paymentType, setPaymentType] = useState<'bank_link' | 'invoice'>('bank_link')
+
+  const [createAccount, setCreateAccount] = useState(true)
   const [password, setPassword]           = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  // Delivery method: 'pickup' (iseteenindus), 'courier' (kuller)
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'courier'>('courier')
-  
-  // Address fields for courier
   const [courierStreet, setCourierStreet] = useState('')
   const [courierCity, setCourierCity] = useState('')
   const [courierPostal, setCourierPostal] = useState('')
@@ -105,6 +118,22 @@ export default function CheckoutPage() {
     setMounted(true)
   }, [])
 
+  // Auto-set payment type to invoice when company checkbox is checked
+  useEffect(() => {
+    if (wantCompanyInvoice) {
+      setPaymentType('invoice')
+    }
+  }, [wantCompanyInvoice])
+
+  // Auto-fill courier address from company address when NOT differing
+  useEffect(() => {
+    if (wantCompanyInvoice && !deliveryAddressDiffers && deliveryMethod === 'courier') {
+      setCourierStreet(companyStreet)
+      setCourierCity(companyCity)
+      setCourierPostal(companyPostal)
+    }
+  }, [wantCompanyInvoice, deliveryAddressDiffers, deliveryMethod, companyStreet, companyCity, companyPostal])
+
   const subtotal  = items.reduce((s, i) => s + i.price * i.qty, 0)
   const discount  = coupon ? coupon.discountAmount : 0
   const vat       = (subtotal - discount) * VAT_RATE
@@ -117,10 +146,6 @@ export default function CheckoutPage() {
       const contentIds = items.map(i => String(i.id))
       const contents = items.map(i => ({ id: String(i.id), quantity: i.qty }))
       const numItems = items.reduce((s, i) => s + i.qty, 0)
-      try {
-        sessionStorage.setItem('pumbapood_last_checkout_value', String(value))
-        sessionStorage.setItem('pumbapood_last_checkout_items', JSON.stringify(contents.map(c => ({ id: Number(c.id), qty: c.quantity }))))
-      } catch {}
       trackBeginCheckout(value)
       trackMetaInitiateCheckout({ value, currency: 'EUR', content_ids: contentIds, contents, num_items: numItems })
     }
@@ -133,13 +158,19 @@ export default function CheckoutPage() {
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       e.email = t('invalidEmail')
     if (!phone.trim())     e.phone     = t('required')
-    
-    // Delivery method validation
-    if (deliveryMethod === 'courier' && !courierStreet.trim()) {
-      e.courierStreet = 'Palun sisestage aadress'
+
+    if (deliveryMethod === 'courier' && !deliveryAddressDiffers) {
+      // Address required for courier when not using company address as fallback
+      // Company address provides these, so only validate when no company or differs
+      if (!wantCompanyInvoice || deliveryAddressDiffers) {
+        if (!courierStreet.trim()) e.courierStreet = t('required')
+        if (!courierCity.trim()) e.courierCity = t('required')
+      }
     }
-    if (deliveryMethod === 'courier' && !courierCity.trim()) {
-      e.courierCity = 'Palun sisestage linn'
+    // When company is selected but delivery differs, courier fields must be filled
+    if (wantCompanyInvoice && deliveryAddressDiffers && deliveryMethod === 'courier') {
+      if (!courierStreet.trim()) e.courierStreet = t('required')
+      if (!courierCity.trim()) e.courierCity = t('required')
     }
 
     if (createAccount) {
@@ -149,7 +180,7 @@ export default function CheckoutPage() {
 
     setErrors(e)
     return Object.keys(e).length === 0
-  }, [firstName, lastName, email, phone, deliveryMethod, courierStreet, courierCity, createAccount, password, confirmPassword, t])
+  }, [firstName, lastName, email, phone, deliveryMethod, courierStreet, courierCity, wantCompanyInvoice, deliveryAddressDiffers, createAccount, password, confirmPassword, t])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -174,11 +205,16 @@ export default function CheckoutPage() {
         pickup_point_postal: COMPANY.shopAddress.postalCode,
       }
     } else if (deliveryMethod === 'courier') {
+      // If company invoice AND addresses don't differ, use company address for delivery
+      const street = (wantCompanyInvoice && !deliveryAddressDiffers) ? companyStreet : courierStreet
+      const city = (wantCompanyInvoice && !deliveryAddressDiffers) ? companyCity : courierCity
+      const postal = (wantCompanyInvoice && !deliveryAddressDiffers) ? companyPostal : courierPostal
+
       shippingObj = {
         ...shippingObj,
-        street: courierStreet,
-        city: courierCity,
-        postal_code: courierPostal,
+        street,
+        city,
+        postal_code: postal,
         country: 'EE',
       }
     }
@@ -193,7 +229,17 @@ export default function CheckoutPage() {
             last_name:  lastName,
             email,
             phone,
-            ...(company.trim() && { company: company.trim() }),
+            ...(wantCompanyInvoice && {
+              company: company.trim() || undefined,
+              reg_code: companyRegNr.trim() || undefined,
+              vat_number: companyVat.trim() || undefined,
+              company_country: companyCountry,
+              company_street: companyStreet.trim() || undefined,
+              company_city: companyCity.trim() || undefined,
+              company_county: companyCounty.trim() || undefined,
+              company_postal: companyPostal.trim() || undefined,
+              delivery_address_differs: deliveryAddressDiffers,
+            }),
           },
           user_id: user?.id || null,
           tracking: {
@@ -206,6 +252,7 @@ export default function CheckoutPage() {
           delivery_method: deliveryMethod,
           create_account: createAccount,
           password: createAccount ? password : undefined,
+          payment_type: paymentType,
           notes:      notes.trim() || undefined,
           coupon_id:  coupon?.id || undefined,
           items: items.map(i => ({
@@ -215,23 +262,21 @@ export default function CheckoutPage() {
         }),
       })
 
-      const data = await res.json() as { payment_url?: string; error?: string; detail?: string; created_account?: boolean }
+      const data = await res.json() as { payment_url?: string; error?: string; detail?: string; created_account?: boolean; invoice_sent?: boolean; ref?: string }
 
-      if (!res.ok || !data.payment_url) {
+      if (!res.ok || (!data.payment_url && !data.invoice_sent)) {
         const msg = data.detail ? `${data.error}: ${data.detail}` : (data.error || t('orderFailed'))
         setApiError(msg)
         setLoading(false)
         return
       }
 
-      // Save purchase data for success page tracking
       try {
         const contents = items.map(i => ({ id: String(i.id), qty: i.qty }))
         sessionStorage.setItem('pumbapood_last_checkout_value', String(total))
         sessionStorage.setItem('pumbapood_last_checkout_items', JSON.stringify(contents))
       } catch {}
 
-      // Sign in if account was just created
       if (data.created_account && createAccount && password) {
         const { error: signInErr } = await signIn(email, password)
         if (signInErr) {
@@ -241,7 +286,12 @@ export default function CheckoutPage() {
 
       localStorage.removeItem('ipumps_cart')
       window.dispatchEvent(new Event('cart_updated'))
-      window.location.href = data.payment_url
+
+      if (data.invoice_sent) {
+        window.location.replace(`${window.location.origin}/checkout/invoice?ref=${data.ref}`)
+      } else {
+        window.location.href = data.payment_url!
+      }
     } catch {
       setApiError(t('connectionFailed'))
       setLoading(false)
@@ -270,7 +320,6 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
 
-        {/* Leivaküljed */}
         <nav className="flex items-center gap-2 text-[15px] text-gray-400 mb-6">
           <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
           <ChevronRight size={14} />
@@ -303,7 +352,6 @@ export default function CheckoutPage() {
                     />
                     {errors.firstName && <p className="text-[13px] text-red-500 mt-1">{errors.firstName}</p>}
                   </div>
-
                   <div>
                     <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
                       {t('lastName')} <span className="text-red-500">*</span>
@@ -315,7 +363,6 @@ export default function CheckoutPage() {
                     />
                     {errors.lastName && <p className="text-[13px] text-red-500 mt-1">{errors.lastName}</p>}
                   </div>
-
                   <div>
                     <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
                       {t('emailAddress')} <span className="text-red-500">*</span>
@@ -327,7 +374,6 @@ export default function CheckoutPage() {
                     />
                     {errors.email && <p className="text-[13px] text-red-500 mt-1">{errors.email}</p>}
                   </div>
-
                   <div>
                     <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
                       {t('phone')} <span className="text-red-500">*</span>
@@ -341,17 +387,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                    {t('companyName')} <span className="text-gray-400 font-normal">{t('optional')}</span>
-                  </label>
-                  <input
-                    type="text" value={company} placeholder="OÜ Näidis"
-                    onChange={e => setCompany(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors"
-                  />
-                </div>
-
+                {/* Loo konto (ainult kui pole sisse logitud) */}
                 {!user && (
                   <div className="mt-5 pt-5 border-t border-gray-100">
                     <label className="flex items-start gap-3 cursor-pointer">
@@ -397,15 +433,160 @@ export default function CheckoutPage() {
                     )}
                   </div>
                 )}
+
+                {/* Soovin arvet ettevõttele checkbox */}
+                <div className="mt-5 pt-5 border-t border-gray-100">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={wantCompanyInvoice}
+                      onChange={e => {
+                        setWantCompanyInvoice(e.target.checked)
+                        if (!e.target.checked) {
+                          setDeliveryAddressDiffers(false)
+                        }
+                      }}
+                      className="mt-0.5 w-5 h-5 rounded border-gray-300 text-[#003366] focus:ring-[#003366] cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-[15px] font-medium text-gray-800">{t('wantCompanyInvoice')}</span>
+                      <p className="text-[13px] text-gray-500 mt-0.5">{t('wantCompanyInvoiceDesc')}</p>
+                    </div>
+                  </label>
+                </div>
               </div>
+
+              {/* Ettevõtte andmed (kui checkbox valitud) */}
+              {wantCompanyInvoice && (
+                <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                  <h2 className="font-bold text-gray-900 text-[17px] mb-5 flex items-center gap-2">
+                    <Building2 size={18} /> {t('companyDetails')}
+                  </h2>
+
+                  {/* Ettevõtte nimi, reg, KMKR */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                        {t('companyName')}
+                      </label>
+                      <input
+                        type="text" value={company} placeholder="OÜ Näidis"
+                        onChange={e => setCompany(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                        {t('companyRegNr')}
+                      </label>
+                      <input
+                        type="text" value={companyRegNr}
+                        onChange={e => setCompanyRegNr(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                        {t('companyVat')}
+                      </label>
+                      <input
+                        type="text" value={companyVat}
+                        onChange={e => setCompanyVat(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Ettevõtte aadress */}
+                  <div className="mt-5 pt-5 border-t border-gray-100">
+                    <h3 className="font-semibold text-gray-800 text-[15px] mb-4">{t('companyAddress')}</h3>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                          {t('countryLabel')}
+                        </label>
+                        <select
+                          value={companyCountry}
+                          onChange={e => setCompanyCountry(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] bg-white"
+                        >
+                          <option value="EE">{t('countryEE')}</option>
+                          <option value="LV">{t('countryLV')}</option>
+                          <option value="LT">{t('countryLT')}</option>
+                          <option value="FI">{t('countryFI')}</option>
+                          <option value="PL">{t('countryPL')}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                          {t('streetLabel')}
+                        </label>
+                        <input
+                          type="text" value={companyStreet}
+                          onChange={e => setCompanyStreet(e.target.value)}
+                          placeholder={t('streetPlaceholder')}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                            {t('cityLabel')}
+                          </label>
+                          <input
+                            type="text" value={companyCity}
+                            onChange={e => setCompanyCity(e.target.value)}
+                            placeholder={t('cityPlaceholder')}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                            {t('companyCounty')}
+                          </label>
+                          <input
+                            type="text" value={companyCounty}
+                            onChange={e => setCompanyCounty(e.target.value)}
+                            placeholder={t('companyCountyPlaceholder')}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                          {t('postalCodeLabel')}
+                        </label>
+                        <input
+                          type="text" value={companyPostal}
+                          onChange={e => setCompanyPostal(e.target.value)}
+                          placeholder="12345"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Arve ja tarne erinevad checkbox */}
+                  <div className="mt-5 pt-5 border-t border-gray-100">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={deliveryAddressDiffers}
+                        onChange={e => setDeliveryAddressDiffers(e.target.checked)}
+                        className="mt-0.5 w-5 h-5 rounded border-gray-300 text-[#003366] focus:ring-[#003366] cursor-pointer"
+                      />
+                      <span className="text-[15px] font-medium text-gray-800">{t('deliveryAddressDiffers')}</span>
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {/* Tarne */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="font-bold text-gray-900 text-[17px] mb-5">{t('deliveryMethod')}</h2>
-
                 <div className="space-y-4">
 
-                  {/* Tarneviis */}
                   <div>
                     <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
                       {t('deliveryMethodLabel')} <span className="text-red-500">*</span>
@@ -438,27 +619,27 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Iseteenindus - pickup location */}
                   {deliveryMethod === 'pickup' && (
                     <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                       <div className="flex items-start gap-3">
                         <Package size={20} className="text-green-600 mt-0.5" />
                         <div>
                           <div className="font-semibold text-gray-900">{t('pickup')}</div>
-                          <div className="text-[14px] text-gray-600 mt-1">
-                            {t('pickupAddress')}
-                          </div>
-                          <div className="text-[14px] text-gray-500">
-                            {t('pickupPhone')}
-                          </div>
+                          <div className="text-[14px] text-gray-600 mt-1">{t('pickupAddress')}</div>
+                          <div className="text-[14px] text-gray-500">{t('pickupPhone')}</div>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Kuller - address fields */}
                   {deliveryMethod === 'courier' && (
                     <div className="space-y-4">
+                      {wantCompanyInvoice && !deliveryAddressDiffers && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-[13px] text-gray-600 flex items-center gap-2">
+                          <FileText size={14} className="text-[#003366] flex-shrink-0" />
+                          {t('deliverySameAsCompany')}
+                        </div>
+                      )}
                       <div>
                         <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
                           {t('streetLabel')} <span className="text-red-500">*</span>
@@ -468,8 +649,9 @@ export default function CheckoutPage() {
                           value={courierStreet}
                           onChange={e => setCourierStreet(e.target.value)}
                           placeholder={t('streetPlaceholder')}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
+                          className={`w-full px-4 py-3 border rounded-xl text-[15px] text-gray-900 outline-none transition-colors placeholder:text-gray-400 ${errors.courierStreet ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#003366]'}`}
                         />
+                        {errors.courierStreet && <p className="text-[13px] text-red-500 mt-1">{errors.courierStreet}</p>}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -481,8 +663,9 @@ export default function CheckoutPage() {
                             value={courierCity}
                             onChange={e => setCourierCity(e.target.value)}
                             placeholder={t('cityPlaceholder')}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366] transition-colors placeholder:text-gray-400"
+                            className={`w-full px-4 py-3 border rounded-xl text-[15px] text-gray-900 outline-none transition-colors placeholder:text-gray-400 ${errors.courierCity ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#003366]'}`}
                           />
+                          {errors.courierCity && <p className="text-[13px] text-red-500 mt-1">{errors.courierCity}</p>}
                         </div>
                         <div>
                           <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
@@ -501,6 +684,40 @@ export default function CheckoutPage() {
                   )}
 
                 </div>
+              </div>
+
+              {/* Makseviis */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <h2 className="font-bold text-gray-900 text-[17px] mb-4">{t('paymentMethod')}</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentType('bank_link')}
+                    className={`py-3.5 px-4 rounded-xl border text-[15px] font-medium transition-colors text-center ${
+                      paymentType === 'bank_link'
+                        ? 'bg-[#003366] text-white border-[#003366]'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#003366] hover:text-[#003366]'
+                    }`}
+                  >
+                    {t('bankLink')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentType('invoice')}
+                    className={`py-3.5 px-4 rounded-xl border text-[15px] font-medium transition-colors text-center ${
+                      paymentType === 'invoice'
+                        ? 'bg-[#003366] text-white border-[#003366]'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#003366] hover:text-[#003366]'
+                    }`}
+                  >
+                    {t('invoicePayment')}
+                  </button>
+                </div>
+                {paymentType === 'invoice' && (
+                  <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div className="text-[14px] text-gray-700">Peale tellimuse esitamist saadetakse arve teie e-posti aadressile. Maksetähtaeg 7 päeva. Peale makse laekumist asume tellimust komplekteerima.</div>
+                  </div>
+                )}
               </div>
 
               {/* Märkused */}
@@ -529,7 +746,6 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
                 <h2 className="font-bold text-gray-900 text-[17px] mb-5">{t('orderSummary')}</h2>
 
-                {/* Tooted */}
                 <div className="space-y-3 mb-5 max-h-64 overflow-y-auto">
                   {items.map(item => (
                     <div key={item.id} className="flex items-center gap-3">
@@ -547,12 +763,10 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                {/* Kupongikood */}
                 <div className="mb-4">
                   <CouponInput subtotal={subtotal} applied={coupon} onApply={setCoupon} />
                 </div>
 
-                {/* Hinnad */}
                 <div className="border-t border-gray-100 pt-4 space-y-2.5 mb-5">
                   <div className="flex justify-between text-[15px]">
                     <span className="text-gray-500">{t('subtotalExVat')}</span>
@@ -580,7 +794,6 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Maksa nupp */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -588,12 +801,13 @@ export default function CheckoutPage() {
                 >
                   {loading ? (
                     <><Loader2 size={18} className="animate-spin" /> {t('redirectingToPayment')}</>
+                  ) : paymentType === 'invoice' ? (
+                    <><Lock size={16} /> {t('submitOrder')} {total.toFixed(2).replace('.', ',')} €</>
                   ) : (
                     <><Lock size={16} /> {t('orderAndPay')} {total.toFixed(2).replace('.', ',')} €</>
                   )}
                 </button>
 
-                {/* Usalduse indikaatorid */}
                 <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-3 gap-2">
                   {[
                     { icon: Lock,        label: t('secure') },

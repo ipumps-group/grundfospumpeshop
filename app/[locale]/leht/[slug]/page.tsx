@@ -10,7 +10,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import JsonLd from '@/components/seo/JsonLd'
 
 export const dynamic = 'force-dynamic'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 
 const LOCALES = ['et', 'en', 'ru', 'lv', 'lt'] as const
 
@@ -65,7 +65,7 @@ function FAQPageSchema({ page, locale, slug }: { page: PageRow; locale: string; 
   const faqs = extractFAQItems(page.content, page.blocks)
   if (faqs.length === 0) return null
 
-  const pageUrl = `${SITE_URL}/${locale}/leht/${slug}`
+  const pageUrl = localizedUrl(`/leht/${slug}`, locale)
 
   const schema = {
     '@context': 'https://schema.org',
@@ -161,7 +161,7 @@ export async function generateMetadata(
   const description = page.meta_description || pick(page, 'short_description', locale) || undefined
   const ogImg = page.og_image_url || page.image_url
 
-  const canonical = `${SITE_URL}/${locale}/leht/${slug}`
+  const canonical = localizedUrl(`/leht/${slug}`, locale)
 
   return {
     title,
@@ -169,7 +169,7 @@ export async function generateMetadata(
     alternates: {
       canonical: canonical,
       languages: Object.fromEntries(
-        LOCALES.map(l => [l, `${SITE_URL}/${l}/leht/${slug}`])
+        LOCALES.map(l => [l, localizedUrl(`/leht/${slug}`, l)])
       ),
     },
     openGraph: {

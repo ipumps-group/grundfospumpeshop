@@ -54,5 +54,18 @@
     "itemsHeading": "Jūsų krepšelyje",
     "returnButton": "Grįžti į krepšelį",
     "footerNote": "Jei jau atlikote užsakymą, prašome ignoruoti šį laišką."
+  },
+  "prepaymentInvoice": {
+    "preview": "Išankstinė sąskaita užsakymui {orderNumber} — {total}",
+    "subject": "Išankstinė sąskaita užsakymui {orderNumber}",
+    "heading": "Išankstinė sąskaita",
+    "intro": "Dėkojame už užsakymą! Pridedama išankstinė sąskaita užsakymui <strong>{orderNumber}</strong>. Prašome apmokėti per 7 dienas. Užsakymą apdorosime gavę mokėjimą.",
+    "itemsHeading": "Užsakytos prekės",
+    "paymentHeading": "Mokėjimo informacija",
+    "bankLabel": "Bankas",
+    "ibanLabel": "IBAN",
+    "dueDateLabel": "Apmokėjimo terminas",
+    "amountLabel": "Suma",
+    "referenceLabel": "Nuorodos numeris"
   }
 }

@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import SetHtmlLang from '@/components/SetHtmlLang'
@@ -31,7 +31,7 @@ export async function generateMetadata(
   const title = tHome('title' as any)
   const description = tHome('description' as any)
 
-  const canonical = `${SITE_URL}/${urlLocale}`
+  const canonical = localizedUrl('/', urlLocale)
 
   return {
     title,
@@ -39,7 +39,7 @@ export async function generateMetadata(
     alternates: {
       canonical: canonical,
       languages: Object.fromEntries(
-        LOCALES.map(l => [l, `${SITE_URL}/${l}`])
+        LOCALES.map(l => [l, localizedUrl('/', l)])
       ),
     },
     openGraph: {
@@ -97,7 +97,7 @@ async function OrganizationSchema() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}/${locale}/tooted?q={search_term_string}`,
+        urlTemplate: `${localizedUrl('/tooted', locale)}?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },

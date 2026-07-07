@@ -30,10 +30,6 @@ async function metaFetch(path: string, params: Record<string, string> = {}): Pro
 
   const url = new URL(`${getBaseUrl()}${path}`)
   url.searchParams.set('access_token', cfg.accessToken)
-  if (cfg.appSecret) {
-    const proof = createHmac('sha256', cfg.appSecret).update(cfg.accessToken!).digest('hex')
-    url.searchParams.set('appsecret_proof', proof)
-  }
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
 
   const res = await fetch(url.toString())
@@ -139,7 +135,7 @@ export async function fetchAds(accountId: string): Promise<Ad[]> {
   const ads: Ad[] = []
 
   const data = await metaFetch(`/act_${adAccountId}/ads`, {
-    fields: 'id,name,adset_id,campaign_id,status,creative{id,title,body,image_url,thumbnail_url,video_id,object_story_spec,call_to_action_type,link_url,resource_url},created_time',
+    fields: 'id,name,adset_id,campaign_id,status,creative{id,title,body,image_url,thumbnail_url,video_id,object_story_spec,call_to_action_type,link_url},created_time',
     limit: '200',
   })
 
@@ -228,14 +224,10 @@ export async function fetchPerformanceMetrics(
       'ctr',
       'cpc',
       'cpm',
-      'cpp',
       'spend',
       'actions',
       'action_values',
       'cost_per_action_type',
-      'conversions',
-      'conversion_values',
-      'roas',
       'video_avg_time_watched_actions',
       'video_p25_watched_actions',
       'video_p50_watched_actions',
@@ -244,6 +236,7 @@ export async function fetchPerformanceMetrics(
     ].join(','),
     level: 'ad',
     time_range: JSON.stringify({ since: dateStart, until: dateEnd }),
+    time_increment: '1',
     limit: '500',
   })
 
@@ -315,40 +308,34 @@ export async function fetchPerformanceMetrics(
 
     const roas = spend > 0 ? conversionValue / spend : 0
 
-    // For daily granularity, we spread over the date range
-    const start = new Date(dateStart)
-    const end = new Date(dateEnd)
-    const days = Math.max(1, Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1)
+    const dateStr = row.date_start || dateStart
 
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const dateStr = d.toISOString().split('T')[0]
-      await upsertDailyInsight({
-        date: dateStr,
-        platform: 'meta_ads',
-        account_id: accountId,
-        campaign_id: dbCampaign.id,
-        ad_set_id: dbAdSetId,
-        ad_id: dbAdId,
-        spend: spend / days,
-        impressions: Math.round(impressions / days),
-        reach: Math.round(Number(row.reach || 0) / days),
-        frequency: Number(row.frequency || 0) / days,
-        clicks: Math.round(clicks / days),
-        link_clicks: Math.round(Number(row.unique_clicks || 0) / days),
-        ctr: ctr / days,
-        cpc: clicks > 0 ? spend / clicks : 0,
-        cpm: impressions > 0 ? (spend / impressions) * 1000 : 0,
-        conversions: conversions / days,
-        conversion_value: conversionValue / days,
-        cost_per_conversion: conversions > 0 ? spend / conversions : 0,
-        roas,
-        leads: Math.round(leads / days),
-        purchases: Math.round(purchases / days),
-        add_to_cart: Math.round(addToCart / days),
-        video_views: Math.round(Number(row.video_avg_time_watched_actions || 0) / days),
-        raw_data: row,
-      })
-    }
+    await upsertDailyInsight({
+      date: dateStr,
+      platform: 'meta_ads',
+      account_id: accountId,
+      campaign_id: dbCampaign.id,
+      ad_set_id: dbAdSetId,
+      ad_id: dbAdId,
+      spend,
+      impressions,
+      reach: Number(row.reach || 0),
+      frequency: Number(row.frequency || 0),
+      clicks,
+      link_clicks: Number(row.unique_clicks || 0),
+      ctr,
+      cpc,
+      cpm,
+      conversions,
+      conversion_value: conversionValue,
+      cost_per_conversion: conversions > 0 ? spend / conversions : 0,
+      roas,
+      leads,
+      purchases,
+      add_to_cart: addToCart,
+      video_views: Number(row.video_avg_time_watched_actions || 0),
+      raw_data: row,
+    })
 
     count++
   }
@@ -371,7 +358,9 @@ async function metaPost(path: string, body: Record<string, unknown>): Promise<an
   const url = `${getBaseUrl()}${path}?${buildAuthParams().toString()}`
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // Meta ad copy can contain Estonian characters (ä, õ, ö, ü). Be explicit
+    // about UTF-8 so the request cannot be interpreted using a legacy charset.
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
     body: JSON.stringify(body),
   })
   return await res.json()

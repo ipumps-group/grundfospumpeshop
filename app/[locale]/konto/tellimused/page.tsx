@@ -63,16 +63,19 @@ function TellimusedList() {
             ) : (
               <>
                 {/* Tabelipäis */}
-                <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-6 py-3 border-b border-gray-100 text-[13px] font-semibold text-gray-500 uppercase tracking-wide">
+                <div className="hidden sm:grid grid-cols-[1fr_auto_auto] gap-4 px-6 py-3 border-b border-gray-100 text-[13px] font-semibold text-gray-500 uppercase tracking-wide">
                   <span>Kuupäev / nr</span>
                   <span className="text-center">Staatus</span>
                   <span className="text-right">Summa</span>
-                  <span />
                 </div>
 
                 <div className="divide-y divide-gray-50">
                   {orders.map(order => (
-                    <div key={order.id} className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-2 sm:gap-4 items-center px-6 py-4">
+                    <Link
+                      key={order.id}
+                      href={`/konto/tellimused/${order.id}`}
+                      className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-2 sm:gap-4 items-center px-6 py-4 hover:bg-gray-50 transition-colors"
+                    >
                       <div>
                         <div className="font-medium text-gray-900 text-[15px]">
                           #{order.montonio_order_id || order.id.slice(0, 8).toUpperCase()}
@@ -89,15 +92,7 @@ function TellimusedList() {
                       <div className="text-[15px] font-semibold text-gray-900 sm:text-right">
                         {order.total.toFixed(2)} €
                       </div>
-                      <div className="sm:text-right">
-                        <Link
-                          href={`/konto/tellimused/${order.id}`}
-                          className="text-[14px] text-[#003366] hover:underline font-medium"
-                        >
-                          Detailid →
-                        </Link>
-                      </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </>

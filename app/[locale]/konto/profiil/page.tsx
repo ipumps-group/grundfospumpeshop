@@ -43,6 +43,25 @@ function Profiil() {
     }
   }, [profile])
 
+  // Auto-fill phone from latest order if profile phone is empty
+  useEffect(() => {
+    if (!user || profile?.phone) return
+    supabase
+      .from('orders')
+      .select('shipping_address')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        const sa = (data?.shipping_address ?? {}) as Record<string, string>
+        const phoneFromOrder = sa.customer_phone
+        if (phoneFromOrder) {
+          setPhone(phoneFromOrder)
+        }
+      })
+  }, [user, profile])
+
   function showToast(msg: string, type: 'success' | 'error') {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3000)

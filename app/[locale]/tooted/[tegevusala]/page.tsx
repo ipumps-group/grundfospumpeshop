@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 import SafeImage from '@/components/SafeImage'
 
@@ -52,7 +52,7 @@ export async function generateMetadata(
 
     const title = locale !== 'et' ? `${catName} | Pump OÜ` : (area.meta_title || `${area.name_et} | Pump OÜ`)
     const description = area.meta_description || `${area.name_et} — vaata kõiki tooteid selles kategoorias.`
-    const canonical = `${SITE_URL}/${locale}/tooted/${tegevusala}`
+    const canonical = localizedUrl(`/tooted/${tegevusala}`, locale)
 
     return {
       title,
@@ -60,7 +60,7 @@ export async function generateMetadata(
       alternates: {
         canonical,
         languages: Object.fromEntries(
-          LOCALES.map(l => [l, `${SITE_URL}/${l}/tooted/${tegevusala}`])
+          LOCALES.map(l => [l, localizedUrl(`/tooted/${tegevusala}`, l)])
         ),
       },
       openGraph: {

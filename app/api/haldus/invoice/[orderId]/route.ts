@@ -4,6 +4,8 @@ import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { generateInvoicePDF } from '@/lib/invoice-pdf'
 
+export const runtime = 'nodejs'
+
 async function getCallerRole(): Promise<string | null> {
   const cookieStore = await cookies()
   const sb = createServerClient(
@@ -65,6 +67,7 @@ export async function GET(
 
   const orderRef = (order.montonio_order_id ?? order.id).toString().slice(-8).toUpperCase()
   const orderNumber = order.order_number ?? undefined
+  const shippingAddress = (order.shipping_address ?? {}) as Record<string, string>
 
   const pdfBytes = await generateInvoicePDF(
     {
@@ -73,6 +76,7 @@ export async function GET(
       created_at: order.created_at,
       total: order.total,
       reference: orderRef,
+      shipping_address: shippingAddress,
     },
     items,
     customerName,

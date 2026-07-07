@@ -19,6 +19,47 @@ export async function GET() {
     // Backfill accounts that are missing a company_id
     await supabaseAdmin.from('ad_accounts').update({ company_id: companyId }).is('company_id', null)
 
+    // Deduplicate ad_accounts — keep only the latest per platform_id
+    const { data: dupAccounts } = await supabaseAdmin
+      .from('ad_accounts')
+      .select('id, platform_id, created_at')
+      .order('created_at', { ascending: false })
+    if (dupAccounts) {
+      const seen = new Set<string>()
+      const toDelete: string[] = []
+      for (const a of dupAccounts) {
+        if (seen.has(a.platform_id)) {
+          toDelete.push(a.id)
+        } else {
+          seen.add(a.platform_id)
+        }
+      }
+      if (toDelete.length > 0) {
+        await supabaseAdmin.from('ad_accounts').delete().in('id', toDelete)
+      }
+    }
+
+    // Deduplicate campaigns — keep only the latest per account_id + platform_campaign_id
+    const { data: dupCampaigns } = await supabaseAdmin
+      .from('campaigns')
+      .select('id, account_id, platform_campaign_id, created_at')
+      .order('created_at', { ascending: false })
+    if (dupCampaigns) {
+      const seenCamp = new Set<string>()
+      const delCamp: string[] = []
+      for (const c of dupCampaigns) {
+        const key = `${c.account_id}:${c.platform_campaign_id}`
+        if (seenCamp.has(key)) {
+          delCamp.push(c.id)
+        } else {
+          seenCamp.add(key)
+        }
+      }
+      if (delCamp.length > 0) {
+        await supabaseAdmin.from('campaigns').delete().in('id', delCamp)
+      }
+    }
+
     // Return accounts, campaigns, sync logs via admin client (bypass RLS)
     const { data: accounts } = await supabaseAdmin.from('ad_accounts').select('*, platform:ad_platforms(*)')
     const { data: campaigns } = await supabaseAdmin.from('campaigns').select('*').order('campaign_name')

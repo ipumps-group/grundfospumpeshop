@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { sendNewOrderAdmin } from '@/lib/email'
+import { sendNewOrderAdmin, sendPrepaymentInvoice } from '@/lib/email'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+
+export const runtime = 'nodejs'
 
 // ─── JWT ─────────────────────────────────────────────────────────────────────
 
@@ -41,6 +43,14 @@ interface CheckoutBody {
     email:      string
     phone:      string
     company?:   string
+    reg_code?:  string
+    vat_number?: string
+    company_country?: string
+    company_street?: string
+    company_city?: string
+    company_county?: string
+    company_postal?: string
+    delivery_address_differs?: boolean
   }
   shipping: {
     carrier:              string
@@ -58,6 +68,7 @@ interface CheckoutBody {
   delivery_method?: string
   create_account?: boolean
   password?: string
+  payment_type?: 'bank_link' | 'invoice'
   tracking?: {
     advertising_consent?: boolean
     fbp?: string
@@ -81,6 +92,103 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabaseServer.auth.getUser()
     if (user) user_id = user.id
   } catch { /* guest checkout if no session */ }
+
+  // ── Retry existing order — generate new Montonio payment link ─────────────────
+  try {
+    const preview = await req.clone().json()
+    if (preview?.retry_order_id && !preview?.items) {
+      const { data: retryOrder, error: retryErr } = await supabaseAdmin
+        .from('orders')
+        .select('id, order_number, total, email, customer_name, montonio_order_id, shipping_address, status')
+        .eq('id', preview.retry_order_id)
+        .single()
+
+      if (retryErr || !retryOrder || retryOrder.status !== 'pending') {
+        return NextResponse.json({ error: 'Tellimust ei leitud või see ei ole ootel staatuses' }, { status: 400 })
+      }
+
+      const { data: retryItems } = await supabaseAdmin
+        .from('order_items')
+        .select('product_id, product_name, quantity, unit_price')
+        .eq('order_id', retryOrder.id)
+
+      const sa = retryOrder.shipping_address ?? {} as Record<string, string>
+      const sandbox2 = process.env.MONTONIO_SANDBOX === 'true'
+      const ak2 = sandbox2 ? process.env.MONTONIO_ACCESS_KEY : process.env.MONTONIO_LIVE_ACCESS_KEY
+      const sk2 = sandbox2 ? process.env.MONTONIO_SECRET_KEY : process.env.MONTONIO_LIVE_SECRET_KEY
+      const siteUrl2 = (process.env.NEXT_PUBLIC_SITE_URL || 'https://pumbapood.ee').replace(/\/$/, '')
+
+      if (!ak2 || !sk2) {
+        return NextResponse.json({ error: 'Montonio API võtmed puuduvad' }, { status: 500 })
+      }
+
+      const retryPayload = {
+        accessKey: ak2,
+        merchantReference: retryOrder.order_number,
+        returnUrl: `${siteUrl2}/checkout/success?ref=${retryOrder.order_number}`,
+        notificationUrl: `${siteUrl2}/api/webhooks/montonio`,
+        locale: 'et',
+        currency: 'EUR',
+        grandTotal: retryOrder.total,
+        payment: { method: 'paymentInitiation', amount: retryOrder.total, currency: 'EUR' },
+        billingAddress: {
+          firstName: sa.customer_name?.split(' ')[0] ?? '',
+          lastName: sa.customer_name?.split(' ').slice(1).join(' ') ?? '',
+          email: sa.customer_email ?? retryOrder.email ?? '',
+          phone: sa.customer_phone ?? '',
+        },
+        shippingAddress: {
+          firstName: sa.customer_name?.split(' ')[0] ?? '',
+          lastName: sa.customer_name?.split(' ').slice(1).join(' ') ?? '',
+          email: sa.customer_email ?? retryOrder.email ?? '',
+          phone: sa.customer_phone ?? '',
+          addressLine1: `${sa.carrier_name ?? ''}: ${sa.pickup_name ?? ''}`,
+          addressLine2: sa.pickup_address ?? '',
+          city: sa.pickup_city ?? '',
+          country: sa.country ?? 'EE',
+          postalCode: sa.pickup_postal ?? '',
+        },
+        lineItems: (retryItems ?? []).map(it => ({
+          productCode: String(it.product_id ?? ''),
+          name: it.product_name,
+          price: Number((it.unit_price * 1.24).toFixed(2)),
+          quantity: it.quantity,
+          finalPrice: Number((it.unit_price * it.quantity * 1.24).toFixed(2)),
+        })),
+      }
+
+      const retryToken = createMontonioJWT(retryPayload, sk2)
+      const retryApiUrl = sandbox2
+        ? 'https://sandbox-stargate.montonio.com/api/orders'
+        : 'https://stargate.montonio.com/api/orders'
+
+      const retryRes = await fetch(retryApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: retryToken }),
+      })
+
+      if (!retryRes.ok) {
+        const err = await retryRes.text()
+        console.error('Montonio retry viga:', err)
+        return NextResponse.json({ error: 'Makselingi loomine ebaõnnestus', detail: err }, { status: 502 })
+      }
+
+      const retryData = await retryRes.json() as { paymentUrl?: string; uuid?: string }
+
+      if (!retryData.paymentUrl) {
+        return NextResponse.json({ error: 'Montonio ei tagastanud makselinki' }, { status: 502 })
+      }
+
+      if (retryData.uuid) {
+        await supabaseAdmin.from('orders')
+          .update({ montonio_order_id: retryData.uuid, updated_at: new Date().toISOString() })
+          .eq('id', retryOrder.id)
+      }
+
+      return NextResponse.json({ payment_url: retryData.paymentUrl, ref: retryOrder.order_number })
+    }
+  } catch { /* not a retry request, continue to normal flow */ }
 
   // ── Debug: Log all Montonio env vars ──────────────────────────────────────────
   const envCheck = {
@@ -118,7 +226,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Vigane päringu keha' }, { status: 400 })
   }
 
-  const { customer, shipping, notes, coupon_id, items, delivery_method, create_account, password, tracking } = body
+  const { customer, shipping, notes, coupon_id, items, delivery_method, create_account, password, payment_type, tracking } = body
 
   if (!customer?.first_name || !customer?.last_name || !customer?.email ||
       !customer?.phone || !items?.length || !shipping?.carrier) {
@@ -176,6 +284,14 @@ export async function POST(req: NextRequest) {
     customer_email:  customer.email,
     customer_phone:  customer.phone,
     ...(customer.company && { company: customer.company }),
+    ...(customer.reg_code && { reg_code: customer.reg_code }),
+    ...(customer.vat_number && { vat_number: customer.vat_number }),
+    ...(customer.company_country && { company_country: customer.company_country }),
+    ...(customer.company_street && { company_street: customer.company_street }),
+    ...(customer.company_city && { company_city: customer.company_city }),
+    ...(customer.company_county && { company_county: customer.company_county }),
+    ...(customer.company_postal && { company_postal: customer.company_postal }),
+    ...(customer.delivery_address_differs !== undefined && { delivery_address_differs: customer.delivery_address_differs }),
     ...(notes && { notes }),
   }
 
@@ -269,17 +385,53 @@ export async function POST(req: NextRequest) {
           const match = existing?.users?.find(u => u.email?.toLowerCase() === customer.email.toLowerCase())
           if (match) {
             await supabaseAdmin.from('orders').update({ user_id: match.id, updated_at: new Date().toISOString() }).eq('id', orderId)
+            // Update profile phone if empty
+            const { data: existingProfile } = await supabaseAdmin.from('profiles').select('phone').eq('id', match.id).single()
+            if (existingProfile && !existingProfile.phone && customer.phone) {
+              await supabaseAdmin.from('profiles').update({ phone: customer.phone, updated_at: new Date().toISOString() }).eq('id', match.id)
+            }
             console.log('[checkout] Linked order to existing user:', match.id)
           }
         }
       } else if (newUser?.user) {
         await supabaseAdmin.from('orders').update({ user_id: newUser.user.id, updated_at: new Date().toISOString() }).eq('id', orderId)
+
+        // Save phone to profile
+        await supabaseAdmin.from('profiles').upsert({
+          id: newUser.user.id,
+          email: customer.email,
+          full_name: `${customer.first_name} ${customer.last_name}`,
+          phone: customer.phone,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'id' })
+
         accountCreated = true
         console.log('[checkout] Account created and linked to order:', newUser.user.id)
       }
     } catch (err) {
       console.error('[checkout] Account creation error (non-blocking):', err)
     }
+  }
+
+  // ── Ettemaksu arve — loo tellimus ilma Montoniota ─────────────────────────
+  if (payment_type === 'invoice') {
+    const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+
+    await sendPrepaymentInvoice({
+      to: customer.email,
+      locale: 'et',
+      customerName: `${customer.first_name} ${customer.last_name}`,
+      orderNumber: orderNumber.toString(),
+      items: items.map(i => ({ name: i.name, quantity: i.qty, unitPrice: i.price })),
+      total: grandTotal,
+      dueDate,
+      orderId,
+    })
+
+    // Send admin notification about new order
+    await sendNewOrderAdmin(orderId)
+
+    return NextResponse.json({ invoice_sent: true, ref: orderNumber, created_account: accountCreated })
   }
 
   // ── 2. Loo Montonio makselink ──────────────────────────────────────────────

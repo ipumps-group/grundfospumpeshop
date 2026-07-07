@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 import { notFound } from 'next/navigation'
 import Script from 'next/script'
 import ProductDetailClient from '@/components/ProductDetailClient'
@@ -11,6 +11,32 @@ import type { Product, Attribute, RelatedProduct, ProductDocument } from '@/comp
 export const revalidate = 3600
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/\[caption[^\]]*\]/gi, '')
+    .replace(/\[\/caption\]/gi, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&#0?38;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function resolveDescription(product: Record<string, unknown>, locale: string): string {
+  const fullDescField = `description_${locale}`
+  const shortDescField = `short_description_${locale}`
+  const raw = (product[fullDescField] as string | null)
+    || (product.description_et as string | null)
+    || (product[shortDescField] as string | null)
+    || (product.short_description_et as string | null)
+    || ''
+  return stripHtml(raw)
+}
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; slug: string }> }
@@ -21,7 +47,7 @@ export async function generateMetadata(
   try {
     const { data: product } = await supabaseAdmin
       .from('products')
-      .select('name, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, image_url, slug')
+      .select('name, description_et, description_en, description_ru, description_lv, description_lt, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, image_url, slug')
       .eq('slug', slug)
       .single()
 
@@ -29,11 +55,10 @@ export async function generateMetadata(
       return { title: 'Toode puudub' }
     }
 
-    const descField = `short_description_${locale}` as keyof typeof product
-    const description = (product[descField] as string | null) || product.short_description_et || ''
+    const description = resolveDescription(product as Record<string, unknown>, locale)
 
     const title = `${product.name} | Pump OÜ`
-    const canonical = `${SITE_URL}/${locale}/toode/${slug}`
+    const canonical = localizedUrl(`/toode/${slug}`, locale)
 
     return {
       title,
@@ -41,7 +66,7 @@ export async function generateMetadata(
       alternates: {
         canonical,
         languages: Object.fromEntries(
-          LOCALES.map(l => [l, `${SITE_URL}/${l}/toode/${slug}`])
+          LOCALES.map(l => [l, localizedUrl(`/toode/${slug}`, l)])
         ),
       },
       openGraph: {
@@ -123,8 +148,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   }
 
   const displayPrice = product.sale_price ?? product.price
-  const descField = `short_description_${locale}` as keyof typeof product
-  const description = (product[descField] as string | null) || product.short_description_et || ''
+  const description = resolveDescription(product as Record<string, unknown>, locale)
   const availability = product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
 
   const productJsonLd = {

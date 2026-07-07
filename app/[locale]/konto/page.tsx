@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ShoppingBag, User, MapPin, ChevronRight } from 'lucide-react'
+import { User, MapPin, ChevronRight } from 'lucide-react'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AccountNav from '@/components/konto/AccountNav'
 import OrderStatusBadge from '@/components/konto/OrderStatusBadge'
@@ -15,7 +15,7 @@ interface Order {
   status: string
   total: number
   created_at: string
-  reference: string | null
+  order_number: string | null
 }
 
 export default function KontoDashboard() {
@@ -37,10 +37,9 @@ function Dashboard() {
     if (!user) return
     supabase
       .from('orders')
-      .select('id, status, total, created_at, reference')
+      .select('id, status, total, created_at, order_number')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(3)
       .then(({ data }) => {
         setOrders(data ?? [])
         setLoadingOrders(false)
@@ -61,11 +60,10 @@ function Dashboard() {
           <p className="text-[15px] text-gray-500 mb-6">Siin saad hallata oma tellimusi ja kontoandmeid.</p>
 
           {/* Kiirlingid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             {[
-              { href: '/konto/tellimused', icon: ShoppingBag, label: t('orders'),    desc: tCommon('viewAll') },
-              { href: '/konto/profiil',   icon: User,         label: t('profile'),   desc: tCommon('edit') },
-              { href: '/konto/aadressid', icon: MapPin,       label: t('addresses'), desc: tCommon('edit') },
+              { href: '/konto/profiil',   icon: User,   label: t('profile'),   desc: tCommon('edit') },
+              { href: '/konto/aadressid', icon: MapPin, label: t('addresses'), desc: tCommon('edit') },
             ].map(({ href, icon: Icon, label, desc }) => (
               <Link
                 key={href}
@@ -99,15 +97,19 @@ function Dashboard() {
               </div>
             ) : orders.length === 0 ? (
               <div className="p-8 text-center text-[15px] text-gray-500">
-                <Link href="/tooted" className="text-[#003366] hover:underline">{tCommon('viewAll')}</Link>
+                <Link href="/tooted" className="text-[#003366] hover:underline">Sirvi tooteid</Link>
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
                 {orders.map(order => (
-                  <div key={order.id} className="flex items-center gap-4 px-6 py-4">
+                  <Link
+                    key={order.id}
+                    href={`/konto/tellimused/${order.id}`}
+                    className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex-1 min-w-0">
                       <div className="text-[15px] font-medium text-gray-900">
-                        #{order.reference || order.id.slice(0, 8).toUpperCase()}
+                        #{order.order_number || order.id.slice(0, 8).toUpperCase()}
                       </div>
                       <div className="text-[13px] text-gray-500">
                         {new Date(order.created_at).toLocaleDateString('et-EE')}
@@ -117,13 +119,8 @@ function Dashboard() {
                     <div className="text-[15px] font-semibold text-gray-900 text-right min-w-[80px]">
                       {order.total.toFixed(2)} €
                     </div>
-                    <Link
-                      href={`/konto/tellimused/${order.id}`}
-                      className="text-[13px] text-[#003366] hover:underline font-medium"
-                    >
-                      {tCommon('open')} →
-                    </Link>
-                  </div>
+                    <ChevronRight size={16} className="text-gray-300" />
+                  </Link>
                 ))}
               </div>
             )}

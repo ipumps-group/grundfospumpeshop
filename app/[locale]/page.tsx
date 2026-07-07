@@ -6,7 +6,7 @@ import ShortcodeRenderer from '@/components/ShortcodeRenderer'
 import ContactForm from '@/components/ContactForm'
 import { getLocale } from 'next-intl/server'
 import type { Section } from '@/components/page-builder/types'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 
 export const revalidate = 3600
 
@@ -100,15 +100,15 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: locale === 'et' ? SITE_URL : `${SITE_URL}/${locale}`,
+      canonical: localizedUrl('/', locale),
       languages: Object.fromEntries(
-        LOCALES.map(l => [l, l === 'et' ? SITE_URL : `${SITE_URL}/${l}`])
+        LOCALES.map(l => [l, localizedUrl('/', l)])
       ),
     },
     openGraph: {
       title,
       description,
-      url: locale === 'et' ? SITE_URL : `${SITE_URL}/${locale}`,
+      url: localizedUrl('/', locale),
       siteName: 'Pump OÜ',
       locale,
       type: 'website',

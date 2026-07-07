@@ -49,6 +49,7 @@ export default function PublicOrderPage() {
   const [emailInput, setEmailInput] = useState(searchParams.get('email') || '')
   const [verified, setVerified] = useState(false)
   const [error, setError] = useState('')
+  const [retrying, setRetrying] = useState(false)
 
   // Auto-verify if email is in URL and matches order
   useEffect(() => {
@@ -80,24 +81,59 @@ export default function PublicOrderPage() {
     }
 
     setOrder(orderData)
-
-    const { data: itemsData } = await supabase
-      .from('order_items')
-      .select('*')
-      .eq('order_id', orderData.id)
-
-    setItems(itemsData ?? [])
     setLoading(false)
   }
 
-  function verifyEmail() {
+  async function verifyEmailAndLoad() {
     if (!order) return
     if (emailInput.toLowerCase() === order.email.toLowerCase()) {
       setVerified(true)
       setError('')
+      setLoading(true)
+      try {
+        const res = await fetch(`/api/orders/${orderNumber}/public`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput }),
+        })
+        const data = await res.json()
+        if (res.ok) {
+          setItems(data.items ?? [])
+        } else {
+          setError(data.error || 'Viga andmete laadimisel')
+        }
+      } catch {
+        setError('Ühenduse viga')
+      }
+      setLoading(false)
     } else {
       setError('Email ei ühti tellimusega')
     }
+  }
+
+  function verifyEmail() {
+    verifyEmailAndLoad()
+  }
+
+  async function retryPayment() {
+    if (!order) return
+    setRetrying(true)
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ retry_order_id: order.id }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.payment_url) {
+        alert(data.error || 'Makselingi loomine ebaõnnestus')
+      } else {
+        window.location.href = data.payment_url
+      }
+    } catch {
+      alert('Ühenduse viga')
+    }
+    setRetrying(false)
   }
 
   if (loading) {
@@ -168,7 +204,18 @@ export default function PublicOrderPage() {
                 {new Date(order.created_at).toLocaleDateString('et-EE', { day: '2-digit', month: 'long', year: 'numeric' })}
               </p>
             </div>
-            <OrderStatusBadge status={order.status} />
+            <div className="flex items-center gap-3">
+              <OrderStatusBadge status={order.status} />
+              {order.status === 'pending' && (
+                <button
+                  onClick={retryPayment}
+                  disabled={retrying}
+                  className="bg-[#003366] hover:bg-[#004080] text-white px-4 py-2 rounded-xl text-[14px] font-semibold transition-colors disabled:opacity-60"
+                >
+                  {retrying ? 'Laadimine...' : 'Maksa uuesti'}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="divide-y divide-gray-50">

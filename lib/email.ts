@@ -6,6 +6,7 @@ import OrderConfirmation from '@/emails/OrderConfirmation';
 import OrderShipped from '@/emails/OrderShipped';
 import RefundConfirmation from '@/emails/RefundConfirmation';
 import AbandonedCart from '@/emails/AbandonedCart';
+import PrepaymentInvoice from '@/emails/PrepaymentInvoice';
 import type { Carrier, DeliveryMethod } from './carriers';
 import {
   buildStatusUpdateHtml,
@@ -103,6 +104,7 @@ interface SendArgs {
   category: EmailCategory;
   extraTags?: Array<{ name: string; value: string }>;
   replyTo?: string;
+  attachments?: Array<{ filename: string; content: Buffer | string }>;
 }
 
 async function send({
@@ -112,6 +114,7 @@ async function send({
   category,
   extraTags = [],
   replyTo,
+  attachments,
 }: SendArgs): Promise<SendResult> {
   if (!to || !to.includes('@')) {
     console.warn(`[email] Invalid recipient address: "${to}" (${category})`);
@@ -130,6 +133,10 @@ async function send({
       replyTo: replyTo ?? EMAIL_REPLY_TO,
       subject,
       react,
+      attachments: attachments?.map(a => ({
+        filename: a.filename,
+        content: typeof a.content === 'string' ? a.content : a.content.toString('base64'),
+      })),
       tags: [
         { name: 'category', value: category },
         { name: 'environment', value: process.env.NODE_ENV ?? 'development' },
@@ -321,6 +328,78 @@ export async function sendAbandonedCart(data: {
   });
 }
 
+export async function sendPrepaymentInvoice(data: {
+  to: string;
+  locale: string;
+  customerName: string;
+  orderNumber: string;
+  items: OrderItemInput[];
+  total: number;
+  dueDate: string;
+  orderId: string;
+}): Promise<SendResult> {
+  const messages = await loadEmailMessages(data.locale);
+  const subject = interpolate(messages.prepaymentInvoice.subject, {
+    orderNumber: data.orderNumber,
+  });
+
+  // Generate PDF attachment
+  let pdfAttachment: { filename: string; content: Buffer } | undefined
+  try {
+    const { data: order } = await supabaseAdmin
+      .from('orders')
+      .select('id, order_number, created_at, total, shipping_address, email, customer_name')
+      .eq('id', data.orderId)
+      .single()
+
+    if (order) {
+      const { generateInvoicePDF } = await import('@/lib/invoice-pdf')
+      const pdfBytes = await generateInvoicePDF(
+        {
+          id: order.id,
+          order_number: order.order_number,
+          created_at: order.created_at,
+          total: order.total,
+          shipping_address: order.shipping_address as Record<string, string> | null ?? undefined,
+        },
+        data.items.map(it => ({ product_name: it.name, qty: it.quantity, price: it.unitPrice })),
+        data.customerName,
+        data.to,
+        'prepayment',
+      )
+      pdfAttachment = {
+        filename: `arve-${data.orderNumber}.pdf`,
+        content: Buffer.from(pdfBytes),
+      }
+    }
+  } catch (err) {
+    console.error('[email] Failed to generate invoice PDF for attachment', err)
+  }
+
+  return send({
+    to: data.to,
+    subject,
+    category: 'order_confirmation',
+    attachments: pdfAttachment ? [pdfAttachment] : undefined,
+    extraTags: [
+      { name: 'order_number', value: data.orderNumber },
+      { name: 'locale', value: data.locale },
+    ],
+    react: React.createElement(PrepaymentInvoice, {
+      locale: data.locale,
+      messages,
+      customerName: data.customerName,
+      orderNumber: data.orderNumber,
+      items: data.items,
+      total: data.total,
+      dueDate: data.dueDate,
+      orderUrl: buildOrderUrl(data.locale, data.orderNumber),
+      siteUrl: SITE_URL,
+      replyToEmail: EMAIL_REPLY_TO,
+    }),
+  });
+}
+
 // ── Staatuse muutuse teavitus kliendile ──────────────────────────────────
 
 interface StatusUpdateData {
@@ -411,7 +490,8 @@ export async function sendNewOrderAdmin(orderId: string): Promise<void> {
   const customerEmail = sa.customer_email ?? order.email ?? null
   const customerName = sa.full_name ?? sa.customer_name ?? order.customer_name ?? null
   const orderRef = (order.order_number ?? order.montonio_order_id ?? order.id).toString()
-  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL ?? 'info@pumbapood.ee'
+  const adminEmailFromSettings = await getSetting('order_notification_email', '')
+  const adminEmail = adminEmailFromSettings || process.env.ADMIN_NOTIFICATION_EMAIL || 'info@pumbapood.ee'
 
   const items = (order.order_items ?? []) as Array<{ product_name: string; quantity: number; unit_price: number }>
 

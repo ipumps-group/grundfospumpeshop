@@ -3,6 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockGtag = vi.fn()
 const mockFbq = vi.fn()
 
+process.env.NEXT_PUBLIC_GOOGLE_ADS_ID = 'AW-TEST'
+process.env.NEXT_PUBLIC_GOOGLE_ADS_ATC_LABEL = 'atc-label'
+process.env.NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_LABEL = 'checkout-label'
+process.env.NEXT_PUBLIC_GOOGLE_ADS_CONTACT_LABEL = 'contact-label'
+process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL = 'purchase-label'
+
 Object.defineProperty(window, 'gtag', { value: mockGtag, writable: true })
 Object.defineProperty(window, 'fbq', { value: mockFbq, writable: true })
 
@@ -33,7 +39,7 @@ describe('advertising consent', () => {
     trackAddToCart(10)
     trackMetaAddToCart({ value: 10, currency: 'EUR' })
 
-    expect(mockGtag).not.toHaveBeenCalled()
+    expect(mockGtag).not.toHaveBeenCalledWith('event', 'conversion', expect.anything())
     expect(mockFbq).not.toHaveBeenCalled()
   })
 })

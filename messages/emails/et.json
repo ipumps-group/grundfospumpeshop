@@ -54,5 +54,18 @@
     "itemsHeading": "Teie ostukorvis",
     "returnButton": "Jätka ostukorvi",
     "footerNote": "Kui olete juba tellimuse sooritanud, võite selle kirja ignoreerida."
+  },
+  "prepaymentInvoice": {
+    "preview": "Ettemaksu arve tellimusele {orderNumber} — {total}",
+    "subject": "Ettemaksu arve tellimusele {orderNumber}",
+    "heading": "Ettemaksu arve",
+    "intro": "Täname tellimuse eest! Lisatud on ettemaksu arve <strong>{orderNumber}</strong>. Palun tasuge arve 7 päeva jooksul. Peale makse laekumist asume tellimust komplekteerima.",
+    "itemsHeading": "Tellitud tooted",
+    "paymentHeading": "Makseinfo",
+    "bankLabel": "Pank",
+    "ibanLabel": "IBAN",
+    "dueDateLabel": "Maksetähtaeg",
+    "amountLabel": "Summa",
+    "referenceLabel": "Viitenumber"
   }
 }

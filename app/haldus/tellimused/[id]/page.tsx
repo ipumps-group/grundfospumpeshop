@@ -109,15 +109,17 @@ export default function TellimusDetailPage() {
   useEffect(() => {
     if (!id) return
     async function load() {
-      const [orderRes, itemsRes, histRes] = await Promise.all([
+      const token = (await supabase.auth.getSession()).data.session?.access_token
+      const [orderRes, dataRes] = await Promise.all([
         supabase.from('orders').select('*').eq('id', id).single(),
-        supabase.from('order_items').select('*').eq('order_id', id),
-        supabase.from('order_status_history').select('*').eq('order_id', id).order('created_at', { ascending: false }),
+        fetch(`/api/haldus/orders/${id}/data`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }).then(r => r.json()),
       ])
       if (orderRes.error || !orderRes.data) { setNotFound(true); setLoading(false); return }
       setOrder(orderRes.data)
-      setItems(itemsRes.data ?? [])
-      setHistory(histRes.data ?? [])
+      setItems(dataRes.items ?? [])
+      setHistory(dataRes.history ?? [])
       setNewStatus(orderRes.data.status)
       setLoading(false)
     }

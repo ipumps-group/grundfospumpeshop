@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { routing } from '@/i18n/routing'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 
 const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
@@ -17,7 +17,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale } = await params
   const meta = METADATA_BY_LOCALE[locale] || METADATA_BY_LOCALE.et
-  const canonical = `${SITE_URL}/${locale}/tooted`
+  const canonical = localizedUrl('/tooted', locale)
 
   return {
     title: meta.title,
@@ -25,7 +25,7 @@ export async function generateMetadata(
     alternates: {
       canonical,
       languages: Object.fromEntries(
-        LOCALES.map(l => [l, `${SITE_URL}/${l}/tooted`])
+        LOCALES.map(l => [l, localizedUrl('/tooted', l)])
       ),
     },
     openGraph: {

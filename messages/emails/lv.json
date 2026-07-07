@@ -54,5 +54,18 @@
     "itemsHeading": "Jūsu grozā",
     "returnButton": "Atgriezties grozā",
     "footerNote": "Ja jūs jau esat veicis pasūtījumu, lūdzu ignorējiet šo e-pastu."
+  },
+  "prepaymentInvoice": {
+    "preview": "Priekšapmaksas rēķins pasūtījumam {orderNumber} — {total}",
+    "subject": "Priekšapmaksas rēķins pasūtījumam {orderNumber}",
+    "heading": "Priekšapmaksas rēķins",
+    "intro": "Paldies par pasūtījumu! Pievienots priekšapmaksas rēķins pasūtījumam <strong>{orderNumber}</strong>. Lūdzu, apmaksājiet 7 dienu laikā. Mēs apstrādāsim pasūtījumu pēc maksājuma saņemšanas.",
+    "itemsHeading": "Pasūtītie produkti",
+    "paymentHeading": "Maksājuma informācija",
+    "bankLabel": "Banka",
+    "ibanLabel": "IBAN",
+    "dueDateLabel": "Apmaksas termiņš",
+    "amountLabel": "Summa",
+    "referenceLabel": "Atsauces numurs"
   }
 }

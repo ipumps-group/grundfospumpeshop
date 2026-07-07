@@ -33,7 +33,7 @@ async function queryGoogleAds(query: string, customerId: string): Promise<any[]>
   const res = await fetch(url, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ query, pageSize: 10000 }),
+    body: JSON.stringify({ query }),
   })
 
   if (!res.ok) {
@@ -56,7 +56,7 @@ async function queryGoogleAds(query: string, customerId: string): Promise<any[]>
     const nextRes = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ query, pageSize: 10000, pageToken: nextPageToken }),
+      body: JSON.stringify({ query, pageToken: nextPageToken }),
     })
     if (!nextRes.ok) break
     const nextData = await nextRes.json()

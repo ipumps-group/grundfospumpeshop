@@ -1,4 +1,4 @@
-import { hasAdvertisingConsent } from '@/lib/tracking-consent'
+import { hasAdvertisingConsent, hasAnalyticsConsent } from '@/lib/tracking-consent'
 
 export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
 export const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID
@@ -11,14 +11,6 @@ const VIEW_ITEM_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_VIEW_ITEM_LABEL
 const SEARCH_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_SEARCH_LABEL
 const LEAD_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL
 
-const isConfigured = !!(
-  GOOGLE_ADS_ID &&
-  PURCHASE_LABEL &&
-  CONTACT_FORM_SUBMIT_LABEL &&
-  BEGIN_CHECKOUT_LABEL &&
-  ADD_TO_CART_LABEL
-)
-
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void
@@ -27,33 +19,27 @@ declare global {
 }
 
 function gtag(...args: unknown[]) {
-  if (typeof window === 'undefined') return
-  if (typeof window.gtag === 'function') {
-    window.gtag(...args)
-  }
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') window.gtag(...args)
 }
 
-function safeGtag(...args: unknown[]): boolean {
-  if (!hasAdvertisingConsent() || typeof window.gtag !== 'function' || !isConfigured) {
-    if (!isConfigured) console.warn('[Google Ads] Not configured — missing env variables')
+function safeConversion(label: string | undefined, params: Record<string, unknown>): boolean {
+  if (!GOOGLE_ADS_ID || !label) {
+    console.warn('[Google Ads] Conversion not configured — missing ID or label')
     return false
   }
-  gtag(...args)
+  if (!hasAdvertisingConsent() || typeof window.gtag !== 'function') return false
+  gtag('event', 'conversion', { ...params, send_to: `${GOOGLE_ADS_ID}/${label}` })
   return true
 }
 
 function analyticsGtag(...args: unknown[]): boolean {
-  if (typeof window.gtag !== 'function') return false
+  if (!hasAnalyticsConsent() || typeof window.gtag !== 'function') return false
   gtag(...args)
   return true
 }
 
 export function trackViewItem(item?: { id: string; name?: string; price?: number; category?: string }) {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: VIEW_ITEM_LABEL ? `${GOOGLE_ADS_ID}/${VIEW_ITEM_LABEL}` : undefined,
-    value: item?.price ?? 0,
-    currency: 'EUR',
-  })
+  const conversionSent = safeConversion(VIEW_ITEM_LABEL, { value: item?.price ?? 0, currency: 'EUR' })
   analyticsGtag('event', 'view_item', {
     currency: 'EUR',
     value: item?.price ?? 0,
@@ -65,16 +51,12 @@ export function trackViewItem(item?: { id: string; name?: string; price?: number
 export function trackViewItemList(items?: Array<{ id: string; name?: string; price?: number }>) {
   analyticsGtag('event', 'view_item_list', {
     currency: 'EUR',
-    items: items?.map(i => ({ item_id: i.id, item_name: i.name, price: i.price })),
+    items: items?.map(item => ({ item_id: item.id, item_name: item.name, price: item.price })),
   })
 }
 
 export function trackSearch(searchTerm?: string) {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: SEARCH_LABEL ? `${GOOGLE_ADS_ID}/${SEARCH_LABEL}` : undefined,
-    value: 0,
-    currency: 'EUR',
-  })
+  const conversionSent = safeConversion(SEARCH_LABEL, { value: 0, currency: 'EUR' })
   analyticsGtag('event', 'search', { search_term: searchTerm || '' })
   return conversionSent
 }
@@ -87,11 +69,7 @@ export function trackSelectItem(item?: { id: string; name?: string; price?: numb
 }
 
 export function trackAddToCart(value?: number) {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: `${GOOGLE_ADS_ID}/${ADD_TO_CART_LABEL}`,
-    value: value ?? 0,
-    currency: 'EUR',
-  })
+  const conversionSent = safeConversion(ADD_TO_CART_LABEL, { value: value ?? 0, currency: 'EUR' })
   analyticsGtag('event', 'add_to_cart', { value: value ?? 0, currency: 'EUR' })
   return conversionSent
 }
@@ -101,32 +79,20 @@ export function trackRemoveFromCart(value?: number) {
 }
 
 export function trackBeginCheckout(value?: number) {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: `${GOOGLE_ADS_ID}/${BEGIN_CHECKOUT_LABEL}`,
-    value: value ?? 0,
-    currency: 'EUR',
-  })
+  const conversionSent = safeConversion(BEGIN_CHECKOUT_LABEL, { value: value ?? 0, currency: 'EUR' })
   analyticsGtag('event', 'begin_checkout', { value: value ?? 0, currency: 'EUR' })
   return conversionSent
 }
 
 export function trackContactFormSubmit() {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: `${GOOGLE_ADS_ID}/${CONTACT_FORM_SUBMIT_LABEL}`,
-    value: 1.0,
-    currency: 'EUR',
-  })
-  analyticsGtag('event', 'generate_lead', { value: 1.0, currency: 'EUR' })
+  const conversionSent = safeConversion(CONTACT_FORM_SUBMIT_LABEL, { value: 1, currency: 'EUR' })
+  analyticsGtag('event', 'generate_lead', { value: 1, currency: 'EUR' })
   return conversionSent
 }
 
 export function trackLead(value?: number) {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: LEAD_LABEL ? `${GOOGLE_ADS_ID}/${LEAD_LABEL}` : undefined,
-    value: value ?? 1.0,
-    currency: 'EUR',
-  })
-  analyticsGtag('event', 'generate_lead', { value: value ?? 1.0, currency: 'EUR' })
+  const conversionSent = safeConversion(LEAD_LABEL, { value: value ?? 1, currency: 'EUR' })
+  analyticsGtag('event', 'generate_lead', { value: value ?? 1, currency: 'EUR' })
   return conversionSent
 }
 
@@ -135,26 +101,18 @@ export function trackPurchase(
   transactionId?: string,
   items?: Array<{ id: string; quantity: number; item_price?: number }>,
 ): boolean {
-  const conversionSent = safeGtag('event', 'conversion', {
-    send_to: `${GOOGLE_ADS_ID}/${PURCHASE_LABEL}`,
+  const mappedItems = items?.map(item => ({ item_id: item.id, quantity: item.quantity, price: item.item_price }))
+  const conversionSent = safeConversion(PURCHASE_LABEL, {
     value: value ?? 0,
     currency: 'EUR',
     transaction_id: transactionId,
-    items: items?.map(item => ({
-      item_id: item.id,
-      quantity: item.quantity,
-      price: item.item_price,
-    })),
+    items: mappedItems,
   })
   analyticsGtag('event', 'purchase', {
     transaction_id: transactionId,
     value: value ?? 0,
     currency: 'EUR',
-    items: items?.map(item => ({
-      item_id: item.id,
-      quantity: item.quantity,
-      price: item.item_price,
-    })),
+    items: mappedItems,
   })
   return conversionSent
 }

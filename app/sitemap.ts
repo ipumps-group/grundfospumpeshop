@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { routing } from '@/i18n/routing'
-import { SITE_URL } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 
 const LOCALES = [...routing.locales] as string[]
 
@@ -15,6 +15,12 @@ type SitemapEntry = {
   alternates?: {
     languages: Record<string, string>
   }
+}
+
+function langEntry(path: string): Record<string, string> {
+  return Object.fromEntries(
+    LOCALES.map(l => [l, localizedUrl(path, l)])
+  )
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -41,38 +47,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 1. Homepage for each locale - PRIORITY 1.0
     for (const locale of LOCALES) {
       entries.push({
-        url: `${SITE_URL}/${locale}`,
+        url: localizedUrl('/', locale),
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 1.0,
-        alternates: {
-          languages: {
-            et: `${SITE_URL}/et`,
-            en: `${SITE_URL}/en`,
-            ru: `${SITE_URL}/ru`,
-            lv: `${SITE_URL}/lv`,
-            lt: `${SITE_URL}/lt`,
-          },
-        },
+        alternates: { languages: langEntry('/') },
       })
     }
 
     // 2. Products page - PRIORITY 0.9
     for (const locale of LOCALES) {
       entries.push({
-        url: `${SITE_URL}/${locale}/tooted`,
+        url: localizedUrl('/tooted', locale),
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 0.9,
-        alternates: {
-          languages: {
-            et: `${SITE_URL}/et/tooted`,
-            en: `${SITE_URL}/en/tooted`,
-            ru: `${SITE_URL}/ru/tooted`,
-            lv: `${SITE_URL}/lv/tooted`,
-            lt: `${SITE_URL}/lt/tooted`,
-          },
-        },
+        alternates: { languages: langEntry('/tooted') },
       })
     }
 
@@ -86,20 +76,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (activityAreas) {
         for (const area of activityAreas) {
           for (const locale of LOCALES) {
+            const path = `/tooted/${area.slug}`
             entries.push({
-              url: `${SITE_URL}/${locale}/tooted/${area.slug}`,
+              url: localizedUrl(path, locale),
               lastModified: area.updated_at ? new Date(area.updated_at) : new Date(),
               changeFrequency: 'weekly',
               priority: 0.9,
-              alternates: {
-                languages: {
-                  et: `${SITE_URL}/et/tooted/${area.slug}`,
-                  en: `${SITE_URL}/en/tooted/${area.slug}`,
-                  ru: `${SITE_URL}/ru/tooted/${area.slug}`,
-                  lv: `${SITE_URL}/lv/tooted/${area.slug}`,
-                  lt: `${SITE_URL}/lt/tooted/${area.slug}`,
-                },
-              },
+              alternates: { languages: langEntry(path) },
             })
           }
         }
@@ -115,28 +98,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const series of seriesData) {
           const areaSlug = (series as any).activity_areas?.slug
           if (!areaSlug) continue
-          const seriesUrl = `${areaSlug}/${series.slug}`
+          const path = `/tooted/${areaSlug}/${series.slug}`
           for (const locale of LOCALES) {
             entries.push({
-              url: `${SITE_URL}/${locale}/tooted/${seriesUrl}`,
+              url: localizedUrl(path, locale),
               lastModified: series.updated_at ? new Date(series.updated_at) : new Date(),
               changeFrequency: 'weekly',
               priority: 0.85,
-              alternates: {
-                languages: {
-                  et: `${SITE_URL}/et/tooted/${seriesUrl}`,
-                  en: `${SITE_URL}/en/tooted/${seriesUrl}`,
-                  ru: `${SITE_URL}/ru/tooted/${seriesUrl}`,
-                  lv: `${SITE_URL}/lv/tooted/${seriesUrl}`,
-                  lt: `${SITE_URL}/lt/tooted/${seriesUrl}`,
-                },
-              },
+              alternates: { languages: langEntry(path) },
             })
           }
         }
       }
     } catch {
-      // Log but don't fail - activity areas will be missing from sitemap this cycle
       console.error('Failed to fetch activity areas for sitemap')
     }
 
@@ -144,20 +118,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (products && products.length > 0) {
       for (const product of products) {
         for (const locale of LOCALES) {
+          const path = `/toode/${product.slug}`
           entries.push({
-            url: `${SITE_URL}/${locale}/toode/${product.slug}`,
+            url: localizedUrl(path, locale),
             lastModified: product.updated_at ? new Date(product.updated_at) : new Date(),
             changeFrequency: 'weekly',
             priority: 0.8,
-            alternates: {
-              languages: {
-                et: `${SITE_URL}/et/toode/${product.slug}`,
-                en: `${SITE_URL}/en/toode/${product.slug}`,
-                ru: `${SITE_URL}/ru/toode/${product.slug}`,
-                lv: `${SITE_URL}/lv/toode/${product.slug}`,
-                lt: `${SITE_URL}/lt/toode/${product.slug}`,
-              },
-            },
+            alternates: { languages: langEntry(path) },
           })
         }
       }
@@ -166,20 +133,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 5. Static pages - PRIORITY 0.5
     for (const pageSlug of STATIC_PAGES) {
       for (const locale of LOCALES) {
+        const path = `/leht/${pageSlug}`
         entries.push({
-          url: `${SITE_URL}/${locale}/leht/${pageSlug}`,
+          url: localizedUrl(path, locale),
           lastModified: new Date(),
           changeFrequency: 'monthly',
           priority: 0.5,
-          alternates: {
-            languages: {
-              et: `${SITE_URL}/et/leht/${pageSlug}`,
-              en: `${SITE_URL}/en/leht/${pageSlug}`,
-              ru: `${SITE_URL}/ru/leht/${pageSlug}`,
-              lv: `${SITE_URL}/lv/leht/${pageSlug}`,
-              lt: `${SITE_URL}/lt/leht/${pageSlug}`,
-            },
-          },
+          alternates: { languages: langEntry(path) },
         })
       }
     }
@@ -188,20 +148,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (pages && pages.length > 0) {
       for (const page of pages) {
         for (const locale of LOCALES) {
+          const path = `/leht/${page.slug}`
           entries.push({
-            url: `${SITE_URL}/${locale}/leht/${page.slug}`,
+            url: localizedUrl(path, locale),
             lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),
             changeFrequency: 'monthly',
             priority: 0.5,
-            alternates: {
-              languages: {
-                et: `${SITE_URL}/et/leht/${page.slug}`,
-                en: `${SITE_URL}/en/leht/${page.slug}`,
-                ru: `${SITE_URL}/ru/leht/${page.slug}`,
-                lv: `${SITE_URL}/lv/leht/${page.slug}`,
-                lt: `${SITE_URL}/lt/leht/${page.slug}`,
-              },
-            },
+            alternates: { languages: langEntry(path) },
           })
         }
       }
@@ -210,7 +163,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[sitemap.ts] Error generating sitemap:', error)
     for (const locale of LOCALES) {
       entries.push({
-        url: `${SITE_URL}/${locale}`,
+        url: localizedUrl('/', locale),
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 1.0,
@@ -219,7 +172,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const pageSlug of STATIC_PAGES) {
       for (const locale of LOCALES) {
         entries.push({
-          url: `${SITE_URL}/${locale}/leht/${pageSlug}`,
+          url: localizedUrl(`/leht/${pageSlug}`, locale),
           lastModified: new Date(),
           changeFrequency: 'monthly',
           priority: 0.5,

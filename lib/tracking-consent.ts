@@ -1,16 +1,24 @@
 export const CONSENT_KEY = 'pumbapood_consent'
 
-export function hasAdvertisingConsent(): boolean {
+function hasConsent(type: 'advertising' | 'analytics'): boolean {
   if (typeof window === 'undefined') return false
 
   try {
     const stored = window.localStorage.getItem(CONSENT_KEY)
     if (!stored) return false
     const parsed = JSON.parse(stored)
-    return parsed?.state?.advertising === true
+    return parsed?.state?.[type] === true
   } catch {
     return false
   }
+}
+
+export function hasAdvertisingConsent(): boolean {
+  return hasConsent('advertising')
+}
+
+export function hasAnalyticsConsent(): boolean {
+  return hasConsent('analytics')
 }
 
 export function readCookie(name: string): string | undefined {
