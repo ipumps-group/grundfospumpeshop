@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { sendOrderConfirmation } from '@/lib/email';
+import { sendOrderConfirmation, sendOrderCancelled } from '@/lib/email';
 import { sendMetaEvent } from '@/lib/meta-capi';
 
 export const runtime = 'nodejs';
@@ -131,6 +131,22 @@ export async function POST(req: NextRequest) {
         note: payload.paymentStatus === 'ABANDONED' ? 'Makse katkestati kliendi poolt' : 'Makse aegus',
         changed_by: 'montonio',
       })
+
+      // Send cancelled notification to customer
+      if (orderForPending.email) {
+        const { data: orderData } = await supabaseAdmin
+          .from('orders')
+          .select('customer_name')
+          .eq('id', orderForPending.id)
+          .single()
+
+        const customerName = orderData?.customer_name ?? orderForPending.email.split('@')[0]
+        await sendOrderCancelled({
+          to: orderForPending.email,
+          customerName,
+          orderNumber: String(orderForPending.order_number),
+        })
+      }
     }
     console.log(
       `[montonio-webhook] Status ${payload.paymentStatus} for ${payload.merchantReference} — order cancelled`

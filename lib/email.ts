@@ -11,6 +11,8 @@ import type { Carrier, DeliveryMethod } from './carriers';
 import {
   buildStatusUpdateHtml,
   buildNewOrderAdminHtml,
+  buildOrderPendingHtml,
+  buildOrderCancelledHtml,
   statusSubject,
 } from './email-templates';
 
@@ -516,5 +518,73 @@ export async function sendNewOrderAdmin(orderId: string): Promise<void> {
     console.log(`[email] Sent admin notification #${orderRef} → ${adminEmail} (id=${data?.id})`)
   } catch (err) {
     console.error(`[email] Admin notification failed (#${orderRef})`, err)
+  }
+}
+
+// ── Tellimus ootel (peale checkout'i) ────────────────────────────────────
+
+export async function sendOrderPending(data: {
+  to: string
+  customerName: string
+  orderNumber: string
+  items: Array<{ product_name: string; quantity: number; unit_price: number }>
+  total: number
+  customerEmail: string
+}): Promise<void> {
+  const html = buildOrderPendingHtml({
+    orderRef: data.orderNumber,
+    customerName: data.customerName,
+    customerEmail: data.customerEmail,
+    items: data.items,
+    total: data.total,
+  })
+
+  try {
+    const { data: result, error } = await getResend().emails.send({
+      from: EMAIL_FROM,
+      to: data.to,
+      replyTo: EMAIL_REPLY_TO,
+      subject: `Tellimus #${data.orderNumber} ootab makset – Pump OÜ`,
+      html,
+      tags: [
+        { name: 'category', value: 'order_pending' },
+        { name: 'order_number', value: data.orderNumber },
+      ],
+    })
+    if (error) throw new Error(error.message)
+    console.log(`[email] Sent pending notification #${data.orderNumber} → ${data.to} (id=${result?.id})`)
+  } catch (err) {
+    console.error(`[email] Pending notification failed (#${data.orderNumber})`, err)
+  }
+}
+
+// ── Makse katkestatud (Montonio ABANDONED / VOIDED) ───────────────────────
+
+export async function sendOrderCancelled(data: {
+  to: string
+  customerName: string
+  orderNumber: string
+}): Promise<void> {
+  const html = buildOrderCancelledHtml({
+    orderRef: data.orderNumber,
+    customerName: data.customerName,
+  })
+
+  try {
+    const { data: result, error } = await getResend().emails.send({
+      from: EMAIL_FROM,
+      to: data.to,
+      replyTo: EMAIL_REPLY_TO,
+      subject: `Makse katkestatud – tellimus #${data.orderNumber} – Pump OÜ`,
+      html,
+      tags: [
+        { name: 'category', value: 'order_cancelled' },
+        { name: 'order_number', value: data.orderNumber },
+      ],
+    })
+    if (error) throw new Error(error.message)
+    console.log(`[email] Sent cancelled notification #${data.orderNumber} → ${data.to} (id=${result?.id})`)
+  } catch (err) {
+    console.error(`[email] Cancelled notification failed (#${data.orderNumber})`, err)
   }
 }

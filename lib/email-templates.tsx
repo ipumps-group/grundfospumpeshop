@@ -290,3 +290,82 @@ export function buildNewOrderAdminHtml(d: NewOrderAdminData): string {
 
   return layout(content)
 }
+
+// ─── Tellimus ootel (saadetakse peale checkout'i, enne makset) ────────────
+
+export function buildOrderPendingHtml(d: {
+  orderRef: string
+  customerName: string | null
+  customerEmail?: string
+  items: Array<{ product_name: string; quantity: number; unit_price: number }>
+  total: number
+}): string {
+  const orderUrl = `https://pumbapood.ee/tellimus/${d.orderRef}${d.customerEmail ? `?email=${encodeURIComponent(d.customerEmail)}` : ''}`
+
+  const itemsHtml = d.items.map(item => `
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:14px;">${item.product_name}</td>
+      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:14px;text-align:center;">${item.quantity} tk</td>
+      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:14px;text-align:right;">${(item.quantity * item.unit_price).toFixed(2)} €</td>
+    </tr>`).join('')
+
+  const content = `
+    <h1 style="margin:0 0 12px;font-size:20px;color:#1a202c;">Tellimus ootab makset ✓</h1>
+    <p style="margin:0 0 16px;font-size:15px;color:#333;line-height:1.6;">
+      Tere${d.customerName ? `, <strong>${d.customerName}</strong>` : ''}! Teie tellimus on registreeritud ja ootab makset. Tellimuse lõpule viimiseks palun sooritage makse.
+    </p>
+
+    <div style="background:#f8fafc;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+      <div style="font-size:13px;color:#64748b;margin-bottom:4px;">Tellimuse number</div>
+      <div style="font-size:17px;font-weight:bold;color:${PRIMARY};">#${d.orderRef}</div>
+    </div>
+
+    <h3 style="margin:0 0 10px;font-size:15px;font-weight:600;color:#1a202c;">Tellitud tooted</h3>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+      ${itemsHtml}
+    </table>
+
+    <div style="text-align:right;font-size:17px;font-weight:bold;color:${PRIMARY};margin-bottom:24px;">
+      Kokku: ${d.total.toFixed(2)} €
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <a href="${orderUrl}" style="display:inline-block;background:${PRIMARY};color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">Vaata tellimust ja maksa</a>
+    </div>
+
+    <p style="margin:0;font-size:14px;color:#64748b;">
+      Küsimuste korral: <a href="mailto:info@pumbapood.ee" style="color:${PRIMARY};">info@pumbapood.ee</a>
+    </p>`
+
+  return layout(content)
+}
+
+// ─── Makse katkestatud ─────────────────────────────────────────────────────
+
+export function buildOrderCancelledHtml(d: {
+  orderRef: string
+  customerName: string | null
+}): string {
+  const orderUrl = `https://pumbapood.ee/tellimus/${d.orderRef}`
+
+  const content = `
+    <h1 style="margin:0 0 12px;font-size:20px;color:#1a202c;">Makse katkestati</h1>
+    <p style="margin:0 0 16px;font-size:15px;color:#333;line-height:1.6;">
+      Tere${d.customerName ? `, <strong>${d.customerName}</strong>` : ''}! Teie tellimuse <strong>#${d.orderRef}</strong> makse katkestati. Ostukorv on endiselt alles — saate tellimuse igal ajal lõpule viia.
+    </p>
+
+    <div style="background:#f8fafc;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+      <div style="font-size:13px;color:#64748b;margin-bottom:4px;">Tellimuse number</div>
+      <div style="font-size:17px;font-weight:bold;color:${PRIMARY};">#${d.orderRef}</div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <a href="${orderUrl}" style="display:inline-block;background:${PRIMARY};color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">Vaata tellimust ja maksa uuesti</a>
+    </div>
+
+    <p style="margin:0;font-size:14px;color:#64748b;">
+      Küsimuste korral: <a href="mailto:info@pumbapood.ee" style="color:${PRIMARY};">info@pumbapood.ee</a>
+    </p>`
+
+  return layout(content)
+}
