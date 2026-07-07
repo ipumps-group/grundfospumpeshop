@@ -103,8 +103,19 @@ export async function POST(req: NextRequest) {
         .eq('id', preview.retry_order_id)
         .single()
 
-      if (retryErr || !retryOrder || retryOrder.status !== 'pending') {
-        return NextResponse.json({ error: 'Tellimust ei leitud või see ei ole ootel staatuses' }, { status: 400 })
+      if (retryErr || !retryOrder || !['pending', 'cancelled'].includes(retryOrder.status)) {
+        return NextResponse.json({ error: 'Tellimust ei leitud või makset ei saa uuesti proovida' }, { status: 400 })
+      }
+
+      // Set back to pending for retry
+      if (retryOrder.status === 'cancelled') {
+        await supabaseAdmin.from('orders').update({ status: 'pending', updated_at: new Date().toISOString() }).eq('id', retryOrder.id)
+        await supabaseAdmin.from('order_status_history').insert({
+          order_id: retryOrder.id,
+          status: 'pending',
+          note: 'Klient proovib uuesti maksta',
+          changed_by: 'system',
+        })
       }
 
       const { data: retryItems } = await supabaseAdmin

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { sendOrderConfirmation, sendOrderStatusUpdate } from '@/lib/email';
+import { sendOrderConfirmation } from '@/lib/email';
 import { sendMetaEvent } from '@/lib/meta-capi';
 
 export const runtime = 'nodejs';
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     payload: payload as unknown as Record<string, unknown>,
   });
 
-  // 5. Handle ABANDONED / VOIDED — send pending reminder email
+  // 5. Handle ABANDONED / VOIDED — set order to cancelled
   if (payload.paymentStatus === 'ABANDONED' || payload.paymentStatus === 'VOIDED') {
     const { data: orderForPending } = await supabaseAdmin
       .from('orders')
@@ -119,11 +119,21 @@ export async function POST(req: NextRequest) {
       .eq('order_number', payload.merchantReference)
       .single();
 
-    if (orderForPending && orderForPending.status === 'pending' && orderForPending.email) {
-      await sendOrderStatusUpdate({ orderId: orderForPending.id, newStatus: 'pending' });
+    if (orderForPending) {
+      await supabaseAdmin
+        .from('orders')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', orderForPending.id)
+
+      await supabaseAdmin.from('order_status_history').insert({
+        order_id: orderForPending.id,
+        status: 'cancelled',
+        note: payload.paymentStatus === 'ABANDONED' ? 'Makse katkestati kliendi poolt' : 'Makse aegus',
+        changed_by: 'montonio',
+      })
     }
     console.log(
-      `[montonio-webhook] Status ${payload.paymentStatus} for ${payload.merchantReference} — pending email sent`
+      `[montonio-webhook] Status ${payload.paymentStatus} for ${payload.merchantReference} — order cancelled`
     );
     return NextResponse.json({ received: true, status: payload.paymentStatus });
   }

@@ -206,7 +206,7 @@ export default function PublicOrderPage() {
             </div>
             <div className="flex items-center gap-3">
               <OrderStatusBadge status={order.status} />
-              {order.status === 'pending' && (
+              {(order.status === 'pending' || order.status === 'cancelled') && (
                 <button
                   onClick={retryPayment}
                   disabled={retrying}
