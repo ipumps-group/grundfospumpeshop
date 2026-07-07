@@ -392,7 +392,13 @@
     "invoiceSuccess": "Rēķina pasūtījums iesniegts!",
     "invoiceSuccessMessage": "Rēķins ir nosūtīts uz jūsu e-pastu. Lūdzu, apmaksājiet 7 dienu laikā. Mēs apstrādāsim pasūtījumu pēc maksājuma saņemšanas.",
     "submitOrder": "Iesniegt pasūtījumu —",
-    "paymentTerm": "Apmaksas termiņš 7 dienas"
+    "paymentTerm": "Apmaksas termiņš 7 dienas",
+    "successWait": "Gaidu maksājuma apstiprinājumu...",
+    "successWaitDesc": "Lūdzu, uzgaidiet, pārbaudām maksājuma statusu. Tas var ilgt līdz 2 minūtēm.",
+    "paymentCancelled": "Maksājums atcelts",
+    "paymentCancelledDesc": "Jūsu maksājums netika apstiprināts. Ja vēlaties, varat mēģināt vēlreiz.",
+    "paymentTimedOut": "Maksājuma apstiprinājuma noildze",
+    "paymentTimedOutDesc": "Maksājuma apstiprināšana ilgst ilgāk nekā paredzēts. Mēs nosūtīsim apstiprinājumu pa e-pastu."
   },
   "account": {
     "login": "Pierakstīties",

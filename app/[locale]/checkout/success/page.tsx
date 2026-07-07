@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Loader2, XCircle, Clock } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/auth-context'
 import { trackPurchase } from '@/lib/google-ads'
 import { trackMetaPurchase } from '@/lib/meta-pixel'
 import { hasAdvertisingConsent } from '@/lib/tracking-consent'
+
+type PageState = 'loading' | 'paid' | 'cancelled' | 'timed_out'
 
 interface ConfirmedPurchase {
   confirmed: true
@@ -27,12 +29,17 @@ function SuccessContent() {
   const searchParams = useSearchParams()
   const ref = searchParams.get('ref') || ''
   const { user } = useAuth()
+  const [pageState, setPageState] = useState<PageState>('loading')
 
   useEffect(() => {
-    if (!ref) return
+    if (!ref) {
+      setPageState('timed_out')
+      return
+    }
 
     let cancelled = false
     let confirmedPurchase: ConfirmedPurchase | null = null
+    const MAX_ATTEMPTS = 60 // 2 minutes at 2s intervals
 
     const sendPurchase = (purchase: ConfirmedPurchase) => {
       if (!hasAdvertisingConsent()) return
@@ -56,21 +63,29 @@ function SuccessContent() {
     }
 
     const verifyAndTrack = async () => {
-      for (let attempt = 0; attempt < 10 && !cancelled; attempt++) {
+      for (let attempt = 0; attempt < MAX_ATTEMPTS && !cancelled; attempt++) {
         try {
           const response = await fetch(`/api/tracking/purchase?ref=${encodeURIComponent(ref)}`, { cache: 'no-store' })
           if (response.ok) {
-            const data = await response.json() as ConfirmedPurchase | { confirmed: false }
+            const data = await response.json() as ConfirmedPurchase | { confirmed: false; cancelled?: boolean }
             if (data.confirmed) {
               confirmedPurchase = data
               sendPurchase(data)
+              setPageState('paid')
+              return
+            }
+            if ('cancelled' in data && data.cancelled) {
+              setPageState('cancelled')
               return
             }
           }
-        } catch (err) {
-          console.error('[purchase-tracking]', err)
+        } catch {
+          // continue polling
         }
         await new Promise(resolve => window.setTimeout(resolve, 2000))
+      }
+      if (!cancelled) {
+        setPageState('timed_out')
       }
     }
 
@@ -86,6 +101,78 @@ function SuccessContent() {
     }
   }, [ref])
 
+  // ── Laadimine ──
+  if (pageState === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-gray-100 p-12 max-w-md w-full text-center shadow-sm">
+          <Loader2 size={60} className="text-[#003366] mx-auto mb-5 animate-spin" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('successWait')}</h1>
+          <p className="text-[15px] text-gray-500">{t('successWaitDesc')}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Tühistatud ──
+  if (pageState === 'cancelled') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-gray-100 p-12 max-w-md w-full text-center shadow-sm">
+          <XCircle size={60} className="text-red-400 mx-auto mb-5" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('paymentCancelled')}</h1>
+          {ref && (
+            <p className="text-[15px] text-gray-500 mb-1">
+              {t('orderRef')} <span className="font-mono font-semibold text-gray-700">{ref}</span>
+            </p>
+          )}
+          <p className="text-[15px] text-gray-500 mb-7">{t('paymentCancelledDesc')}</p>
+          <div className="flex flex-col gap-3">
+            <Link href={`/tellimus/${ref}`}
+              className="inline-block bg-[#003366] text-white px-6 py-3 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors">
+              {t('tryAgain')}
+            </Link>
+            <Link href="/tooted"
+              className="inline-block text-[#003366] px-6 py-3 rounded-xl font-semibold text-[15px] hover:underline">
+              {t('backToShop')}
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Aegunud ──
+  if (pageState === 'timed_out') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-gray-100 p-12 max-w-md w-full text-center shadow-sm">
+          <Clock size={60} className="text-amber-400 mx-auto mb-5" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('paymentTimedOut')}</h1>
+          {ref && (
+            <p className="text-[15px] text-gray-500 mb-1">
+              {t('orderRef')} <span className="font-mono font-semibold text-gray-700">{ref}</span>
+            </p>
+          )}
+          <p className="text-[15px] text-gray-500 mb-7">{t('paymentTimedOutDesc')}</p>
+          <div className="flex flex-col gap-3">
+            {ref && (
+              <Link href={`/tellimus/${ref}`}
+                className="inline-block bg-[#003366] text-white px-6 py-3 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors">
+                Vaata tellimust
+              </Link>
+            )}
+            <Link href="/"
+              className="inline-block text-[#003366] px-6 py-3 rounded-xl font-semibold text-[15px] hover:underline">
+              {t('backToShop')}
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Edukalt makstud ──
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white rounded-2xl border border-gray-100 p-12 max-w-md w-full text-center shadow-sm">

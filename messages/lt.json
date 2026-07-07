@@ -392,7 +392,13 @@
     "invoiceSuccess": "Sąskaitos užsakymas pateiktas!",
     "invoiceSuccessMessage": "Sąskaita išsiųsta jūsų el. paštu. Prašome apmokėti per 7 dienas. Užsakymą apdorosime gavę mokėjimą.",
     "submitOrder": "Pateikti užsakymą —",
-    "paymentTerm": "Apmokėjimo terminas 7 dienos"
+    "paymentTerm": "Apmokėjimo terminas 7 dienos",
+    "successWait": "Laukiu mokėjimo patvirtinimo...",
+    "successWaitDesc": "Palaukite, tikriname mokėjimo būseną. Tai gali užtrukti iki 2 minučių.",
+    "paymentCancelled": "Mokėjimas atšauktas",
+    "paymentCancelledDesc": "Jūsų mokėjimas nebuvo patvirtintas. Jei norite, galite bandyti dar kartą.",
+    "paymentTimedOut": "Mokėjimo patvirtinimo laikas baigėsi",
+    "paymentTimedOutDesc": "Mokėjimo patvirtinimas užtrunka ilgiau nei tikėtasi. Mes atsiųsime patvirtinimą el. paštu."
   },
   "account": {
     "login": "Prisijungti",

@@ -394,7 +394,13 @@
     "invoiceSuccess": "Arve tellimus esitatud!",
     "invoiceSuccessMessage": "Arve on saadetud teie e-posti aadressile. Palun tasuge arve 7 päeva jooksul. Peale makse laekumist asume tellimust komplekteerima.",
     "submitOrder": "Esita tellimus —",
-    "paymentTerm": "Maksetähtaeg 7 päeva"
+    "paymentTerm": "Maksetähtaeg 7 päeva",
+    "successWait": "Ootan makse kinnitust...",
+    "successWaitDesc": "Palun oota, kontrollime makse staatust. See võib võtta kuni 2 minutit.",
+    "paymentCancelled": "Makse tühistatud",
+    "paymentCancelledDesc": "Makset ei kinnitatud. Soovi korral saad uuesti proovida.",
+    "paymentTimedOut": "Makse kinnitamine aegus",
+    "paymentTimedOutDesc": "Makse kinnitamine võtab oodatust kauem. Kinnituse saadame e-postile."
   },
   "account": {
     "login": "Logi sisse",

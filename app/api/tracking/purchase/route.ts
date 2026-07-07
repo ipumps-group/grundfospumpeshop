@@ -19,7 +19,8 @@ export async function GET(req: NextRequest) {
     .single()
 
   if (!order || !['paid', 'shipped', 'delivered'].includes(order.status)) {
-    return NextResponse.json({ confirmed: false }, { headers: { 'Cache-Control': 'no-store' } })
+    const cancelled = order && ['cancelled', 'failed'].includes(order.status)
+    return NextResponse.json({ confirmed: false, ...(cancelled && { cancelled: true }) }, { headers: { 'Cache-Control': 'no-store' } })
   }
 
   const contents = (order.order_items || []).map(item => ({

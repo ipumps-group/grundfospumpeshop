@@ -392,7 +392,13 @@
     "invoiceSuccess": "Invoice order submitted!",
     "invoiceSuccessMessage": "The invoice has been sent to your email. Please pay within 7 days. We will process your order once the payment is received.",
     "submitOrder": "Submit order —",
-    "paymentTerm": "Payment term 7 days"
+    "paymentTerm": "Payment term 7 days",
+    "successWait": "Waiting for payment confirmation...",
+    "successWaitDesc": "Please wait while we verify your payment. This may take up to 2 minutes.",
+    "paymentCancelled": "Payment cancelled",
+    "paymentCancelledDesc": "Your payment was not confirmed. You can try again if you wish.",
+    "paymentTimedOut": "Payment confirmation timed out",
+    "paymentTimedOutDesc": "Payment is taking longer than expected. We will send confirmation by email."
   },
   "account": {
     "login": "Log in",
