@@ -284,8 +284,11 @@ export default function CheckoutPage() {
         }
       }
 
-      localStorage.removeItem('ipumps_cart')
-      window.dispatchEvent(new Event('cart_updated'))
+      // Clear cart — only for invoice orders (bank link = clear on payment confirmed)
+      if (paymentType === 'invoice') {
+        localStorage.removeItem('ipumps_cart')
+        window.dispatchEvent(new Event('cart_updated'))
+      }
 
       if (data.invoice_sent) {
         window.location.replace(`${window.location.origin}/checkout/invoice?ref=${data.ref}`)

@@ -71,6 +71,8 @@ function SuccessContent() {
             if (data.confirmed) {
               confirmedPurchase = data
               sendPurchase(data)
+              localStorage.removeItem('ipumps_cart')
+              window.dispatchEvent(new Event('cart_updated'))
               setPageState('paid')
               return
             }
