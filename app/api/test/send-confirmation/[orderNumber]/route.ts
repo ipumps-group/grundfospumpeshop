@@ -36,10 +36,10 @@ export async function POST(
   const { orderNumber } = await params;
   console.log('[test-confirm] Loading order:', orderNumber);
 
-  const { data: order, error } = await supabaseAdmin
+    const { data: order, error } = await supabaseAdmin
     .from('orders')
     .select(`
-      order_number, email, customer_name, locale,
+      id, order_number, email, customer_name, locale,
       total, discount_amount, shipping_address,
       order_items ( product_name, quantity, unit_price )
     `)
@@ -89,6 +89,7 @@ export async function POST(
       total: Number(order.total),
       paymentMethod: 'test',
       shippingAddress: shippingText,
+      orderId: order.id,
     });
 
     console.log('[test-confirm] Send result:', JSON.stringify(result));

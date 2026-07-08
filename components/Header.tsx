@@ -199,25 +199,29 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
 
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <div className="border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-1.5 flex flex-wrap justify-between items-center gap-1">
+        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center gap-3">
 
-          <div className="flex items-center gap-4 text-[15px] text-white/60 flex-wrap">
+          <div className="flex items-center gap-3 text-[15px] text-white/60 flex-1 min-w-0">
             {siteSettings?.header_phone && (
-              <a href={`tel:${siteSettings.header_phone.replace(/\s/g, '')}`} className="flex items-center gap-1 hover:text-white/80 transition-colors">
-                <Phone size={11} /> {siteSettings.header_phone}
+              <a href={`tel:${siteSettings.header_phone.replace(/\s/g, '')}`} className="flex items-center gap-1 hover:text-white/80 transition-colors flex-shrink-0">
+                <Phone size={14} /><span className="hidden sm:inline">{siteSettings.header_phone}</span>
               </a>
             )}
             {siteSettings?.header_email && (
               <ObfuscatedEmail
                 email={siteSettings.header_email}
-                prefix={<Mail size={11} />}
-                className="flex items-center gap-1 hover:text-white/80 transition-colors"
+                prefix={<Mail size={14} />}
+                className="flex items-center gap-1 hover:text-white/80 transition-colors flex-shrink-0"
+                textClassName="hidden sm:inline"
               />
             )}
           </div>
 
-          <div className="flex items-center gap-3 text-[15px] text-white/60 flex-wrap justify-end">
-            {siteSettings?.header_opening_hours ? <span>{siteSettings.header_opening_hours}</span> : <span>{t('workingHours')}</span>}
+          <div className="flex items-center gap-3 text-[15px] text-white/60 flex-shrink-0">
+            {siteSettings?.header_opening_hours
+              ? <span className="hidden sm:inline">{siteSettings.header_opening_hours}</span>
+              : <span className="hidden sm:inline">{t('workingHours')}</span>
+            }
 
             {/* Keelevalik */}
             <div className="relative" data-lang-dropdown>

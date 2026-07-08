@@ -503,8 +503,21 @@ function ProductTabs({ product, attributes, locale, attrNameMap, documents }: { 
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
-      {/* Tab bar */}
-      <div className="flex border-b border-gray-100 overflow-x-auto">
+      {/* Mobile select */}
+      <div className="sm:hidden p-4 pb-0">
+        <select
+          value={active}
+          onChange={(e) => setActive(e.target.value)}
+          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-[15px] font-medium text-gray-800 focus:outline-none focus:border-[#003366] focus:ring-2 focus:ring-[#003366]/10"
+        >
+          {tabs.map(tab => (
+            <option key={tab.key} value={tab.key}>{tab.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Desktop tab bar */}
+      <div className="hidden sm:flex border-b border-gray-100 overflow-x-auto">
         {tabs.map(tab => (
           <button
             key={tab.key}

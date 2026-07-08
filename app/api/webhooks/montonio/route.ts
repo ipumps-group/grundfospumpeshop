@@ -284,6 +284,7 @@ export async function POST(req: NextRequest) {
       total,
       paymentMethod: payload.paymentMethod,
       shippingAddress: shippingAddressText,
+      orderId: order.id,
     });
   } catch (emailErr) {
     // Tellimus on juba paid — ei tohi webhook'i fail'iks teha,

@@ -67,64 +67,93 @@ function CartRow({
   onRemove: (id: number) => void
 }) {
   const t = useTranslations('cart')
+  const unitPrice = fmt(withVat(item.price))
+  const rowTotal  = fmt(withVat(item.price) * item.qty)
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4">
-      {/* Pilt */}
-      <Link href={`/toode/${item.slug}`}
-        className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 p-2 hover:bg-gray-100 transition-colors">
-        <CartThumb src={item.image_url || '/placeholder.png'} alt={item.name} />
-      </Link>
-
-      {/* Nimi + hind */}
-      <div className="flex-1 min-w-0">
+    <>
+      {/* ── Mobiilikaart (2-veeruline grid) ─────────────────────────── */}
+      <div className="sm:hidden bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col">
         <Link href={`/toode/${item.slug}`}
-          className="font-semibold text-gray-800 text-[15px] hover:text-[#003366] transition-colors line-clamp-2 leading-snug block">
-          {item.name}
+          className="bg-gray-50 flex items-center justify-center h-44 p-5 flex-shrink-0">
+          <img
+            src={item.image_url || '/placeholder.png'}
+            alt={item.name}
+            className="h-28 object-contain"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png' }}
+          />
         </Link>
-        <div className="text-[15px] text-gray-500 mt-0.5">
-          {fmt(withVat(item.price))} {t('perPiece')}
+
+        <div className="p-4 flex flex-col flex-1">
+          <Link href={`/toode/${item.slug}`}
+            className="font-semibold text-gray-800 text-[15px] leading-tight line-clamp-2 block mb-2 flex-1">
+            {item.name}
+          </Link>
+
+          <div className="text-[13px] text-gray-400 mb-2 whitespace-nowrap">
+            {unitPrice} {t('perPiece')}
+          </div>
+
+          <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-gray-50">
+            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+              <button onClick={() => onQtyChange(item.id, -1)}
+                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                <Minus size={14} />
+              </button>
+              <span className="w-8 text-center text-[13px] font-semibold text-gray-800">{item.qty}</span>
+              <button onClick={() => onQtyChange(item.id, 1)}
+                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                <Plus size={14} />
+              </button>
+            </div>
+            <div className="text-base font-bold text-[#003366] whitespace-nowrap">{rowTotal}</div>
+            <button onClick={() => onRemove(item.id)}
+              className="p-2 text-gray-300 hover:text-red-500 transition-colors flex-shrink-0" title={t('remove')}>
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Kogus + kokku + kustuta */}
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {/* Koguse muutmine */}
-        <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-          <button
-            onClick={() => onQtyChange(item.id, -1)}
-            className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            <Minus size={14} />
-          </button>
-          <span className="w-10 text-center text-[15px] font-semibold text-gray-800">
-            {item.qty}
-          </span>
-          <button
-            onClick={() => onQtyChange(item.id, 1)}
-            className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            <Plus size={14} />
-          </button>
-        </div>
+      {/* ── Desktop rida ─────────────────────────────────────────────── */}
+      <div className="hidden sm:flex bg-white rounded-2xl border border-gray-100 p-4 items-center gap-4">
+        <Link href={`/toode/${item.slug}`}
+          className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 p-2 hover:bg-gray-100 transition-colors">
+          <CartThumb src={item.image_url || '/placeholder.png'} alt={item.name} />
+        </Link>
 
-        {/* Rea koguhind */}
-        <div className="text-right w-20">
-          <div className="text-[15px] font-bold text-[#003366]">
-            {fmt(withVat(item.price) * item.qty)}
+        <div className="flex-1 min-w-0">
+          <Link href={`/toode/${item.slug}`}
+            className="font-semibold text-gray-800 text-[15px] hover:text-[#003366] transition-colors line-clamp-2 leading-snug block">
+            {item.name}
+          </Link>
+          <div className="text-[15px] text-gray-500 mt-0.5 whitespace-nowrap">
+            {unitPrice} {t('perPiece')}
           </div>
         </div>
 
-        {/* Kustuta */}
-        <button
-          onClick={() => onRemove(item.id)}
-          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-          title={t('remove')}
-        >
-          <Trash2 size={17} />
-        </button>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+            <button onClick={() => onQtyChange(item.id, -1)}
+              className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+              <Minus size={14} />
+            </button>
+            <span className="w-10 text-center text-[15px] font-semibold text-gray-800">{item.qty}</span>
+            <button onClick={() => onQtyChange(item.id, 1)}
+              className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+              <Plus size={14} />
+            </button>
+          </div>
+          <div className="text-right w-20">
+            <div className="text-[15px] font-bold text-[#003366]">{rowTotal}</div>
+          </div>
+          <button onClick={() => onRemove(item.id)}
+            className="p-2 text-gray-300 hover:text-red-500 transition-colors" title={t('remove')}>
+            <Trash2 size={17} />
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -139,6 +168,7 @@ export default function OstukorvPage() {
   useEffect(() => {
     setItems(getCart())
     setMounted(true)
+    window.scrollTo(0, 0)
 
     const handler = () => setItems(getCart())
     window.addEventListener('cart_updated', handler)
@@ -168,7 +198,9 @@ export default function OstukorvPage() {
   const vat           = subtotalNoVat * VAT_RATE
   const total         = subtotalNoVat + vat  // incl. VAT
 
-  if (!mounted) return null
+  if (!mounted) {
+    return <div className="min-h-screen bg-gray-50" />
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -211,17 +243,21 @@ export default function OstukorvPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {/* ── Toodete nimekiri ─────────────────────────────────────── */}
-            <div className="lg:col-span-2 flex flex-col gap-3">
-              {items.map(item => (
-                <CartRow
-                  key={item.id}
-                  item={item}
-                  onQtyChange={updateQty}
-                  onRemove={removeItem}
-                />
-              ))}
+            <div className={`lg:col-span-2 grid gap-3 sm:flex sm:flex-col ${items.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              {items.map((item, idx) => {
+                const isLastOdd = items.length % 2 === 1 && items.length > 1 && idx === items.length - 1
+                return (
+                  <div key={item.id} className={isLastOdd ? 'col-span-full' : ''}>
+                    <CartRow
+                      item={item}
+                      onQtyChange={updateQty}
+                      onRemove={removeItem}
+                    />
+                  </div>
+                )
+              })}
 
-              <div className="flex justify-between items-center pt-2">
+              <div className="col-span-full flex justify-between items-center pt-2">
                 <Link href="/tooted"
                   className="text-[15px] text-[#003366] hover:underline font-medium">
                   {t('continueShopping')}

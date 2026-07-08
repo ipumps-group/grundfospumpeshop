@@ -19,7 +19,8 @@
     "itemsHeading": "Tellitud tooted",
     "shippingHeading": "Kohaletoimetamine",
     "shippingNote": "Saadame teile uue e-kirja kohe, kui pakk on teel — koos jälgimisnumbriga.",
-    "paymentMethod": "Makseviis"
+    "paymentMethod": "Makseviis",
+    "invoiceAttached": "Arve on lisatud manusena."
   },
   "orderShipped": {
     "preview": "Tellimus {orderNumber} on teel — jälgimisnumber {trackingNumber}",

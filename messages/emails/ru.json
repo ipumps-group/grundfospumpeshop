@@ -19,7 +19,8 @@
     "itemsHeading": "Заказанные товары",
     "shippingHeading": "Доставка",
     "shippingNote": "Мы отправим вам новое письмо, как только посылка будет отправлена — с номером отслеживания.",
-    "paymentMethod": "Способ оплаты"
+    "paymentMethod": "Способ оплаты",
+    "invoiceAttached": "Счёт прикреплён."
   },
   "orderShipped": {
     "preview": "Заказ {orderNumber} в пути — отслеживание {trackingNumber}",

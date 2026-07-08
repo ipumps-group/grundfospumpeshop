@@ -19,7 +19,8 @@
     "itemsHeading": "Pasūtītie produkti",
     "shippingHeading": "Piegāde",
     "shippingNote": "Mēs jums nosūtīsim jaunu e-pastu, tiklīdz paka būs ceļā — ar izsekošanas numuru.",
-    "paymentMethod": "Maksājuma veids"
+    "paymentMethod": "Maksājuma veids",
+    "invoiceAttached": "Rēķins ir pievienots."
   },
   "orderShipped": {
     "preview": "Pasūtījums {orderNumber} ir ceļā — izsekošana {trackingNumber}",

@@ -120,8 +120,8 @@ async function OrganizationSchema() {
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: '59.437',
-      longitude: '24.7536',
+      latitude: '59.4607',
+      longitude: '24.9319',
     },
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',

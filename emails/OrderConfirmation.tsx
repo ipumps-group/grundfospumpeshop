@@ -122,6 +122,12 @@ export default function OrderConfirmation({
               {t.orderConfirmation.shippingNote}
             </Text>
 
+            {t.orderConfirmation.invoiceAttached && (
+              <Text style={s.invoiceNote}>
+                {t.orderConfirmation.invoiceAttached}
+              </Text>
+            )}
+
             <Section style={{ textAlign: 'center' as const, margin: '32px 0' }}>
               <Button href={orderUrl} style={s.button}>
                 {t.common.viewOrder}
@@ -155,6 +161,7 @@ const s = {
   greeting: { fontSize: '16px', color: '#003366', marginBottom: '8px', fontWeight: 'bold' as const },
   paragraph: { fontSize: '15px', color: '#333', lineHeight: '1.6', margin: '8px 0' },
   paragraphSmall: { fontSize: '13px', color: '#64748b', lineHeight: '1.5', margin: '8px 0' },
+  invoiceNote: { fontSize: '14px', color: '#003366', fontWeight: 'bold' as const, margin: '16px 0 0', padding: '12px', backgroundColor: '#f0f5ff', borderRadius: '6px', textAlign: 'center' as const },
   metaText: { fontSize: '14px', color: '#555', margin: '12px 0' },
   hr: { borderColor: '#e6e6e6', margin: '24px 0' },
   h2: { fontSize: '16px', color: '#003366', margin: '16px 0 12px', fontWeight: 'bold' as const },

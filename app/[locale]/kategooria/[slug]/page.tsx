@@ -101,19 +101,19 @@ function ProductCard({ product }: { product: Product }) {
         {product.short_description_et && (
           <div className="text-[13px] text-gray-400 line-clamp-1 mb-3">{product.short_description_et}</div>
         )}
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50 gap-2">
           <div>
-            <div className="text-lg font-bold text-[#003366]">
+            <div className="text-base sm:text-lg font-bold text-[#003366] whitespace-nowrap">
               {Number(displayPrice).toFixed(2).replace('.', ',')} €
             </div>
             {product.sale_price && (
-              <div className="text-[13px] text-gray-400 line-through">
+              <div className="text-[13px] text-gray-400 line-through whitespace-nowrap">
                 {Number(product.price).toFixed(2).replace('.', ',')} €
               </div>
             )}
           </div>
           <button onClick={handleAdd} disabled={!product.in_stock}
-            className={`p-2.5 rounded-xl transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
+            className={`p-2.5 rounded-xl transition-all flex-shrink-0 ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
             {added ? <Check size={16} /> : <ShoppingCart size={16} />}
           </button>
         </div>
@@ -160,7 +160,7 @@ function ProductRow({ product }: { product: Product }) {
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
         <div className="text-right">
-          <div className="text-lg font-bold text-[#003366]">
+          <div className="text-base sm:text-lg font-bold text-[#003366] whitespace-nowrap">
             {Number(displayPrice).toFixed(2).replace('.', ',')} €
           </div>
           {product.sale_price && (

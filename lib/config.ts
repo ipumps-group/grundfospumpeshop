@@ -38,7 +38,7 @@ export const COMPANY = {
     postalCode: '74114',
     country: 'EE',
   },
-  shopLat: 59.437,
-  shopLng: 24.7536,
+  shopLat: 59.4607,
+  shopLng: 24.9319,
   openingHours: 'Mo-Fr 08:00-17:00',
 } as const

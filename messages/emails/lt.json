@@ -19,7 +19,8 @@
     "itemsHeading": "Užsakytos prekės",
     "shippingHeading": "Pristatymas",
     "shippingNote": "Mes atsiųsime jums naują laišką, kai tik siunta bus išsiųsta — su sekimo numeriu.",
-    "paymentMethod": "Mokėjimo būdas"
+    "paymentMethod": "Mokėjimo būdas",
+    "invoiceAttached": "Sąskaita pridėta."
   },
   "orderShipped": {
     "preview": "Užsakymas {orderNumber} jau pakeliui — sekimas {trackingNumber}",

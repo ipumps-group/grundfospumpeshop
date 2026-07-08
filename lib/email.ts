@@ -185,11 +185,43 @@ export async function sendOrderConfirmation(data: {
   total: number;
   paymentMethod?: string;
   shippingAddress: string;
+  orderId: string;
 }): Promise<SendResult> {
   const messages = await loadEmailMessages(data.locale);
   const subject = interpolate(messages.orderConfirmation.subject, {
     orderNumber: data.orderNumber,
   });
+
+  let pdfAttachment: { filename: string; content: Buffer } | undefined
+  try {
+    const { data: order } = await supabaseAdmin
+      .from('orders')
+      .select('id, order_number, created_at, total, shipping_address')
+      .eq('id', data.orderId)
+      .single()
+
+    if (order) {
+      const { generateInvoicePDF } = await import('@/lib/invoice-pdf')
+      const pdfBytes = await generateInvoicePDF(
+        {
+          id: order.id,
+          order_number: order.order_number,
+          created_at: order.created_at,
+          total: order.total,
+          shipping_address: order.shipping_address as Record<string, string> | null ?? undefined,
+        },
+        data.items.map(it => ({ product_name: it.name, qty: it.quantity, price: it.unitPrice })),
+        data.customerName,
+        data.to,
+      )
+      pdfAttachment = {
+        filename: `arve-${data.orderNumber}.pdf`,
+        content: Buffer.from(pdfBytes),
+      }
+    }
+  } catch (err) {
+    console.error('[email] Failed to generate invoice PDF for order confirmation', err)
+  }
 
   return send({
     to: data.to,
@@ -199,6 +231,7 @@ export async function sendOrderConfirmation(data: {
       { name: 'order_number', value: data.orderNumber },
       { name: 'locale', value: data.locale },
     ],
+    attachments: pdfAttachment ? [pdfAttachment] : undefined,
     react: React.createElement(OrderConfirmation, {
       locale: data.locale,
       messages,

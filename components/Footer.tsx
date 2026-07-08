@@ -166,6 +166,17 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
               </div>
             </div>
           </div>
+
+          {/* Veerg 4 — Usaldusmärgis */}
+          <div className="flex items-center justify-center">
+            <Image
+              src="/PUMP_OU_16984168_Usaldusvaarne_ettevote_2026_Margis_EEv.png"
+              alt="Usaldusväärne ettevõte 2026"
+              width={180}
+              height={180}
+              className="w-auto h-auto max-w-[180px]"
+            />
+          </div>
         </div>
 
         {/* ── Alumine riba ──────────────────────────────────────────────── */}

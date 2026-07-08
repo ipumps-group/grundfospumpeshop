@@ -30,6 +30,7 @@ export interface EmailMessages {
     shippingHeading: string;
     shippingNote: string;
     paymentMethod: string;
+    invoiceAttached: string;
   };
   orderShipped: {
     preview: string;

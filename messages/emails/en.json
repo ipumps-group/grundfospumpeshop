@@ -19,7 +19,8 @@
     "itemsHeading": "Items ordered",
     "shippingHeading": "Shipping",
     "shippingNote": "We'll email you again as soon as your package ships — with a tracking number.",
-    "paymentMethod": "Payment method"
+    "paymentMethod": "Payment method",
+    "invoiceAttached": "The invoice is attached."
   },
   "orderShipped": {
     "preview": "Order {orderNumber} is on the way — tracking {trackingNumber}",

@@ -389,74 +389,74 @@ export default function CheckoutPage() {
                     {errors.phone && <p className="text-[13px] text-red-500 mt-1">{errors.phone}</p>}
                   </div>
                 </div>
+              </div>
 
-                {/* Loo konto (ainult kui pole sisse logitud) */}
-                {!user && (
-                  <div className="mt-5 pt-5 border-t border-gray-100">
-                    <label className="flex items-start gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={createAccount}
-                        onChange={e => setCreateAccount(e.target.checked)}
-                        className="mt-0.5 w-5 h-5 rounded border-gray-300 text-[#003366] focus:ring-[#003366] cursor-pointer"
-                      />
-                      <div>
-                        <span className="text-[15px] font-medium text-gray-800">{t('createAccount')}</span>
-                        <p className="text-[13px] text-gray-500 mt-0.5">{t('createAccountDesc')}</p>
-                      </div>
-                    </label>
-
-                    {createAccount && (
-                      <div className="mt-4 space-y-3">
-                        <div>
-                          <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                            {t('password')} <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="password"
-                            value={password}
-                            onChange={e => { setPassword(e.target.value); setErrors(p => ({...p, password:''})) }}
-                            className={`w-full px-4 py-3 border rounded-xl text-[15px] text-gray-900 outline-none transition-colors ${errors.password ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#003366]'}`}
-                          />
-                          {errors.password && <p className="text-[13px] text-red-500 mt-1">{errors.password}</p>}
-                        </div>
-                        <div>
-                          <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
-                            {t('confirmPassword')} <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={e => { setConfirmPassword(e.target.value); setErrors(p => ({...p, confirmPassword:''})) }}
-                            className={`w-full px-4 py-3 border rounded-xl text-[15px] text-gray-900 outline-none transition-colors ${errors.confirmPassword ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#003366]'}`}
-                          />
-                          {errors.confirmPassword && <p className="text-[13px] text-red-500 mt-1">{errors.confirmPassword}</p>}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Soovin arvet ettevõttele checkbox */}
-                <div className="mt-5 pt-5 border-t border-gray-100">
+              {/* Loo konto (ainult kui pole sisse logitud) */}
+              {!user && (
+                <div className="bg-white rounded-2xl border border-gray-100 p-6">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={wantCompanyInvoice}
-                      onChange={e => {
-                        setWantCompanyInvoice(e.target.checked)
-                        if (!e.target.checked) {
-                          setDeliveryAddressDiffers(false)
-                        }
-                      }}
+                      checked={createAccount}
+                      onChange={e => setCreateAccount(e.target.checked)}
                       className="mt-0.5 w-5 h-5 rounded border-gray-300 text-[#003366] focus:ring-[#003366] cursor-pointer"
                     />
                     <div>
-                      <span className="text-[15px] font-medium text-gray-800">{t('wantCompanyInvoice')}</span>
-                      <p className="text-[13px] text-gray-500 mt-0.5">{t('wantCompanyInvoiceDesc')}</p>
+                      <span className="text-[15px] font-semibold text-gray-800">{t('createAccount')}</span>
+                      <p className="text-[13px] text-gray-500 mt-0.5">{t('createAccountDesc')}</p>
                     </div>
                   </label>
+
+                  {createAccount && (
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                          {t('password')} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          value={password}
+                          onChange={e => { setPassword(e.target.value); setErrors(p => ({...p, password:''})) }}
+                          className={`w-full px-4 py-3 border rounded-xl text-[15px] text-gray-900 outline-none transition-colors ${errors.password ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#003366]'}`}
+                        />
+                        {errors.password && <p className="text-[13px] text-red-500 mt-1">{errors.password}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+                          {t('confirmPassword')} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          value={confirmPassword}
+                          onChange={e => { setConfirmPassword(e.target.value); setErrors(p => ({...p, confirmPassword:''})) }}
+                          className={`w-full px-4 py-3 border rounded-xl text-[15px] text-gray-900 outline-none transition-colors ${errors.confirmPassword ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#003366]'}`}
+                        />
+                        {errors.confirmPassword && <p className="text-[13px] text-red-500 mt-1">{errors.confirmPassword}</p>}
+                      </div>
+                    </div>
+                  )}
                 </div>
+              )}
+
+              {/* Soovin arvet ettevõttele */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={wantCompanyInvoice}
+                    onChange={e => {
+                      setWantCompanyInvoice(e.target.checked)
+                      if (!e.target.checked) {
+                        setDeliveryAddressDiffers(false)
+                      }
+                    }}
+                    className="mt-0.5 w-5 h-5 rounded border-gray-300 text-[#003366] focus:ring-[#003366] cursor-pointer"
+                  />
+                  <div>
+                    <span className="text-[15px] font-semibold text-gray-800">{t('wantCompanyInvoice')}</span>
+                    <p className="text-[13px] text-gray-500 mt-0.5">{t('wantCompanyInvoiceDesc')}</p>
+                  </div>
+                </label>
               </div>
 
               {/* Ettevõtte andmed (kui checkbox valitud) */}
