@@ -160,27 +160,27 @@ export default function CheckoutPage() {
     if (!phone.trim())     e.phone     = t('required')
 
     if (deliveryMethod === 'courier' && !deliveryAddressDiffers) {
-      // Address required for courier when not using company address as fallback
-      // Company address provides these, so only validate when no company or differs
       if (!wantCompanyInvoice || deliveryAddressDiffers) {
         if (!courierStreet.trim()) e.courierStreet = t('required')
         if (!courierCity.trim()) e.courierCity = t('required')
       }
     }
-    // When company is selected but delivery differs, courier fields must be filled
     if (wantCompanyInvoice && deliveryAddressDiffers && deliveryMethod === 'courier') {
       if (!courierStreet.trim()) e.courierStreet = t('required')
       if (!courierCity.trim()) e.courierCity = t('required')
     }
 
-    if (createAccount) {
+    if (!user && createAccount) {
       if (!password || password.length < 6) e.password = t('passwordMinLength')
       if (password !== confirmPassword) e.confirmPassword = t('passwordMismatch')
     }
 
+    if (Object.keys(e).length > 0) {
+      console.log('[checkout] validation errors:', e)
+    }
     setErrors(e)
     return Object.keys(e).length === 0
-  }, [firstName, lastName, email, phone, deliveryMethod, courierStreet, courierCity, wantCompanyInvoice, deliveryAddressDiffers, createAccount, password, confirmPassword, t])
+  }, [firstName, lastName, email, phone, deliveryMethod, courierStreet, courierCity, wantCompanyInvoice, deliveryAddressDiffers, createAccount, password, confirmPassword, t, user])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -295,7 +295,8 @@ export default function CheckoutPage() {
       } else {
         window.location.href = data.payment_url!
       }
-    } catch {
+    } catch (err) {
+      console.error('[checkout] Submit error:', err)
       setApiError(t('connectionFailed'))
       setLoading(false)
     }

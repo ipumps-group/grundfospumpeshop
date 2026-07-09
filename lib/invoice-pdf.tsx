@@ -165,15 +165,22 @@ export function InvoicePDF({ order, items, customerName, customerEmail, invoiceT
           </View>
         )}
 
-        {/* Tarneaadress (kui erineb ettevõtte aadressist) */}
-        {sa.delivery_address_differs && (
+        {/* Tarneaadress (kui erineb ettevõtte aadressist või iseteenindus) */}
+        {sa.company && (sa.delivery_address_differs || sa.carrier === 'pickup' || sa.street) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Tarneaadress</Text>
             <Text style={styles.clientInfo}>
               {sa.carrier_name && `${sa.carrier_name}\n`}
-              {sa.street && `${sa.street}\n`}
-              {sa.city && `${sa.postal_code ? sa.postal_code + ' ' : ''}${sa.city}\n`}
-              {sa.country && mapCountry(sa.country)}
+              {sa.carrier === 'pickup'
+                ? `${sa.pickup_name || sa.pickup_address}, ${[sa.pickup_postal, sa.country ? mapCountry(sa.country) : ''].filter(Boolean).join(', ')}`
+                : (
+                  <>
+                    {sa.street && `${sa.street}\n`}
+                    {sa.city && `${sa.postal_code ? sa.postal_code + ' ' : ''}${sa.city}\n`}
+                    {sa.country && mapCountry(sa.country)}
+                  </>
+                )
+              }
             </Text>
           </View>
         )}
@@ -184,12 +191,16 @@ export function InvoicePDF({ order, items, customerName, customerEmail, invoiceT
             <Text style={styles.sectionTitle}>Tarneaadress</Text>
             <Text style={styles.clientInfo}>
               {sa.carrier_name && `${sa.carrier_name}\n`}
-              {sa.pickup_name && `${sa.pickup_name}\n`}
-              {sa.pickup_address && `${sa.pickup_address}\n`}
-              {sa.street && `${sa.street}\n`}
-              {sa.city && `${sa.postal_code ? sa.postal_code + ' ' : ''}${sa.city}\n`}
-              {sa.pickup_city && `${sa.pickup_postal ? sa.pickup_postal + ' ' : ''}${sa.pickup_city}\n`}
-              {sa.country && mapCountry(sa.country)}
+              {sa.carrier === 'pickup'
+                ? `${sa.pickup_name || sa.pickup_address}, ${[sa.pickup_postal, sa.country ? mapCountry(sa.country) : ''].filter(Boolean).join(', ')}`
+                : (
+                  <>
+                    {sa.street && `${sa.street}\n`}
+                    {sa.city && `${sa.postal_code ? sa.postal_code + ' ' : ''}${sa.city}\n`}
+                    {sa.country && mapCountry(sa.country)}
+                  </>
+                )
+              }
             </Text>
           </View>
         )}

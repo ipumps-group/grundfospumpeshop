@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (id uuid, email text, full_name text,
 
 CREATE TABLE IF NOT EXISTS public.categories (id serial, slug text, name_et text, name_en text, name_lv text, name_lt text, name_ru text, parent_slug text, created_at timestamp with time zone DEFAULT now());
 
-CREATE TABLE IF NOT EXISTS public.settings (key text, value text NOT NULL DEFAULT ''::text, updated_at timestamp with time zone DEFAULT now());
+CREATE TABLE IF NOT EXISTS public.settings (key text PRIMARY KEY, value text NOT NULL DEFAULT ''::text, updated_at timestamp with time zone DEFAULT now());
 
 CREATE TABLE IF NOT EXISTS public.pages (id uuid NOT NULL DEFAULT gen_random_uuid(), slug text, title text, short_description text, content text, image_url text, published boolean DEFAULT true, created_at timestamp with time zone DEFAULT now(), updated_at timestamp with time zone DEFAULT now(), template text NOT NULL DEFAULT 'default'::text, title_en text, title_ru text, title_lv text, title_lt text, content_en text, content_ru text, content_lv text, content_lt text, short_description_en text, short_description_ru text, short_description_lv text, short_description_lt text, blocks jsonb NOT NULL DEFAULT '[]'::jsonb, status text NOT NULL DEFAULT 'draft'::text, visibility text NOT NULL DEFAULT 'public'::text, nav_label text, show_in_nav boolean DEFAULT false, meta_title text, meta_description text, og_image_url text, show_title boolean DEFAULT true);
 

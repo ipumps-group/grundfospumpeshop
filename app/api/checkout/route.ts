@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { sendNewOrderAdmin, sendPrepaymentInvoice, sendOrderPending } from '@/lib/email'
+import { sendNewOrderAdmin, sendPrepaymentInvoice } from '@/lib/email'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -546,16 +546,6 @@ export async function POST(req: NextRequest) {
         .update({ montonio_order_id: data.uuid, updated_at: new Date().toISOString() })
         .eq('id', orderId)
     }
-
-    // Send pending notification to customer
-    await sendOrderPending({
-      to: customer.email,
-      customerName: `${customer.first_name} ${customer.last_name}`,
-      orderNumber: orderNumber.toString(),
-      items: items.map(i => ({ product_name: i.name, quantity: i.qty, unit_price: i.price })),
-      total: grandTotal,
-      customerEmail: customer.email,
-    })
 
     // Send admin notification about new order (fire-and-forget)
     await sendNewOrderAdmin(orderId)

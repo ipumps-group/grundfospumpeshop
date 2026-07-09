@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
 );
 
 CREATE TABLE IF NOT EXISTS public.settings (
-  key text, value text NOT NULL DEFAULT ''::text,
+  key text PRIMARY KEY, value text NOT NULL DEFAULT ''::text,
   updated_at timestamp with time zone DEFAULT now()
 );
 
