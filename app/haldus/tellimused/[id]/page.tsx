@@ -409,6 +409,10 @@ export default function TellimusDetailPage() {
                 {(sa.pickup_city || sa.pickup_postal) && (
                   <p className="text-gray-500">{sa.pickup_postal} {sa.pickup_city}</p>
                 )}
+                {sa.street && <p className="text-gray-700">{sa.street}</p>}
+                {(sa.city || sa.postal_code) && (
+                  <p className="text-gray-500">{sa.postal_code} {sa.city}</p>
+                )}
               </div>
             </div>
           )}

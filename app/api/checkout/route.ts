@@ -56,11 +56,14 @@ interface CheckoutBody {
     carrier:              string
     carrier_name:         string
     country:              string
-    pickup_point_uuid:    string
-    pickup_point_name:    string
-    pickup_point_address: string
-    pickup_point_city:    string
-    pickup_point_postal:  string
+    pickup_point_uuid?:    string
+    pickup_point_name?:    string
+    pickup_point_address?: string
+    pickup_point_city?:    string
+    pickup_point_postal?:  string
+    street?:               string
+    city?:                 string
+    postal_code?:          string
   }
   notes?:     string
   coupon_id?: string
@@ -153,11 +156,13 @@ export async function POST(req: NextRequest) {
           lastName: sa.customer_name?.split(' ').slice(1).join(' ') ?? '',
           email: sa.customer_email ?? retryOrder.email ?? '',
           phone: sa.customer_phone ?? '',
-          addressLine1: `${sa.carrier_name ?? ''}: ${sa.pickup_name ?? ''}`,
-          addressLine2: sa.pickup_address ?? '',
-          city: sa.pickup_city ?? '',
+          addressLine1: sa.carrier === 'courier'
+            ? sa.street ?? ''
+            : `${sa.carrier_name ?? ''}: ${sa.pickup_name ?? ''}`,
+          addressLine2: sa.carrier === 'courier' ? '' : sa.pickup_address ?? '',
+          city: sa.carrier === 'courier' ? sa.city ?? '' : sa.pickup_city ?? '',
           country: sa.country ?? 'EE',
-          postalCode: sa.pickup_postal ?? '',
+          postalCode: sa.carrier === 'courier' ? sa.postal_code ?? '' : sa.pickup_postal ?? '',
         },
         lineItems: (retryItems ?? []).map(it => ({
           productCode: String(it.product_id ?? ''),
@@ -291,6 +296,9 @@ export async function POST(req: NextRequest) {
     pickup_address:  shipping.pickup_point_address,
     pickup_city:     shipping.pickup_point_city,
     pickup_postal:   shipping.pickup_point_postal,
+    ...(shipping.street && { street: shipping.street }),
+    ...(shipping.city && { city: shipping.city }),
+    ...(shipping.postal_code && { postal_code: shipping.postal_code }),
     customer_name:   `${customer.first_name} ${customer.last_name}`,
     customer_email:  customer.email,
     customer_phone:  customer.phone,
@@ -487,11 +495,13 @@ export async function POST(req: NextRequest) {
       lastName:    customer.last_name,
       email:      customer.email,
       phone:      customer.phone,
-      addressLine1: `${shipping.carrier_name}: ${shipping.pickup_point_name}`,
-      addressLine2: shipping.pickup_point_address,
-      city:         shipping.pickup_point_city,
+      addressLine1: shipping.carrier === 'courier'
+        ? shipping.street ?? ''
+        : `${shipping.carrier_name}: ${shipping.pickup_point_name ?? ''}`,
+      addressLine2: shipping.carrier === 'courier' ? '' : shipping.pickup_point_address ?? '',
+      city:         shipping.carrier === 'courier' ? shipping.city ?? '' : shipping.pickup_point_city ?? '',
       country:      shipping.country,
-      postalCode:  shipping.pickup_point_postal,
+      postalCode:  shipping.carrier === 'courier' ? shipping.postal_code ?? '' : shipping.pickup_point_postal ?? '',
     },
 
     lineItems: items.map(item => ({
