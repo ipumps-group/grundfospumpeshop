@@ -49,6 +49,12 @@ function formatShippingAddress(addr: unknown): string {
   if (!addr || typeof addr !== 'object') return '';
   const a = addr as Record<string, unknown>;
 
+  if (a.carrier === 'courier' || a.street) {
+    const street = a.street ? String(a.street) : '';
+    const cityLine = [a.postal_code, a.city].filter(Boolean).map(String).join(' ');
+    return [street, cityLine].filter(Boolean).join('\n');
+  }
+
   // Pakiautomaat — eelistame nime, kui olemas
   if (a.parcel_machine_name) {
     const name = String(a.parcel_machine_name);

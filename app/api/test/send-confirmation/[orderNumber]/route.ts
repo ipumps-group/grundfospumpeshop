@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendOrderConfirmation } from '@/lib/email';
+import { formatDeliveryAddress } from '@/lib/shipping-address';
 
 export const runtime = 'nodejs';
 
@@ -68,12 +69,7 @@ export async function POST(
   }));
   const subtotal = items.reduce((s, it) => s + it.quantity * it.unitPrice, 0);
 
-  const addr = (order.shipping_address ?? {}) as Record<string, unknown>;
-  const shippingText = addr.parcel_machine_name
-    ? String(addr.parcel_machine_name)
-    : addr.street
-    ? `${String(addr.street)}${addr.city ? ', ' + String(addr.city) : ''}`
-    : 'N/A';
+  const shippingText = formatDeliveryAddress(order.shipping_address) || 'N/A';
 
   console.log('[test-confirm] Calling sendOrderConfirmation...');
 

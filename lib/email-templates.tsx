@@ -1,5 +1,7 @@
 // E-kirja HTML templateid — tagastavad HTML stringid Resendile saatmiseks
 
+import { getDeliveryAddressLines } from '@/lib/shipping-address'
+
 const PRIMARY = '#003366'
 const LIGHT_BG = '#f8fafc'
 
@@ -121,6 +123,7 @@ interface OrderConfirmationData {
 
 export function buildOrderConfirmationHtml(d: OrderConfirmationData): string {
   const sa = d.order.shipping_address ?? {}
+  const deliveryAddressLines = getDeliveryAddressLines(sa)
   const subtotal = d.items.reduce((s, item) => s + item.quantity * item.unit_price, 0)
   const total = Number(d.order.total)
   const vat = Number((total - subtotal).toFixed(2))
@@ -171,11 +174,11 @@ export function buildOrderConfirmationHtml(d: OrderConfirmationData): string {
       </tr>
     </table>
 
-    ${(sa.carrier_name || sa.pickup_name) ? `
+    ${(sa.carrier_name || deliveryAddressLines.length) ? `
     <div style="background:#eff6ff;border-radius:8px;padding:16px 20px;margin-bottom:24px;">
       <div style="font-size:13px;font-weight:600;color:${PRIMARY};margin-bottom:6px;">📦 Tarneinfo</div>
-      ${sa.carrier_name ? `<div style="font-size:14px;font-weight:600;">${sa.carrier_name}: ${sa.pickup_name || ''}</div>` : ''}
-      ${sa.pickup_address ? `<div style="font-size:13px;color:#64748b;">${sa.pickup_address}, ${sa.pickup_city || ''} ${sa.pickup_postal || ''}</div>` : ''}
+      ${sa.carrier_name ? `<div style="font-size:14px;font-weight:600;">${sa.carrier_name}</div>` : ''}
+      ${deliveryAddressLines.map(line => `<div style="font-size:13px;color:#64748b;">${line}</div>`).join('')}
     </div>` : ''}
 
     <div style="margin:24px 0;">
@@ -254,6 +257,7 @@ export function buildNewOrderAdminHtml(d: NewOrderAdminData): string {
     </tr>`).join('')
 
   const sa = d.shippingAddress ?? {}
+  const deliveryAddressLines = getDeliveryAddressLines(sa)
 
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;color:#1a202c;">🛒 Uus tellimus saabunud</h1>
@@ -283,10 +287,10 @@ export function buildNewOrderAdminHtml(d: NewOrderAdminData): string {
       Kokku: ${d.order.total.toFixed(2)} €
     </div>
 
-    ${(sa.carrier_name || sa.pickup_name) ? `
+    ${(sa.carrier_name || deliveryAddressLines.length) ? `
     <div style="font-size:13px;color:#64748b;margin-bottom:4px;">Tarne</div>
-    <div style="font-size:14px;">${sa.carrier_name}: ${sa.pickup_name || ''}</div>
-    <div style="font-size:13px;color:#64748b;">${sa.pickup_address || ''}, ${sa.pickup_city || ''}</div>` : ''}`
+    ${sa.carrier_name ? `<div style="font-size:14px;font-weight:600;">${sa.carrier_name}</div>` : ''}
+    ${deliveryAddressLines.map(line => `<div style="font-size:13px;color:#64748b;">${line}</div>`).join('')}` : ''}`
 
   return layout(content)
 }
