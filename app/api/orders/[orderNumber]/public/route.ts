@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { verifyOrderViewToken } from '@/lib/order-view-token'
 
 export async function POST(
   req: NextRequest,
@@ -7,15 +8,15 @@ export async function POST(
 ) {
   const { orderNumber } = await params
 
-  let body: { email?: string }
+  let body: { email?: string; token?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
   }
 
-  if (!body.email) {
-    return NextResponse.json({ error: 'Email required' }, { status: 400 })
+  if (!body.email && !body.token) {
+    return NextResponse.json({ error: 'Email or token required' }, { status: 400 })
   }
 
   const { data: order, error: orderErr } = await supabaseAdmin
@@ -28,8 +29,19 @@ export async function POST(
     return NextResponse.json({ error: 'Tellimust ei leitud' }, { status: 404 })
   }
 
-  const orderEmail = order.email || (order.shipping_address as any)?.customer_email
-  if (!orderEmail || orderEmail.toLowerCase() !== body.email.toLowerCase()) {
+  const shippingAddress = (order.shipping_address ?? {}) as Record<string, unknown>
+  const customerEmail = typeof shippingAddress.customer_email === 'string'
+    ? shippingAddress.customer_email
+    : ''
+  const orderEmail = order.email || customerEmail
+  const validToken = body.token
+    ? verifyOrderViewToken(orderNumber, body.token)
+    : false
+  const validEmail = body.email && orderEmail
+    ? orderEmail.toLowerCase() === body.email.toLowerCase()
+    : false
+
+  if (!validToken && !validEmail) {
     return NextResponse.json({ error: 'Email ei ühti tellimusega' }, { status: 403 })
   }
 

@@ -8,6 +8,8 @@ import RefundConfirmation from '@/emails/RefundConfirmation';
 import AbandonedCart from '@/emails/AbandonedCart';
 import PrepaymentInvoice from '@/emails/PrepaymentInvoice';
 import type { Carrier, DeliveryMethod } from './carriers';
+import { createOrderViewToken } from './order-view-token';
+import { formatDeliveryAddress } from './shipping-address';
 import {
   buildStatusUpdateHtml,
   buildNewOrderAdminHtml,
@@ -163,7 +165,8 @@ async function send({
 }
 
 function buildOrderUrl(locale: string, orderNumber: string): string {
-  return `${SITE_URL.replace(/\/$/, '')}/${locale}/tellimus/${orderNumber}`;
+  const token = createOrderViewToken(orderNumber);
+  return `${SITE_URL.replace(/\/$/, '')}/${locale}/tellimus/${orderNumber}?token=${encodeURIComponent(token)}`;
 }
 
 // ── Avalikud funktsioonid ─────────────────────────────────────────────────
@@ -184,6 +187,7 @@ export async function sendOrderConfirmation(data: {
   discount: number;
   total: number;
   paymentMethod?: string;
+  deliveryMethod?: string;
   shippingAddress: string;
   orderId: string;
 }): Promise<SendResult> {
@@ -242,6 +246,7 @@ export async function sendOrderConfirmation(data: {
       discount: data.discount,
       total: data.total,
       paymentMethod: data.paymentMethod,
+      deliveryMethod: data.deliveryMethod,
       shippingAddress: data.shippingAddress,
       orderUrl: buildOrderUrl(data.locale, data.orderNumber),
       siteUrl: SITE_URL,
@@ -380,6 +385,8 @@ export async function sendPrepaymentInvoice(data: {
 
   // Generate PDF attachment
   let pdfAttachment: { filename: string; content: Buffer } | undefined
+  let deliveryMethod: string | undefined
+  let deliveryAddress: string | undefined
   try {
     const { data: order } = await supabaseAdmin
       .from('orders')
@@ -388,6 +395,12 @@ export async function sendPrepaymentInvoice(data: {
       .single()
 
     if (order) {
+      const shippingAddress = (order.shipping_address ?? {}) as Record<string, unknown>
+      deliveryMethod = typeof shippingAddress.carrier_name === 'string'
+        ? shippingAddress.carrier_name
+        : undefined
+      deliveryAddress = formatDeliveryAddress(shippingAddress) || undefined
+
       const { generateInvoicePDF } = await import('@/lib/invoice-pdf')
       const pdfBytes = await generateInvoicePDF(
         {
@@ -428,6 +441,8 @@ export async function sendPrepaymentInvoice(data: {
       items: data.items,
       total: data.total,
       dueDate: data.dueDate,
+      deliveryMethod,
+      deliveryAddress,
       orderUrl: buildOrderUrl(data.locale, data.orderNumber),
       siteUrl: SITE_URL,
       replyToEmail: EMAIL_REPLY_TO,
@@ -464,8 +479,8 @@ export async function sendOrderStatusUpdate({ orderId, newStatus, note }: Status
   }
 
   const sa: Record<string, string> = order.shipping_address ?? {}
-  let customerEmail: string | null = sa.customer_email ?? order.email ?? null
-  let customerName: string | null = sa.full_name ?? sa.customer_name ?? order.customer_name ?? null
+  const customerEmail: string | null = sa.customer_email ?? order.email ?? null
+  const customerName: string | null = sa.full_name ?? sa.customer_name ?? order.customer_name ?? null
   const orderRef = (order.order_number ?? order.montonio_order_id ?? order.id).toString()
 
   if (!customerEmail) {

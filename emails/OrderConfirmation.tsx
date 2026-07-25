@@ -15,6 +15,7 @@ export interface OrderConfirmationProps {
   discount: number;
   total: number;
   paymentMethod?: string;
+  deliveryMethod?: string;
   shippingAddress: string;
   orderUrl: string;
   siteUrl: string;
@@ -26,7 +27,7 @@ const formatPrice = (n: number) =>
 
 export default function OrderConfirmation({
   locale, messages, customerName, orderNumber, items,
-  subtotal, discount, total, paymentMethod, shippingAddress,
+  subtotal, discount, total, paymentMethod, deliveryMethod, shippingAddress,
   orderUrl, siteUrl, replyToEmail,
 }: OrderConfirmationProps) {
   const t = messages;
@@ -115,6 +116,11 @@ export default function OrderConfirmation({
             <Heading as="h2" style={s.h2}>
               {t.orderConfirmation.shippingHeading}
             </Heading>
+            {deliveryMethod && (
+              <Text style={s.metaText}>
+                <strong>{deliveryMethod}</strong>
+              </Text>
+            )}
             <Text style={{ ...s.paragraph, whiteSpace: 'pre-line' }}>
               {shippingAddress}
             </Text>

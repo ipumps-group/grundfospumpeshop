@@ -14,6 +14,8 @@ export interface PrepaymentInvoiceProps {
   items: Array<{ name: string; quantity: number; unitPrice: number }>;
   total: number;
   dueDate: string;
+  deliveryMethod?: string;
+  deliveryAddress?: string;
   orderUrl: string;
   siteUrl: string;
   replyToEmail: string;
@@ -24,7 +26,7 @@ const formatPrice = (n: number) =>
 
 export default function PrepaymentInvoice({
   locale, messages, customerName, orderNumber, items,
-  total, dueDate, orderUrl, siteUrl, replyToEmail,
+  total, dueDate, deliveryMethod, deliveryAddress, orderUrl, siteUrl, replyToEmail,
 }: PrepaymentInvoiceProps) {
   const t = messages;
 
@@ -112,6 +114,25 @@ export default function PrepaymentInvoice({
               </Row>
             </Section>
 
+            {(deliveryMethod || deliveryAddress) && (
+              <>
+                <Hr style={s.hr} />
+                <Heading as="h2" style={s.h2}>
+                  {t.orderConfirmation.shippingHeading}
+                </Heading>
+                {deliveryMethod && (
+                  <Text style={s.metaText}>
+                    <strong>{deliveryMethod}</strong>
+                  </Text>
+                )}
+                {deliveryAddress && (
+                  <Text style={{ ...s.paragraph, whiteSpace: 'pre-line' }}>
+                    {deliveryAddress}
+                  </Text>
+                )}
+              </>
+            )}
+
             <Section style={{ textAlign: 'center' as const, margin: '32px 0' }}>
               <Button href={orderUrl} style={s.button}>
                 {t.common.viewOrder}
@@ -144,6 +165,7 @@ const s = {
   content: { padding: '32px' },
   greeting: { fontSize: '16px', color: '#003366', marginBottom: '8px', fontWeight: 'bold' as const },
   paragraph: { fontSize: '15px', color: '#333', lineHeight: '1.6', margin: '8px 0' },
+  metaText: { fontSize: '14px', color: '#333', margin: '6px 0' },
   paragraphSmall: { fontSize: '13px', color: '#64748b', lineHeight: '1.5', margin: '8px 0' },
   hr: { borderColor: '#e6e6e6', margin: '24px 0' },
   h2: { fontSize: '16px', color: '#003366', margin: '16px 0 12px', fontWeight: 'bold' as const },

@@ -277,6 +277,10 @@ export async function POST(req: NextRequest) {
   const discount = Number(order.discount_amount ?? 0);
   const total = Number(order.total);
   const shippingAddressText = formatShippingAddress(order.shipping_address);
+  const shippingAddress = (order.shipping_address ?? {}) as Record<string, unknown>;
+  const deliveryMethod = typeof shippingAddress.carrier_name === 'string'
+    ? shippingAddress.carrier_name
+    : undefined;
 
   try {
     await sendOrderConfirmation({
@@ -289,6 +293,7 @@ export async function POST(req: NextRequest) {
       discount,
       total,
       paymentMethod: payload.paymentMethod,
+      deliveryMethod,
       shippingAddress: shippingAddressText,
       orderId: order.id,
     });

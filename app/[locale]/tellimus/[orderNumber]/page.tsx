@@ -1,17 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 import OrderStatusBadge from '@/components/konto/OrderStatusBadge'
-import { supabase } from '@/lib/supabase'
+import { getDeliveryAddressLines } from '@/lib/shipping-address'
 
 interface ShippingAddress {
+  carrier?: string
   carrier_name?: string
   pickup_name?: string
   pickup_address?: string
   pickup_city?: string
   pickup_postal?: string
+  street?: string
+  city?: string
+  postal_code?: string
   customer_name?: string
   customer_email?: string
   customer_phone?: string
@@ -42,73 +46,79 @@ interface OrderItem {
 export default function PublicOrderPage() {
   const { orderNumber } = useParams<{ orderNumber: string }>()
   const searchParams = useSearchParams()
+  const token = searchParams.get('token') || ''
   const [order, setOrder] = useState<Order | null>(null)
   const [items, setItems] = useState<OrderItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(Boolean(token))
   const [notFound, setNotFound] = useState(false)
   const [emailInput, setEmailInput] = useState(searchParams.get('email') || '')
   const [verified, setVerified] = useState(false)
   const [error, setError] = useState('')
   const [retrying, setRetrying] = useState(false)
 
-  // Auto-verify if email is in URL and matches order
-  useEffect(() => {
-    if (!orderNumber) return
-    loadOrder()
+  const loadVerifiedOrder = useCallback(async (credentials: { email?: string; token?: string }) => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/orders/${orderNumber}/public`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setOrder(data.order)
+        setItems(data.items ?? [])
+        setVerified(true)
+        setError('')
+      } else if (res.status === 404) {
+        setNotFound(true)
+      } else {
+        setError(data.error || 'Viga andmete laadimisel')
+      }
+    } catch {
+      setError('Ühenduse viga')
+    }
+    setLoading(false)
   }, [orderNumber])
 
-  // Auto-verify when order loads with email in URL
   useEffect(() => {
-    if (order && emailInput && !verified) {
-      const orderEmail = order.email || order.shipping_address?.customer_email
-      if (orderEmail?.toLowerCase() === emailInput.toLowerCase()) {
-        setVerified(true)
-      }
-    }
-  }, [order, emailInput])
+    if (!orderNumber || !token) return
 
-  async function loadOrder() {
-    const { data: orderData, error: orderError } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('order_number', orderNumber)
-      .single()
-
-    if (orderError || !orderData) {
-      setNotFound(true)
-      setLoading(false)
-      return
-    }
-
-    setOrder(orderData)
-    setLoading(false)
-  }
-
-  async function verifyEmailAndLoad() {
-    if (!order) return
-    if (emailInput.toLowerCase() === order.email.toLowerCase()) {
-      setVerified(true)
-      setError('')
-      setLoading(true)
-      try {
-        const res = await fetch(`/api/orders/${orderNumber}/public`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailInput }),
-        })
-        const data = await res.json()
+    let active = true
+    fetch(`/api/orders/${orderNumber}/public`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    })
+      .then(async res => ({ res, data: await res.json() }))
+      .then(({ res, data }) => {
+        if (!active) return
         if (res.ok) {
+          setOrder(data.order)
           setItems(data.items ?? [])
+          setVerified(true)
+          setError('')
+        } else if (res.status === 404) {
+          setNotFound(true)
         } else {
           setError(data.error || 'Viga andmete laadimisel')
         }
-      } catch {
-        setError('Ühenduse viga')
-      }
-      setLoading(false)
-    } else {
-      setError('Email ei ühti tellimusega')
+      })
+      .catch(() => {
+        if (active) setError('Ühenduse viga')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
     }
+  }, [orderNumber, token])
+
+  async function verifyEmailAndLoad() {
+    if (!emailInput.trim()) return
+    await loadVerifiedOrder({ email: emailInput.trim() })
   }
 
   function verifyEmail() {
@@ -144,7 +154,7 @@ export default function PublicOrderPage() {
     )
   }
 
-  if (notFound || !order) {
+  if (notFound) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
@@ -156,7 +166,7 @@ export default function PublicOrderPage() {
     )
   }
 
-  if (!verified) {
+  if (!verified || !order) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
@@ -184,6 +194,7 @@ export default function PublicOrderPage() {
   }
 
   const sa = order.shipping_address ?? {}
+  const deliveryAddressLines = getDeliveryAddressLines(sa)
   const subtotal = Number((order.total / 1.24).toFixed(2))
   const vat = Number((order.total - subtotal).toFixed(2))
 
@@ -258,16 +269,10 @@ export default function PublicOrderPage() {
               {sa.customer_email && <p className="text-gray-500">{sa.customer_email}</p>}
               {sa.customer_phone && <p className="text-gray-500">{sa.customer_phone}</p>}
               {sa.company && <p className="text-gray-500">{sa.company}</p>}
-              {(sa.carrier_name || sa.pickup_name) && (
-                <p className="mt-2">
-                  {sa.carrier_name && <span className="font-medium">{sa.carrier_name}: </span>}
-                  {sa.pickup_name}
-                </p>
-              )}
-              {sa.pickup_address && <p className="text-gray-500">{sa.pickup_address}</p>}
-              {(sa.pickup_city || sa.pickup_postal) && (
-                <p className="text-gray-500">{sa.pickup_postal} {sa.pickup_city}</p>
-              )}
+              {sa.carrier_name && <p className="mt-2 font-medium">{sa.carrier_name}</p>}
+              {deliveryAddressLines.map(line => (
+                <p key={line} className="text-gray-500">{line}</p>
+              ))}
               {sa.notes && (
                 <p className="mt-2 italic text-gray-500">Märkus: {sa.notes}</p>
               )}
