@@ -16,7 +16,7 @@ export function getResend(): Resend {
  * Domeen peab olema Resendis verifitseeritud.
  */
 export const EMAIL_FROM = `${COMPANY.legalName} <${
-  process.env.RESEND_FROM_EMAIL ?? 'noreply@pumbapood.ee'
+  process.env.RESEND_FROM_EMAIL ?? 'info@pumbapood.ee'
 }>`;
 
 /**

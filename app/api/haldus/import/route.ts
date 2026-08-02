@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ExcelJS from 'exceljs'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireSuperadmin } from '@/lib/api-auth'
 
 // POST /api/haldus/import — streams SSE progress while importing
 // Events: { phase, msg?, current?, total?, pct?, updated?, unchanged?, skipped?, errors?, total_errors? }
@@ -44,15 +45,7 @@ const FIXED_KEYS = new Set(Object.keys(HEADER_TO_FIELD))
 
 export async function POST(req: NextRequest) {
   // ── Auth ───────────────────────────────────────────────────────────────────
-  const token = (req.headers.get('authorization') ?? '').replace('Bearer ', '').trim()
-  if (token) {
-    const { data: { user } } = await supabaseAdmin.auth.getUser(token)
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    const { data: profile } = await supabaseAdmin
-      .from('profiles').select('role').eq('id', user.id).single()
-    if (profile?.role !== 'superadmin')
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  try { await requireSuperadmin() } catch (response) { return response as NextResponse }
 
   // ── Parse file before stream starts ───────────────────────────────────────
   let arrayBuf: ArrayBuffer
@@ -147,7 +140,8 @@ export async function POST(req: NextRequest) {
         push({ phase: 'fetching', msg: `Andmed laetud — alustan võrdlemist...` })
 
         // Phase 3: process rows
-        let updated = 0, created = 0, skipped = 0, unchanged = 0
+        let updated = 0, created = 0, unchanged = 0
+        const skipped = 0
         const errors: string[] = []
         const total = rows.length
 
@@ -185,6 +179,18 @@ export async function POST(req: NextRequest) {
               if (val) attrUpdates.push({ name: col.field, value: val })
             }
           })
+
+          // Vigase hinnaga toodet ei tohi avalikus poes müüa.
+          const importedPrice = productData.price
+          const importedSalePrice = productData.sale_price
+          if (
+            importedPrice === null ||
+            (typeof importedPrice === 'number' && importedPrice <= 0) ||
+            (typeof importedSalePrice === 'number' && importedSalePrice <= 0)
+          ) {
+            productData.published = false
+            productData.in_stock = false
+          }
 
           const prod = productBySku[sku]
 

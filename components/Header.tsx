@@ -341,7 +341,13 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
             {user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  onClick={() => {
+                    setUserMenuOpen(prev => {
+                      const next = !prev
+                      if (next) setMegaOpen(false)
+                      return next
+                    })
+                  }}
                   className="flex items-center gap-1.5 px-3 py-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg text-[15px] font-medium transition-colors"
                   aria-label={t('account')}
                 >

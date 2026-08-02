@@ -242,14 +242,63 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Vigane päringu keha' }, { status: 400 })
   }
 
-  const { customer, shipping, notes, coupon_id, items, delivery_method, create_account, password, payment_type, tracking } = body
+  const { customer, shipping, notes, coupon_id, items: requestedItems, create_account, password, payment_type, tracking } = body
 
   if (!customer?.first_name || !customer?.last_name || !customer?.email ||
-      !customer?.phone || !items?.length || !shipping?.carrier) {
+      !customer?.phone || !requestedItems?.length || !shipping?.carrier) {
     return NextResponse.json({ error: 'Puuduvad kohustuslikud väljad' }, { status: 422 })
   }
 
   // pickup_point_uuid is no longer required (parcel machine delivery removed)
+
+  if (requestedItems.length > 100 || requestedItems.some(item =>
+    !Number.isSafeInteger(item.id) || item.id <= 0 ||
+    !Number.isSafeInteger(item.qty) || item.qty < 1 || item.qty > 100
+  )) {
+    return NextResponse.json({ error: 'Ostukorvi sisu on vigane' }, { status: 422 })
+  }
+
+  const productIds = requestedItems.map(item => item.id)
+  if (new Set(productIds).size !== productIds.length) {
+    return NextResponse.json({ error: 'Ostukorvis on dubleeritud tooted' }, { status: 422 })
+  }
+
+  const { data: databaseProducts, error: productsError } = await supabaseAdmin
+    .from('products')
+    .select('id, slug, name, price, sale_price, published, in_stock')
+    .in('id', productIds)
+
+  if (productsError) {
+    console.error('Toodete hindade kontroll ebaõnnestus:', productsError)
+    return NextResponse.json({ error: 'Toodete kontroll ebaõnnestus' }, { status: 500 })
+  }
+
+  const productsById = new Map<number, NonNullable<typeof databaseProducts>[number]>()
+  for (const product of databaseProducts ?? []) {
+    if (productsById.has(product.id)) {
+      return NextResponse.json({ error: 'Tooteandmed on vastuolulised' }, { status: 409 })
+    }
+    productsById.set(product.id, product)
+  }
+
+  const items: CartItem[] = []
+  for (const requested of requestedItems) {
+    const product = productsById.get(requested.id)
+    const databasePrice = Number(product?.sale_price ?? product?.price)
+    if (!product || !product.published || !product.in_stock || !Number.isFinite(databasePrice) || databasePrice <= 0) {
+      return NextResponse.json(
+        { error: `Toode ${requested.name || requested.id} ei ole hetkel müügiks saadaval` },
+        { status: 422 },
+      )
+    }
+    items.push({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      price: databasePrice,
+      qty: requested.qty,
+    })
+  }
 
   const VAT_RATE = 0.24
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0)

@@ -52,6 +52,7 @@ const SLUG_TO_CAT_KEY: Partial<Record<string, CatNameKey>> = {
 
 function addToCart(product: Product) {
   if (typeof window === 'undefined') return
+  if (!product.in_stock || Number(product.sale_price ?? product.price) <= 0) return
   try {
     const cart = JSON.parse(localStorage.getItem('ipumps_cart') || '[]')
     const existing = cart.find((i: { id: number }) => i.id === product.id)
@@ -112,7 +113,7 @@ function ProductCard({ product }: { product: Product }) {
               </div>
             )}
           </div>
-          <button onClick={handleAdd} disabled={!product.in_stock}
+          <button onClick={handleAdd} disabled={!product.in_stock || displayPrice <= 0}
             className={`p-2.5 rounded-xl transition-all flex-shrink-0 ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
             {added ? <Check size={16} /> : <ShoppingCart size={16} />}
           </button>
@@ -169,7 +170,7 @@ function ProductRow({ product }: { product: Product }) {
             </div>
           )}
         </div>
-        <button onClick={handleAdd} disabled={!product.in_stock}
+        <button onClick={handleAdd} disabled={!product.in_stock || displayPrice <= 0}
           className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
           {added ? <><Check size={15} /> {t('added')}</> : <><ShoppingCart size={15} /> {t('add')}</>}
         </button>
@@ -295,6 +296,9 @@ export default function KategooriaPage({ params }: { params: Promise<{ slug: str
       .from('products')
       .select('id, slug, name, sku, short_description_et, price, sale_price, image_url, in_stock', { count: 'exact' })
       .in('id', productIds)
+      .eq('published', true)
+      .gt('price', 0)
+      .or('sale_price.is.null,sale_price.gt.0')
 
     if (query.trim()) {
       const term = `%${query.trim()}%`

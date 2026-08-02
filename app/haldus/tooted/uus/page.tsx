@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import StatusToggle from '@/components/haldus/StatusToggle'
+import { fmt, withVat } from '@/lib/price'
 
 const canManageProducts = (role: string) => role === 'superadmin'
 import ProductImageUpload from '@/components/haldus/ProductImageUpload'
@@ -165,14 +166,16 @@ export default function UusToode() {
             <h2 className="font-semibold text-gray-900">Hind ja laoseis</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Hind (€) <span className="text-red-500">*</span></label>
+                <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Hind KM-ta (€) <span className="text-red-500">*</span></label>
                 <input type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]" placeholder="0.00" />
+                <p className="mt-1.5 text-[13px] text-gray-500">Hind KM-ga: <span className="font-semibold text-gray-700">{price && Number.isFinite(Number(price)) ? fmt(withVat(Number(price))) : '—'}</span></p>
               </div>
               <div>
-                <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Soodushind (€)</label>
+                <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Soodushind KM-ta (€)</label>
                 <input type="number" step="0.01" min="0" value={salePrice} onChange={e => setSalePrice(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]" placeholder="Vabatahtlik" />
+                <p className="mt-1.5 text-[13px] text-gray-500">Hind KM-ga: <span className="font-semibold text-gray-700">{salePrice && Number.isFinite(Number(salePrice)) ? fmt(withVat(Number(salePrice))) : '—'}</span></p>
               </div>
             </div>
             <StatusToggle checked={inStock} onChange={setInStock} label="Toode on laos" />

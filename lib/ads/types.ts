@@ -1,4 +1,4 @@
-export type Platform = 'google_ads' | 'meta_ads' | 'ga4' | 'all'
+export type Platform = 'google_ads' | 'meta_ads' | 'ga4' | 'gsc' | 'all'
 
 export type ChangeRequestStatus = 'pending' | 'approved' | 'rejected' | 'executed' | 'failed'
 export type ChangeRequestSource = 'manual' | 'ai_recommendation'

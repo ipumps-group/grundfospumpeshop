@@ -145,6 +145,8 @@ export default async function SeriesPage({
       .select('id, slug, name, sku, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, price, sale_price, image_url, in_stock')
       .eq('series_slug', effectiveSeeria)
       .eq('published', true)
+      .gt('price', 0)
+      .or('sale_price.is.null,sale_price.gt.0')
       .order('name', { ascending: true })
 
     const pageTitle = series?.name || seeria

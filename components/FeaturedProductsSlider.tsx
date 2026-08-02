@@ -52,6 +52,8 @@ export default function FeaturedProductsSlider() {
       .select('id, slug, name, sku, price, sale_price, image_url, in_stock, published')
       .in('id', productIds)
       .eq('published', true)
+      .gt('price', 0)
+      .or('sale_price.is.null,sale_price.gt.0')
     
     setProducts(productsData || [])
   }

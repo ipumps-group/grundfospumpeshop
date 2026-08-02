@@ -10,6 +10,7 @@ import StatusToggle from '@/components/haldus/StatusToggle'
 import ProductImageUpload from '@/components/haldus/ProductImageUpload'
 import ProductFileUpload from '@/components/haldus/ProductFileUpload'
 import ConfirmDialog from '@/components/haldus/ConfirmDialog'
+import { fmt, withVat } from '@/lib/price'
 
 const canManageProducts = (role: string) => role === 'superadmin'
 
@@ -166,7 +167,10 @@ export default function MuudaToode() {
     if (!name.trim() || !price) { setError('Nimi ja hind on kohustuslikud'); return }
     setSaving(true); setError(''); setSaved(false)
 
-    const { error: err } = await supabase.from('products').update({
+    const res = await fetch(`/api/haldus/products/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
       name: name.trim(), sku: sku.trim() || null, slug: slug.trim() || null,
       short_description_et: shortDesc.trim() || null,
       description_et: desc.trim() || null,
@@ -183,10 +187,14 @@ export default function MuudaToode() {
       importance: importance ? parseInt(importance) : null,
       category_gf: categoryGf.trim() || null,
       url_gf: urlGf.trim() || null,
-      updated_at: new Date().toISOString(),
-    }).eq('id', id)
+      category_slugs: catSlugs,
+      }),
+    })
 
-    if (err) { setError(err.message); setSaving(false); return }
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({ error: 'Toote salvestamine ebaõnnestus' }))
+      setError(json.error ?? 'Toote salvestamine ebaõnnestus'); setSaving(false); return
+    }
 
     // Fire-and-forget auto-translation (non-blocking)
     const fieldsToTranslate: Record<string, string> = {}
@@ -200,23 +208,23 @@ export default function MuudaToode() {
       }).catch(console.error)
     }
 
-    // Update categories
-    await supabase.from('product_categories').delete().eq('product_id', id)
-    if (catSlugs.length > 0) {
-      await supabase.from('product_categories').insert(
-        catSlugs.map(s => ({ product_id: id, category_slug: s }))
-      )
-    }
-
     setSaving(false); setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }
 
   async function handleDelete() {
     setDeleting(true)
-    await supabase.from('product_categories').delete().eq('product_id', id)
-    await supabase.from('products').delete().eq('id', id)
+    setError('')
+    const res = await fetch(`/api/haldus/products/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({ error: 'Toote kustutamine ebaõnnestus' }))
+      setError(json.error ?? 'Toote kustutamine ebaõnnestus')
+      setDeleting(false)
+      setConfirmOpen(false)
+      return
+    }
     router.push('/haldus/tooted')
+    router.refresh()
   }
 
   async function handleSaveBulk() {
@@ -448,14 +456,20 @@ export default function MuudaToode() {
               <h2 className="font-semibold text-gray-900">Hind ja laoseis</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Hind (€) <span className="text-red-500">*</span></label>
+                  <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Hind KM-ta (€) <span className="text-red-500">*</span></label>
                   <input type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]" />
+                  <p className="mt-1.5 text-[13px] text-gray-500">
+                    Hind KM-ga: <span className="font-semibold text-gray-700">{price && Number.isFinite(Number(price)) ? fmt(withVat(Number(price))) : '—'}</span>
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Soodushind (€)</label>
+                  <label className="block text-[15px] font-medium text-gray-700 mb-1.5">Soodushind KM-ta (€)</label>
                   <input type="number" step="0.01" min="0" value={salePrice} onChange={e => setSalePrice(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]" placeholder="—" />
+                  <p className="mt-1.5 text-[13px] text-gray-500">
+                    Hind KM-ga: <span className="font-semibold text-gray-700">{salePrice && Number.isFinite(Number(salePrice)) ? fmt(withVat(Number(salePrice))) : '—'}</span>
+                  </p>
                 </div>
               </div>
               <StatusToggle checked={inStock} onChange={setInStock} label="Toode on laos" />

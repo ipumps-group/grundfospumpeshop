@@ -47,11 +47,12 @@ export async function generateMetadata(
   try {
     const { data: product } = await supabaseAdmin
       .from('products')
-      .select('name, description_et, description_en, description_ru, description_lv, description_lt, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, image_url, slug')
+      .select('name, description_et, description_en, description_ru, description_lv, description_lt, short_description_et, short_description_en, short_description_ru, short_description_lv, short_description_lt, image_url, slug, price, sale_price, published')
       .eq('slug', slug)
       .single()
 
-    if (!product) {
+    const metadataPrice = Number(product?.sale_price ?? product?.price)
+    if (!product || !product.published || !Number.isFinite(metadataPrice) || metadataPrice <= 0) {
       return { title: 'Toode puudub' }
     }
 
@@ -103,7 +104,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     .eq('slug', slug)
     .single()
 
-  if (!product) {
+  const displayPrice = Number(product?.sale_price ?? product?.price)
+  if (!product || !product.published || !Number.isFinite(displayPrice) || displayPrice <= 0) {
     notFound()
   }
 
@@ -147,7 +149,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     }
   }
 
-  const displayPrice = product.sale_price ?? product.price
   const description = resolveDescription(product as Record<string, unknown>, locale)
   const availability = product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
 

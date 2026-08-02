@@ -91,6 +91,7 @@ function saveCart(items: CartItem[]) {
 }
 
 function addToCart(product: Product, qty: number) {
+  if (!product.in_stock || Number(product.sale_price ?? product.price) <= 0) return
   const cart = getCart()
   const existing = cart.find(i => i.id === product.id)
   if (existing) {
@@ -335,7 +336,7 @@ function ProductInfo({ product }: { product: Product }) {
         </div>
         <button
           onClick={handleAdd}
-          disabled={!product.in_stock}
+          disabled={!product.in_stock || displayPrice <= 0}
           className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-[15px] transition-all ${
             added
               ? 'bg-green-500 text-white'

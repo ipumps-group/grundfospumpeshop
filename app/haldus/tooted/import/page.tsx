@@ -4,7 +4,6 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Upload, CheckCircle, AlertCircle, FileSpreadsheet } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
-import { supabase } from '@/lib/supabase'
 
 const canManageProducts = (role: string) => role === 'superadmin'
 
@@ -56,13 +55,11 @@ export default function ImportPage() {
     setProgress({ phase: 'reading', msg: 'Alustab importi...' })
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
       const form = new FormData()
       form.append('file', file)
 
       const res = await fetch('/api/haldus/import', {
         method: 'POST',
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
         body: form,
       })
 

@@ -88,6 +88,7 @@ function parseIpWater(v: string): number | null {
 
 function addToCart(product: Product) {
   if (typeof window === 'undefined') return
+  if (!product.in_stock || Number(product.sale_price ?? product.price) <= 0) return
   try {
     const cart = JSON.parse(localStorage.getItem('ipumps_cart') || '[]')
     const existing = cart.find((i: { id: number }) => i.id === product.id)
@@ -151,7 +152,7 @@ function MiniProductCard({ product }: { product: Product }) {
           </div>
           <button
             onClick={handleAdd}
-            disabled={!product.in_stock}
+            disabled={!product.in_stock || price <= 0}
             aria-label={t('addToCart')}
             className={`p-2 rounded-lg transition-all ${added ? 'bg-green-500 text-white' : product.in_stock ? 'bg-[#003366] hover:bg-[#01a0dc] text-white' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}
           >
@@ -240,6 +241,8 @@ export default function PumpCalculator() {
       .select('id')
       .eq('primary_activity_area_slug', tegevusala)
       .eq('published', true)
+      .gt('price', 0)
+      .or('sale_price.is.null,sale_price.gt.0')
 
     if (!areaProducts || areaProducts.length === 0) {
       setProducts([]); setTotal(0); setLoading(false); return
@@ -348,6 +351,9 @@ export default function PumpCalculator() {
       .from('products')
       .select('id, slug, name, sku, price, sale_price, image_url, in_stock, short_description_et', { count: 'exact' })
       .in('id', productIds)
+      .eq('published', true)
+      .gt('price', 0)
+      .or('sale_price.is.null,sale_price.gt.0')
       .order('importance', { ascending: true, nullsFirst: false })
       .order('name')
       .limit(6)
