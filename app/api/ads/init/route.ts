@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireSuperadmin } from '@/lib/api-auth'
 
 export async function GET() {
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405, headers: { Allow: 'POST' } })
+}
+
+export async function POST() {
+  try { await requireSuperadmin() } catch (response) { return response as NextResponse }
   try {
     // Find or create a company
     let { data: companies } = await supabaseAdmin.from('companies').select('id').limit(1)

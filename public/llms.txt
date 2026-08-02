@@ -1,24 +1,37 @@
-# iPumps — Grundfos pumbad Eestis
-> Grundfos pumpade ametlik edasimüüja Eestis. 321 toodet laos — küte, jahutus, puurkaevud, drenaaž ja palju muud.
+# Pump OÜ — Grundfos pumps in Estonia
 
-## Peamised lehed / Main pages
+> Pump OÜ is an Estonian Grundfos pump retailer. The catalogue covers heating, hot-water circulation, borewell, drainage, pressure boosting, sewage and other water-pumping applications. Product pages show VAT-inclusive consumer prices, availability and technical details.
 
-- [Avaleht / Home](https://pumbapood.ee/): Grundfos pumps and solutions, search, categories
-- [Kõik tooted / All Products](https://pumbapood.ee/tooted): Complete product catalog with filters and search (321+ products)
-- [Küttepumbad / Heating Pumps](https://pumbapood.ee/tooted/kute): Grundfos heating pumps for residential and commercial buildings
-- [Jahutuspumbad / Cooling Pumps](https://pumbapood.ee/tooted/jahutus): Cooling pumps for climate systems
-- [Sooja tarbevee pumbad / Hot Water Pumps](https://pumbapood.ee/tooted/sooja-tarbevee-tsirkulatsioonipump): Circulation pumps for boilers
-- [Puurkaevu pumbad / Borewell Pumps](https://pumbapood.ee/tooted/puurkaevud): Deep well pumps up to 200m depth
-- [Drenaaži pumbad / Drainage Pumps](https://pumbapood.ee/tooted/drenaaz): Drainage pumps for basements
-- [Salvkaevu pumbad / Well Pumps](https://pumbapood.ee/tooted/salvkaevud): Surface water well pumps
-- [Rõhutõste pumbad / Pressure Pumps](https://pumbapood.ee/tooted/rohutoste): Pressure boosters for water pressure
-- [Reovee pumbad / Sewage Pumps](https://pumbapood.ee/tooted/reovesi): Sewage pumps for drainage systems
-- [Kontakt / Contact](https://pumbapood.ee/leht/kontakt): Contact info and location
+## Primary pages
 
-## Keeleversioonid / Language versions
+- [Estonian home](https://pumbapood.ee/)
+- [English home](https://pumbapood.ee/en)
+- [Russian home](https://pumbapood.ee/ru)
+- [Latvian home](https://pumbapood.ee/lv)
+- [Lithuanian home](https://pumbapood.ee/lt)
+- [Full product catalogue](https://pumbapood.ee/tooted)
+- [Heating pumps](https://pumbapood.ee/tooted/kuttepumbad)
+- [Domestic hot-water circulation pumps](https://pumbapood.ee/tooted/tsirkulatsioonipumbad-soe-tarbevesi)
+- [Borewell pumps](https://pumbapood.ee/tooted/puurkaevupumbad)
+- [Drainage pumps](https://pumbapood.ee/tooted/drenaazipumbad)
+- [Well pumps](https://pumbapood.ee/tooted/salvkaevupumbad)
+- [Pressure booster pumps](https://pumbapood.ee/tooted/rohutostepumbad)
+- [Sewage pumps](https://pumbapood.ee/tooted/reoveepumbad)
+- [Contact and shop location](https://pumbapood.ee/leht/kontakt)
 
-- [Eesti (ET)](https://pumbapood.ee/) — Default
-- [English (EN)](https://pumbapood.ee/en)
-- [Русский (RU)](https://pumbapood.ee/ru)
-- [Latviešu (LV)](https://pumbapood.ee/lv)
-- [Lietuvių (LT)](https://pumbapood.ee/lt)
+## Business facts
+
+- Legal name: Pump OÜ
+- Registration number: 16391391
+- VAT number: EE102445343
+- Address: Vana-Narva mnt 3, Maardu, Harju maakond 74114, Estonia
+- Phone: +372 527 4403
+- Email: info@pumbapood.ee
+- Opening hours: Monday–Friday, 08:00–17:00
+
+## Crawling guidance
+
+- Canonical URLs and alternate-language links are included in page metadata.
+- The XML sitemap is available at https://pumbapood.ee/sitemap.xml.
+- Use product detail pages as the authoritative source for current price, availability and specifications.
+- Prices displayed to consumers and exposed in product structured data include Estonian VAT.

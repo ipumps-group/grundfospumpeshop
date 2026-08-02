@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import XLSX from 'xlsx'
-import { readFileSync } from 'fs'
+import ExcelJS from 'exceljs'
 import { fileURLToPath } from 'url'
 import { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } from './env.mjs'
 
@@ -77,9 +76,22 @@ async function getSeriesName(name) {
 
 async function main() {
   console.log('Reading Excel file...')
-  const workbook = XLSX.readFile(FILE)
-  const sheet = workbook.Sheets[workbook.SheetNames[0]]
-  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 })
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.readFile(FILE)
+  const sheet = workbook.worksheets[0]
+  if (!sheet) throw new Error('Excel workbook has no worksheets')
+  const cellValue = value => {
+    if (value === null || value === undefined) return ''
+    if (typeof value !== 'object') return value
+    if ('result' in value) return value.result ?? ''
+    if ('text' in value) return value.text ?? ''
+    if ('richText' in value) return value.richText.map(part => part.text).join('')
+    return String(value)
+  }
+  const rows = []
+  sheet.eachRow({ includeEmpty: false }, row => {
+    rows.push(Array.from({ length: Math.max(22, row.cellCount) }, (_, index) => cellValue(row.getCell(index + 1).value)))
+  })
 
   console.log(`Total rows: ${rows.length}`)
   let updated = 0

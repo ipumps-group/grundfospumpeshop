@@ -1,15 +1,34 @@
 import type { NextConfig } from 'next'
 import path from 'path'
+import createBundleAnalyzer from '@next/bundle-analyzer'
 
-// Bundle analyzer - enable with ANALYZE=true npm run build
-const withBundleAnalyzer = (process.env.ANALYZE === 'true' 
-  ? require('@next/bundle-analyzer')({ enabled: true })
-  : (config: NextConfig) => config)
+const legacyCategoryPaths = [
+  ['kute', 'kuttepumbad'],
+  ['sooja-tarbevee-tsirkulatsioonipump', 'tsirkulatsioonipumbad-soe-tarbevesi'],
+  ['puurkaevud', 'puurkaevupumbad'],
+  ['drenaaz', 'drenaazipumbad'],
+  ['drenaa', 'drenaazipumbad'],
+  ['salvkaevud', 'salvkaevupumbad'],
+  ['rohutoste', 'rohutostepumbad'],
+  ['reovesi', 'reoveepumbad'],
+] as const
 
 const nextConfig: NextConfig = {
   // ─── REDIRECTS ───────────────────────────────────────────────────────────────
   async redirects() {
     return [
+      ...legacyCategoryPaths.flatMap(([oldSlug, newSlug]) => ([
+        {
+          source: `/tooted/${oldSlug}`,
+          destination: `/tooted/${newSlug}`,
+          permanent: true,
+        },
+        {
+          source: `/:locale/tooted/${oldSlug}`,
+          destination: `/:locale/tooted/${newSlug}`,
+          permanent: true,
+        },
+      ])),
       // Old Vercel preview domain → production
       {
         source: '/:path*',
@@ -38,7 +57,7 @@ const nextConfig: NextConfig = {
         has: [
           { type: 'query', key: 'tegevusala', value: 'jahutus' },
         ],
-        destination: '/:locale/tooted/kuttepumbad',
+        destination: '/:locale/tooted/jahutus',
         permanent: true,
       },
       {
@@ -100,15 +119,10 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-        ],
-      },
-      // Static assets - long cache
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
       {
@@ -171,11 +185,5 @@ const nextConfig: NextConfig = {
 }
 
 // Bundle analyzer wrapper - enable with ANALYZE=true npm run build
-let nextConfigExport = nextConfig
-
-if (process.env.ANALYZE === 'true') {
-  const bundleAnalyzer = require('@next/bundle-analyzer')({ enabled: true })
-  nextConfigExport = bundleAnalyzer(nextConfig)
-}
-
-export default nextConfigExport
+const bundleAnalyzer = createBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })
+export default bundleAnalyzer(nextConfig)

@@ -29,7 +29,6 @@ export async function PATCH(
   }
 
   const body = await req.json().catch(() => ({}))
-  console.log('[status] PATCH called for order:', id, 'body:', JSON.stringify(body))
   const { status, note, sendEmail = true } = body as {
     status: string
     note?: string

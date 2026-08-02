@@ -1,26 +1,22 @@
-'use client'
-
-import Script from 'next/script'
-
-let _jsonLdCounter = 0
-
 interface JsonLdProps {
   data: Record<string, unknown>
   id?: string
 }
 
 /**
- * Renders JSON-LD structured data for rich results.
- * Uses next/script with afterInteractive strategy for optimal loading.
+ * Renders JSON-LD structured data in the server response for crawlers.
  */
+export function serializeJsonLd(data: Record<string, unknown>): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c')
+}
+
 export default function JsonLd({ data, id }: JsonLdProps) {
-  const uniqueId = id || `json-ld-${++_jsonLdCounter}`
+  const json = serializeJsonLd(data)
   return (
-    <Script
-      id={uniqueId}
+    <script
+      {...(id ? { id } : {})}
       type="application/ld+json"
-      strategy="afterInteractive"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: json }}
     />
   )
 }

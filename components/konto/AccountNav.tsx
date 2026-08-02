@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import NextLink from 'next/link'
+import { Link, usePathname } from '@/i18n/navigation'
 import { LayoutDashboard, ShoppingBag, User, MapPin, LogOut, Shield } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { useTranslations } from 'next-intl'
@@ -42,13 +42,13 @@ export default function AccountNav() {
           )
         })}
         {isAdmin && (
-          <Link
+          <NextLink
             href="/haldus"
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-medium whitespace-nowrap text-[#003366] bg-blue-50 hover:bg-blue-100 transition-colors"
           >
             <Shield size={15} />
             {tNav('adminPanel')}
-          </Link>
+          </NextLink>
         )}
         <button
           onClick={signOut}
@@ -81,13 +81,13 @@ export default function AccountNav() {
         {isAdmin && (
           <>
             <div className="my-2 border-t border-gray-100" />
-            <Link
+            <NextLink
               href="/haldus"
               className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[15px] font-semibold text-[#003366] bg-blue-50 hover:bg-blue-100 transition-colors"
             >
               <Shield size={16} />
               {tNav('adminPanel')}
-            </Link>
+            </NextLink>
           </>
         )}
         <button

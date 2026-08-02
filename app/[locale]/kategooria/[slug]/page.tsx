@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback, use } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import {
   Search, SlidersHorizontal, LayoutGrid, List,

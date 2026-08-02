@@ -1,8 +1,7 @@
-import Link from 'next/link'
-import { getLocale, getTranslations } from 'next-intl/server'
+import { Link } from '@/i18n/navigation'
+import { getTranslations } from 'next-intl/server'
 
 export default async function NotFound() {
-  const locale = await getLocale()
   const t = await getTranslations('common')
 
   return (
@@ -16,7 +15,7 @@ export default async function NotFound() {
           {t('notFoundMessage')}
         </p>
         <Link
-          href={`/${locale}`}
+          href="/"
           className="inline-flex items-center gap-2 bg-[#003366] hover:bg-[#004080] text-white px-6 py-3 rounded-xl font-semibold transition-colors"
         >
           {t('backToHome')}

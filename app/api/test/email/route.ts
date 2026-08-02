@@ -12,8 +12,6 @@ export async function POST(req: NextRequest) {
 
   const { orderId, type = 'statusUpdate', status = 'processing' } = await req.json().catch(() => ({}))
   
-  console.log('[test-email] Received:', { orderId, type, status })
-  
   try {
     await sendOrderStatusUpdate({ orderId, newStatus: status })
     return NextResponse.json({ ok: true, message: 'Email sent' })
@@ -25,6 +23,7 @@ export async function POST(req: NextRequest) {
 
 // GET /api/test/email - Form to test
 export async function GET() {
+  try { await requireAdmin() } catch (e) { return e as NextResponse }
   const html = `
     <!DOCTYPE html>
     <html><body>

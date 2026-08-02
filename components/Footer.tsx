@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { Phone, Mail } from 'lucide-react'
-import ObfuscatedEmail from './ObfuscatedEmail'
 import { useTranslations, useLocale } from 'next-intl'
 import { supabase } from '@/lib/supabase'
 
@@ -77,15 +75,6 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
       })
   }, [settings])
 
-  const team = [
-    { 
-      name: settings?.footer_team_1_name || '',  
-      eUser: settings?.footer_team_1_email || 'info',  
-      phone: settings?.footer_team_1_phone || '', 
-      tel: settings?.footer_team_1_phone?.replace(/\s/g, '') || '' 
-    },
-  ].filter(t => t.name || t.phone)
-
   return (
     <footer className="bg-[#001f40] text-white/70">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -95,7 +84,7 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
 
           {/* Veerg 1 — Logo + kirjeldus + kontaktandmed */}
           <div className="col-span-2 lg:col-span-1">
-            <Link href="/et" className="mb-4 block">
+            <Link href="/" className="mb-4 block">
               <Image 
                 src="/ipumps-logo-white.svg" 
                 alt="Pumbapood" 
@@ -103,7 +92,6 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
                 height={36}
                 className="w-auto"
                 style={{ height: 36 }}
-                priority
               />
             </Link>
             <p className="text-[14px] leading-relaxed mb-4">
@@ -118,8 +106,8 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
                   {settings.footer_phone}
                 </a>
               )}
-              {settings?.footer_reg && <div className="pt-1 text-white/30">{settings.footer_reg}</div>}
-              {settings?.footer_vat && <div className="text-white/30">{settings.footer_vat}</div>}
+              {settings?.footer_reg && <div className="pt-1 text-white/70">{settings.footer_reg}</div>}
+              {settings?.footer_vat && <div className="text-white/70">{settings.footer_vat}</div>}
             </div>
           </div>
 
@@ -128,13 +116,13 @@ export default function Footer({ siteSettings: initialSettings }: FooterProps) {
             <div className="text-white font-semibold text-[14px] uppercase tracking-wider mb-4">{t('categories')}</div>
             <div className="space-y-2">
               {categoryKeys.map(cat => (
-                <a
+                <Link
                   key={cat.slug}
                   href={`/tooted/${cat.slug}`}
                   className="block text-[14px] hover:text-white transition-colors"
                 >
                   {tCat(cat.nameKey)}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

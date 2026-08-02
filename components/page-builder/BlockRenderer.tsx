@@ -6,7 +6,7 @@ import ShortcodeRenderer from '@/components/ShortcodeRenderer'
 import SearchBarBlockRenderer from './SearchBarBlockRenderer'
 import TegevusaladBlockRenderer from './TegevusaladBlockRenderer'
 import Image from 'next/image'
-import type { Section, ContentBlock, HeadingBlock, TextBlock, ImageBlock, ButtonBlock, VideoBlock, DividerBlock, SpacerBlock, SliderBlock } from './types'
+import type { Section, ContentBlock, HeadingBlock, TextBlock, ImageBlock, ButtonBlock, VideoBlock, DividerBlock, SpacerBlock } from './types'
 
 // ─── Video URL parser ──────────────────────────────────────────────────────
 
@@ -21,24 +21,20 @@ function getEmbedUrl(url: string): string | null {
 
 // ─── Padding helper ────────────────────────────────────────────────────────
 
-function getPadding(size: string, custom?: number): { paddingTop?: string; paddingBottom?: string } {
-  switch (size) {
-    case 'small':  return {}  // handled by className
-    case 'medium': return {}
-    case 'large':  return {}
-    case 'custom': return { paddingTop: `${custom ?? 0}px`, paddingBottom: `${custom ?? 0}px` }
-    default: return {}
-  }
-}
-
 const PAD_TOP: Record<string, string> = {
   small: 'pt-4', medium: 'pt-12', large: 'pt-24', custom: '',
 }
 const PAD_BOT: Record<string, string> = {
   small: 'pb-4', medium: 'pb-12', large: 'pb-24', custom: '',
 }
-const PAD_X: Record<string, string> = {
-  small: 'px-4', medium: 'px-8', large: 'px-16', custom: '',
+function readableTextColor(background: string | undefined): string {
+  const match = background?.match(/^#([0-9a-f]{6})$/i)
+  if (!match) return '#001f40'
+  const channels = [0, 2, 4].map(offset => parseInt(match[1].slice(offset, offset + 2), 16) / 255)
+  const luminance = channels
+    .map(channel => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+    .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0)
+  return (1.05 / (luminance + 0.05)) >= 4.5 ? '#ffffff' : '#001f40'
 }
 
 // ─── Single block renderer ─────────────────────────────────────────────────
@@ -166,7 +162,7 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
       const btnFontSize = b.font_size ? `${b.font_size}px` : undefined
       let btnCls = `inline-block px-6 py-3 rounded-xl font-semibold ${b.font_size ? '' : 'text-[15px]'} transition-opacity hover:opacity-80`
       if (b.style === 'filled') {
-        btnCls += ' text-white'
+        btnCls += ''
       } else if (b.style === 'outline') {
         btnCls += ' bg-transparent border-2'
       } else {
@@ -174,7 +170,7 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
       }
       const btnStyle: React.CSSProperties =
         b.style === 'filled'
-          ? { backgroundColor: b.color, fontSize: btnFontSize }
+          ? { backgroundColor: b.color, color: readableTextColor(b.color), fontSize: btnFontSize }
           : b.style === 'outline'
           ? { color: b.color, borderColor: b.color, fontSize: btnFontSize }
           : { color: b.color, fontSize: btnFontSize }
@@ -232,7 +228,7 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
 
 // ─── Section renderer ──────────────────────────────────────────────────────
 
-function RenderSection({ section, locale }: { section: Section; locale: string }) {
+function RenderSection({ section, locale, priorityBackground }: { section: Section; locale: string; priorityBackground: boolean }) {
   const { settings, columns } = section
   const isBoxed = settings.width === 'boxed'
   const isCustom = settings.width === 'custom'
@@ -275,11 +271,15 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
   if (settings.padding_bottom === 'custom') paddingStyle.paddingBottom = `${settings.padding_bottom_custom ?? 0}px`
 
   // Unique class for responsive overrides: grid columns at md+, custom px at md+
-  const gridId = `sg${section.id.replace(/-/g, '').slice(0, 10)}`
+  const gridId = `sg${section.id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)}`
+  const safeNumber = (value: unknown, fallback: number, min = 0, max = 5000) => {
+    const number = Number(value)
+    return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback
+  }
   const styleRules = [
-    `@media(min-width:768px){.${gridId}{grid-template-columns:${columns.map(c => `${c.width}fr`).join(' ')}}}`,
+    `@media(min-width:768px){.${gridId}{grid-template-columns:${columns.map(c => `${safeNumber(c.width, 1, 0.1, 12)}fr`).join(' ')}}}`,
     settings.padding_x === 'custom'
-      ? `@media(min-width:768px){.${gridId}{padding-left:${settings.padding_x_custom ?? 0}px;padding-right:${settings.padding_x_custom ?? 0}px}}`
+      ? `@media(min-width:768px){.${gridId}{padding-left:${safeNumber(settings.padding_x_custom, 0)}px;padding-right:${safeNumber(settings.padding_x_custom, 0)}px}}`
       : '',
   ].filter(Boolean).join('\n')
 
@@ -352,7 +352,7 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
             fill
             sizes="100vw"
             className="object-cover z-0"
-            priority={section.order === 0}
+            priority={priorityBackground}
           />
         )}
         {overlay}
@@ -367,10 +367,16 @@ function RenderSection({ section, locale }: { section: Section; locale: string }
 // ─── Public export ─────────────────────────────────────────────────────────
 
 export default function BlockRenderer({ sections, locale }: { sections: Section[]; locale: string }) {
+  const firstBackgroundIndex = sections.findIndex(section => Boolean(section.settings.background_image_url))
   return (
     <>
-      {sections.map(section => (
-        <RenderSection key={section.id} section={section} locale={locale} />
+      {sections.map((section, index) => (
+        <RenderSection
+          key={section.id}
+          section={section}
+          locale={locale}
+          priorityBackground={index === firstBackgroundIndex}
+        />
       ))}
     </>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 
 const CONSENT_KEY = 'pumbapood_consent'
@@ -68,7 +68,7 @@ export default function CookieConsent() {
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <p className="text-[14px] text-gray-600 flex-1 leading-relaxed">
           {t('message')}{' '}
-          <Link href="/leht/privaatsuspoliitika" className="text-[#003366] underline hover:text-[#004080]">
+          <Link href="/leht/privaatsuspoliitika" aria-label={`${t('learnMore')}: ${t('message')}`} className="text-[#003366] underline hover:text-[#004080]">
             {t('learnMore')}
           </Link>
         </p>

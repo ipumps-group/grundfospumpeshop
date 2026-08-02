@@ -5,12 +5,14 @@ import ShortcodeRenderer from '@/components/ShortcodeRenderer'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import type { Section } from '@/components/page-builder/types'
 import Link from 'next/link'
+import { requireAdmin } from '@/lib/api-auth'
 
 interface Column { title: string; text: string }
 
 export default async function EelvaadePage(
   { params }: { params: Promise<{ id: string }> }
 ) {
+  await requireAdmin()
   const { id } = await params
 
   const { data: page } = await supabaseAdmin

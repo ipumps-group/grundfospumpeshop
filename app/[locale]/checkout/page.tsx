@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { trackBeginCheckout } from '@/lib/google-ads'
 import { trackMetaInitiateCheckout } from '@/lib/meta-pixel'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import {
   ChevronRight, Lock, Loader2, AlertCircle,
   Package, ShieldCheck, Truck, Building2, FileText

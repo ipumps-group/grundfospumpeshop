@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAccessToken } from '@/lib/ads/google-ads'
+import { requireSuperadmin } from '@/lib/api-auth'
 
 async function runGaql(gaql: string, label: string): Promise<{ step: string; ok: boolean; detail: string }[]> {
   const steps: { step: string; ok: boolean; detail: string }[] = []
@@ -60,7 +61,7 @@ async function googleTest() {
   ]
   for (const key of required) {
     const val = process.env[key]
-    steps.push({ step: `env.${key}`, ok: !!val, detail: val ? `${val.slice(0, 8)}...` : 'missing' })
+    steps.push({ step: `env.${key}`, ok: !!val, detail: val ? 'configured' : 'missing' })
   }
 
   // 2. OAuth
@@ -106,7 +107,7 @@ async function metaTest() {
   const required = ['META_ACCESS_TOKEN', 'META_AD_ACCOUNT_ID']
   for (const key of required) {
     const val = process.env[key]
-    steps.push({ step: `env.${key}`, ok: !!val, detail: val ? `${val.slice(0, 12)}...` : 'missing' })
+    steps.push({ step: `env.${key}`, ok: !!val, detail: val ? 'configured' : 'missing' })
   }
 
   const token = process.env.META_ACCESS_TOKEN
@@ -181,6 +182,7 @@ async function metaTest() {
 }
 
 export async function GET(request: Request) {
+  try { await requireSuperadmin() } catch (response) { return response as NextResponse }
   const { searchParams } = new URL(request.url)
   const platform = searchParams.get('platform') || 'google_ads'
 

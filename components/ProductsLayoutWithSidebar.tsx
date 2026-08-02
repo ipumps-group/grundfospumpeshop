@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Search, ChevronDown, LayoutGrid, List } from 'lucide-react'
 import { ViewModeProvider, useViewMode } from '@/lib/ViewModeContext'
 import { useTranslations } from 'next-intl'

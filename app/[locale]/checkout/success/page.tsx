@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { CheckCircle2, Loader2, XCircle, Clock } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
@@ -28,14 +28,12 @@ function SuccessContent() {
   const tAcc = useTranslations('account')
   const searchParams = useSearchParams()
   const ref = searchParams.get('ref') || ''
+  const token = searchParams.get('token') || ''
   const { user } = useAuth()
-  const [pageState, setPageState] = useState<PageState>('loading')
+  const [pageState, setPageState] = useState<PageState>(ref && token ? 'loading' : 'timed_out')
 
   useEffect(() => {
-    if (!ref) {
-      setPageState('timed_out')
-      return
-    }
+    if (!ref || !token) return
 
     let cancelled = false
     let confirmedPurchase: ConfirmedPurchase | null = null
@@ -65,7 +63,7 @@ function SuccessContent() {
     const verifyAndTrack = async () => {
       for (let attempt = 0; attempt < MAX_ATTEMPTS && !cancelled; attempt++) {
         try {
-          const response = await fetch(`/api/tracking/purchase?ref=${encodeURIComponent(ref)}`, { cache: 'no-store' })
+          const response = await fetch(`/api/tracking/purchase?ref=${encodeURIComponent(ref)}&token=${encodeURIComponent(token)}`, { cache: 'no-store' })
           if (response.ok) {
             const data = await response.json() as ConfirmedPurchase | { confirmed: false; cancelled?: boolean }
             if (data.confirmed) {
@@ -101,7 +99,7 @@ function SuccessContent() {
       cancelled = true
       window.removeEventListener('consent_changed', onConsentChanged)
     }
-  }, [ref])
+  }, [ref, token])
 
   // ── Laadimine ──
   if (pageState === 'loading') {

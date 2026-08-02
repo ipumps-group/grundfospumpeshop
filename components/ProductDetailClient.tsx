@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import {
   ChevronRight, Package, Truck, Shield,
@@ -160,23 +160,23 @@ function Breadcrumb({ product }: { product: Product }) {
   return (
     <nav className="bg-gray-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2 text-[15px] text-gray-500 flex-wrap">
-        <a href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</a>
+        <Link href="/" className="hover:text-[#003366] transition-colors">{tNav('home')}</Link>
         <ChevronRight size={14} className="text-gray-300" />
-        <a href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</a>
+        <Link href="/tooted" className="hover:text-[#003366] transition-colors">{tNav('products')}</Link>
         {catName && (
           <>
             <ChevronRight size={14} className="text-gray-300" />
-            <a href={`/tooted/${product.primary_activity_area_slug}`} className="hover:text-[#003366] transition-colors">
+            <Link href={`/tooted/${product.primary_activity_area_slug}`} className="hover:text-[#003366] transition-colors">
               {catName}
-            </a>
+            </Link>
           </>
         )}
         {seriesName && (
           <>
             <ChevronRight size={14} className="text-gray-300" />
-            <a href={`/tooted/${product.primary_activity_area_slug}/${product.series_slug}`} className="hover:text-[#003366] transition-colors">
+            <Link href={`/tooted/${product.primary_activity_area_slug}/${product.series_slug}`} className="hover:text-[#003366] transition-colors">
               {seriesName}
-            </a>
+            </Link>
           </>
         )}
         <ChevronRight size={14} className="text-gray-300" />
@@ -367,12 +367,12 @@ function ProductInfo({ product }: { product: Product }) {
       )}
 
       {/* Päring */}
-      <a
-        href={`/${locale}/leht/kontakt`}
+      <Link
+        href="/leht/kontakt"
         className="flex items-center justify-center gap-2 py-3 px-6 rounded-xl border-2 border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white font-semibold text-[15px] transition-all"
       >
         <Phone size={16} /> {t('requestQuote')}
-      </a>
+      </Link>
 
       {/* Eelised */}
       <div className="grid grid-cols-3 gap-3 pt-2 border-t border-gray-100">
@@ -629,7 +629,7 @@ function RelatedProducts({ products }: { products: RelatedProduct[] }) {
       <h2 className="text-xl font-bold text-gray-900 mb-5">{t('relatedProductsTitle')}</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {products.map(p => (
-          <a key={p.slug} href={`/toode/${p.slug}`}
+          <Link key={p.slug} href={`/toode/${p.slug}`}
             className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[#003366]/20 hover:shadow-lg transition-all duration-300">
             <div className="bg-gray-50 p-5 flex items-center justify-center h-36">
               <img
@@ -649,7 +649,7 @@ function RelatedProducts({ products }: { products: RelatedProduct[] }) {
                 {Number(p.price).toFixed(2).replace('.', ',')} €
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>
@@ -689,9 +689,9 @@ export default function ProductDetailClient({ product, attributes, attrNameMap, 
           <div className="text-5xl mb-4">🔍</div>
           <h1 className="text-xl font-bold text-gray-800 mb-2">{t('notFound')}</h1>
           <p className="text-[15px] text-gray-500 mb-5">{t('notFoundHint')}</p>
-          <a href="/tooted" className="bg-[#003366] text-white px-6 py-3 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors">
+          <Link href="/tooted" className="bg-[#003366] text-white px-6 py-3 rounded-xl font-semibold text-[15px] hover:bg-[#004080] transition-colors">
             {t('viewAllProducts')}
-          </a>
+          </Link>
         </div>
       </div>
     )

@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL, localizedUrl } from '@/lib/config'
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 import ProductsGrid from '../../ProductsGrid'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 
 export const dynamic = 'force-dynamic'
-
-const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; tegevusala: string; seeria: string }> }
@@ -43,9 +40,7 @@ export async function generateMetadata(
       description,
       alternates: {
         canonical,
-        languages: Object.fromEntries(
-          LOCALES.map(l => [l, localizedUrl(`/tooted/${tegevusala}/${seeria}`, l)])
-        ),
+        languages: languageAlternates(`/tooted/${tegevusala}/${seeria}`),
       },
       openGraph: {
         title,

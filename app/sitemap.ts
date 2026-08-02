@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { routing } from '@/i18n/routing'
-import { SITE_URL, localizedUrl } from '@/lib/config'
+import { localizedUrl, languageAlternates } from '@/lib/config'
 
 const LOCALES = [...routing.locales] as string[]
 
@@ -18,10 +18,12 @@ type SitemapEntry = {
 }
 
 function langEntry(path: string): Record<string, string> {
-  return Object.fromEntries(
-    LOCALES.map(l => [l, localizedUrl(path, l)])
-  )
+  return languageAlternates(path)
 }
+
+// Generate from the live catalogue at request time so a transient build-time
+// database failure cannot publish a permanently truncated sitemap.
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: SitemapEntry[] = []
@@ -96,7 +98,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       if (seriesData) {
         for (const series of seriesData) {
-          const areaSlug = (series as any).activity_areas?.slug
+          const relation = series.activity_areas as { slug: string } | { slug: string }[] | null
+          const areaSlug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug
           if (!areaSlug) continue
           const path = `/tooted/${areaSlug}/${series.slug}`
           for (const locale of LOCALES) {
@@ -131,7 +134,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     // 5. Static pages - PRIORITY 0.5
+    const dynamicPageSlugs = new Set((pages || []).map(page => page.slug))
     for (const pageSlug of STATIC_PAGES) {
+      if (dynamicPageSlugs.has(pageSlug)) continue
       for (const locale of LOCALES) {
         const path = `/leht/${pageSlug}`
         entries.push({
@@ -181,5 +186,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return entries as MetadataRoute.Sitemap
+  return Array.from(new Map(entries.map(entry => [entry.url, entry])).values()) as MetadataRoute.Sitemap
 }

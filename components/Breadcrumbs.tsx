@@ -1,4 +1,5 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
+import JsonLd from '@/components/seo/JsonLd'
 
 interface BreadcrumbItem {
   label: string
@@ -27,17 +28,14 @@ export default function Breadcrumbs({ items, locale = 'et', siteUrl = 'https://p
   return (
     <>
       {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       
       {/* Visible Breadcrumbs */}
       <nav className="max-w-7xl mx-auto px-4 py-3">
         <ol className="flex items-center gap-1 text-sm text-gray-500 flex-wrap">
           <li>
             <Link 
-              href={`/${locale}`} 
+              href="/"
               className="hover:text-[#003366] transition-colors"
             >
               Avaleht

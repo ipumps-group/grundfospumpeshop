@@ -30,7 +30,7 @@
   },
   "hero": {
     "title": "Насосы и решения Grundfos",
-    "subtitle": "Поиск среди 321 продукта по названию, SKU или техническим параметрам",
+    "subtitle": "Поиск товаров по названию, SKU или техническим параметрам",
     "searchPlaceholder": "например MAGNA3, Max Flow 5 м³/ч, Rated Power 65W, SKU 59641500...",
     "searchButton": "Поиск",
     "searching": "Поиск...",
@@ -553,11 +553,11 @@
     "siteName": "Pump OÜ",
     "home": {
       "title": "Насосы Grundfos и решения – Pump OÜ",
-      "description": "Купите насосы Grundfos MAGNA3, Alpha, scALA и другие. 321 модель в наличии. Консультации и установка."
+      "description": "Купите насосы Grundfos MAGNA3, ALPHA, SCALA и другие. Консультации и быстрая доставка."
     },
     "products": {
       "title": "Все товары – Pump OÜ",
-      "description": "Смотрите все насосы Grundfos. 321 модель, цены с НДС, быстрая доставка."
+      "description": "Каталог насосов Grundfos: цены с НДС и быстрая доставка."
     }
   },
   "tegevusalad": {
@@ -592,7 +592,7 @@
   },
   "cookieConsent": {
     "message": "Мы используем куки для работы сайта и статистики посещений.",
-    "learnMore": "Подробнее",
+    "learnMore": "Политика конфиденциальности",
     "acceptAll": "Принять всё",
     "essential": "Только нужные"
   }

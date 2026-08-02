@@ -39,16 +39,16 @@ CREATE TABLE IF NOT EXISTS public.ui_translations (locale text, messages jsonb N
 -- Table RLS policies
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN
-  CREATE POLICY "Public read products table" ON public.products FOR SELECT USING (true);
+  CREATE POLICY "Public read products table" ON public.products FOR SELECT TO anon, authenticated USING (published = true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
-  CREATE POLICY "Authenticated insert products" ON public.products FOR INSERT TO authenticated WITH CHECK (true);
+  CREATE POLICY "Service role insert products" ON public.products FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
-  CREATE POLICY "Authenticated update products table" ON public.products FOR UPDATE TO authenticated USING (true);
+  CREATE POLICY "Service role update products table" ON public.products FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
-  CREATE POLICY "Authenticated delete products table" ON public.products FOR DELETE TO authenticated USING (true);
+  CREATE POLICY "Service role delete products table" ON public.products FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- Storage buckets
@@ -62,15 +62,15 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE POLICY "Authenticated upload products" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'products');
+  CREATE POLICY "Service role upload products" ON storage.objects FOR INSERT TO service_role WITH CHECK (bucket_id = 'products');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE POLICY "Authenticated update products" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'products');
+  CREATE POLICY "Service role update products" ON storage.objects FOR UPDATE TO service_role USING (bucket_id = 'products') WITH CHECK (bucket_id = 'products');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE POLICY "Authenticated delete products" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'products');
+  CREATE POLICY "Service role delete products" ON storage.objects FOR DELETE TO service_role USING (bucket_id = 'products');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN

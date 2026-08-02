@@ -34,11 +34,11 @@ create policy "Public read storage"
   on storage.objects for select
   using (bucket_id = 'product-documents');
 
--- Allow authenticated admins to upload and delete
+-- Admin uploads run through server APIs using service_role.
 create policy "Authenticated upload"
-  on storage.objects for insert to authenticated
+  on storage.objects for insert to service_role
   with check (bucket_id = 'product-documents');
 
 create policy "Authenticated delete"
-  on storage.objects for delete to authenticated
+  on storage.objects for delete to service_role
   using (bucket_id = 'product-documents');

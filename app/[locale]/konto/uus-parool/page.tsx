@@ -1,15 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef, FormEvent } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 
 export default function UusParoolPage() {
   const t = useTranslations('account')
-  const locale = useLocale()
   const { user, loading } = useAuth()
   const router = useRouter()
 
@@ -53,7 +51,7 @@ export default function UusParoolPage() {
       setSubmitting(false)
     } else {
       setSuccess(true)
-      setTimeout(() => router.replace(`/${locale}/konto`), 2000)
+      setTimeout(() => router.replace('/konto'), 2000)
     }
   }
 
@@ -89,7 +87,7 @@ export default function UusParoolPage() {
             {t('linkExpiredDesc')}
           </p>
           <Link
-            href={`/${locale}/konto/parooli-taastamine`}
+            href="/konto/parooli-taastamine"
             className="inline-block bg-[#003366] hover:bg-[#004080] text-white px-6 py-3 rounded-xl font-semibold transition-colors text-[15px]"
           >
             {t('requestNewLink')}
@@ -147,7 +145,7 @@ export default function UusParoolPage() {
         </form>
 
         <p className="text-center text-[14px] text-gray-500 mt-5">
-          <Link href={`/${locale}/konto/sisselogimine`} className="text-[#003366] font-semibold hover:underline">
+          <Link href="/konto/sisselogimine" className="text-[#003366] font-semibold hover:underline">
             {t('backToLogin')}
           </Link>
         </p>

@@ -87,8 +87,13 @@ export async function GET(req: NextRequest) {
   const carrier = searchParams.get('carrier') || 'omniva'
   const country = searchParams.get('country') || 'EE'
 
-  const accessKey = process.env.MONTONIO_ACCESS_KEY ?? ''
-  const secretKey = process.env.MONTONIO_SECRET_KEY ?? ''
+  const useSandbox = process.env.MONTONIO_SANDBOX === 'true'
+  const accessKey = useSandbox
+    ? (process.env.MONTONIO_ACCESS_KEY ?? '')
+    : (process.env.MONTONIO_LIVE_ACCESS_KEY ?? '')
+  const secretKey = useSandbox
+    ? (process.env.MONTONIO_SECRET_KEY ?? '')
+    : (process.env.MONTONIO_LIVE_SECRET_KEY ?? '')
 
   try {
     let points: ParcelPoint[] = []

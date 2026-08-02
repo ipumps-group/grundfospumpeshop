@@ -64,7 +64,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
 
   if (sent) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="flex flex-col items-center justify-center py-12 px-5 text-center bg-white rounded-2xl">
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
           <CheckCircle size={32} className="text-green-600" />
         </div>
@@ -75,7 +75,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 bg-white rounded-2xl p-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[13px] font-medium text-gray-700 mb-1">{t('name')} *</label>
@@ -96,7 +96,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[13px] font-medium text-gray-700 mb-1">
-            {t('phone')} <span className="font-normal text-gray-400">({t('optional')})</span>
+            {t('phone')} <span className="font-normal text-gray-600">({t('optional')})</span>
           </label>
           <input
             type="tel" value={phone} onChange={e => setPhone(e.target.value)}
@@ -105,7 +105,7 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
         </div>
         <div>
           <label className="block text-[13px] font-medium text-gray-700 mb-1">
-            {t('address')} <span className="font-normal text-gray-400">({t('optional')})</span>
+            {t('address')} <span className="font-normal text-gray-600">({t('optional')})</span>
           </label>
           <input
             type="text" value={address} onChange={e => setAddress(e.target.value)}

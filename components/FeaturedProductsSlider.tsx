@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -59,7 +59,7 @@ export default function FeaturedProductsSlider() {
   }
 
   useEffect(() => {
-    loadFeatured()
+    const initialLoad = window.setTimeout(() => { void loadFeatured() }, 0)
 
     // Real-time: kui kategooria tooteid muudetakse, uuenda slider kohe
     const channel = supabase
@@ -72,8 +72,10 @@ export default function FeaturedProductsSlider() {
       }, () => { loadFeatured() })
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      window.clearTimeout(initialLoad)
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   // ── Responsive visible count ──────────────────────────────────────────────
@@ -87,18 +89,15 @@ export default function FeaturedProductsSlider() {
     return () => window.removeEventListener('resize', update)
   }, [])
 
-  // Reset page to 0 when visible changes (prevents out-of-range position)
-  useEffect(() => {
-    setAnimate(false)
-    setPage(0)
-  }, [visible])
-
   // ── Derived ───────────────────────────────────────────────────────────────
   // Each "page" advances by 1 card (not a full visible-width)
   const totalPages = products.length > 0 ? products.length : 0
 
-  // Duplicate the array so the last real page seamlessly wraps to the first
-  const slides = [...products, ...products]
+  // Only duplicate the cards needed for the wrap transition. Duplicating the
+  // entire catalogue inflated homepage DOM size and image work.
+  const slides = products.length > visible
+    ? [...products, ...products.slice(0, visible)]
+    : products
 
   // ── Auto-advance every 4 s ────────────────────────────────────────────────
   useEffect(() => {
@@ -158,9 +157,9 @@ export default function FeaturedProductsSlider() {
                 <ChevronRight size={16} />
               </button>
             </div>
-            <a href="/tooted" className="text-[15px] text-[#003366] hover:underline font-medium hidden sm:block">
+            <Link href="/tooted" className="text-[15px] text-[#003366] hover:underline font-medium hidden sm:block">
               {t('viewAll')}
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -225,7 +224,7 @@ export default function FeaturedProductsSlider() {
                         {/* Info area */}
                         <div className="p-4 flex flex-col flex-1">
                           {product.sku && (
-                            <div className="text-[13px] text-gray-400 font-mono mb-1">{product.sku}</div>
+                          <div className="text-[13px] text-gray-600 font-mono mb-1">{product.sku}</div>
                           )}
                           <div className="font-semibold text-gray-800 text-[15px] leading-tight mb-3 group-hover:text-[#003366] transition-colors line-clamp-2 flex-1">
                             {product.name}
@@ -255,16 +254,22 @@ export default function FeaturedProductsSlider() {
 
             {/* Page dots */}
             <div className="flex justify-center items-center gap-2 mt-6">
-              {Array.from({ length: totalPages }).map((_, i) => (
+              {totalPages <= 10 ? Array.from({ length: totalPages }).map((_, i) => (
                 <button
                   key={i}
                   onClick={() => { setAnimate(true); setPage(i) }}
                   aria-label={`Go to slide ${i + 1}`}
-                  className={`rounded-full transition-all duration-300 ${
-                    dotActive === i ? 'bg-[#003366] w-6 h-3' : 'bg-gray-300 w-3 h-3 hover:bg-gray-400'
-                  }`}
-                />
-              ))}
+                  className="w-8 h-8 flex items-center justify-center rounded-full"
+                >
+                  <span className={`block rounded-full transition-all duration-300 ${
+                    dotActive === i ? 'bg-[#003366] w-6 h-3' : 'bg-gray-400 w-3 h-3'
+                  }`} />
+                </button>
+              )) : (
+                <span className="text-[14px] font-medium text-gray-700" aria-live="polite">
+                  {dotActive + 1} / {totalPages}
+                </span>
+              )}
             </div>
           </>
         )}

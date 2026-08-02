@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import type { DailyInsight, Campaign, AggregatedInsight } from './types'
 
 // ─── CSV ─────────────────────────────────────────────
@@ -32,8 +32,10 @@ export function campaignsToCSV(campaigns: Campaign[]): string {
 }
 
 // ─── XLSX ────────────────────────────────────────────
-export function insightsToXLSX(insights: DailyInsight[], title = 'Ads Insights'): Buffer {
-  const wb = XLSX.utils.book_new()
+export async function insightsToXLSX(insights: DailyInsight[], title = 'Ads Insights'): Promise<Buffer> {
+  const wb = new ExcelJS.Workbook()
+  wb.creator = 'Pump OÜ'
+  wb.title = title
 
   // Summary sheet
   const summaryData = [
@@ -46,8 +48,9 @@ export function insightsToXLSX(insights: DailyInsight[], title = 'Ads Insights')
     { Metric: 'Total Purchases', Value: insights.reduce((s, i) => s + i.purchases, 0) },
   ]
 
-  const summaryWs = XLSX.utils.json_to_sheet(summaryData)
-  XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary')
+  const summaryWs = wb.addWorksheet('Summary')
+  summaryWs.columns = [{ header: 'Metric', key: 'Metric', width: 24 }, { header: 'Value', key: 'Value', width: 18 }]
+  summaryWs.addRows(summaryData)
 
   // Detail sheet
   const detailRows = insights.map(i => ({
@@ -66,16 +69,22 @@ export function insightsToXLSX(insights: DailyInsight[], title = 'Ads Insights')
     Purchases: i.purchases,
   }))
 
-  const detailWs = XLSX.utils.json_to_sheet(detailRows)
-  XLSX.utils.book_append_sheet(wb, detailWs, 'Daily Insights')
+  const detailWs = wb.addWorksheet('Daily Insights')
+  const detailHeaders = Object.keys(detailRows[0] || { Date: '', Platform: '', Spend: '' })
+  detailWs.columns = detailHeaders.map(key => ({ header: key, key, width: Math.max(12, key.length + 3) }))
+  detailWs.addRows(detailRows)
 
-  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
-  return buf
+  for (const sheet of wb.worksheets) {
+    sheet.getRow(1).font = { bold: true }
+    sheet.views = [{ state: 'frozen', ySplit: 1 }]
+  }
+  return Buffer.from(await wb.xlsx.writeBuffer())
 }
 
 // ─── AGGREGATED TO XLSX ─────────────────────────────
-export function aggregatedToXLSX(data: AggregatedInsight[], campaigns: Campaign[]): Buffer {
-  const wb = XLSX.utils.book_new()
+export async function aggregatedToXLSX(data: AggregatedInsight[], campaigns: Campaign[]): Promise<Buffer> {
+  const wb = new ExcelJS.Workbook()
+  wb.creator = 'Pump OÜ'
 
   const campMap = new Map(campaigns.map(c => [c.id, c.campaign_name]))
 
@@ -96,11 +105,13 @@ export function aggregatedToXLSX(data: AggregatedInsight[], campaigns: Campaign[
     Purchases: d.total_purchases,
   }))
 
-  const ws = XLSX.utils.json_to_sheet(rows)
-  XLSX.utils.book_append_sheet(wb, ws, 'Campaign Performance')
-
-  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
-  return buf
+  const ws = wb.addWorksheet('Campaign Performance')
+  const headers = Object.keys(rows[0] || { Campaign: '', Platform: '', Spend: '' })
+  ws.columns = headers.map(key => ({ header: key, key, width: Math.max(12, key.length + 3) }))
+  ws.addRows(rows)
+  ws.getRow(1).font = { bold: true }
+  ws.views = [{ state: 'frozen', ySplit: 1 }]
+  return Buffer.from(await wb.xlsx.writeBuffer())
 }
 
 export function generateCSV(data: Record<string, unknown>[], filename: string): string {

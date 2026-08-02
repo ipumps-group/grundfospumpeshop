@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTranslations, useLocale } from 'next-intl'
 

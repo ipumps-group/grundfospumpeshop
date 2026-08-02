@@ -1,9 +1,10 @@
 ﻿'use client'
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import {
   Search, SlidersHorizontal, LayoutGrid, List,
   ShoppingCart, ChevronDown, ChevronRight, X, Check

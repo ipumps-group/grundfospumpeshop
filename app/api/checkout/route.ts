@@ -4,6 +4,9 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { sendNewOrderAdmin, sendPrepaymentInvoice } from '@/lib/email'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { canRetryOrder } from '@/lib/order-access'
+import { createOrderViewToken } from '@/lib/order-view-token'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -83,6 +86,10 @@ interface CheckoutBody {
 // ─── POST /api/checkout ───────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (rateLimit(`checkout:${ip}`, STRICT_RATE.maxRequests).blocked) {
+    return NextResponse.json({ error: 'Liiga palju päringuid, proovi minuti pärast uuesti' }, { status: 429 })
+  }
   // ── Derive user_id from session cookie, NEVER from request body ─────────────
   let user_id: string | null = null
   try {
@@ -102,12 +109,22 @@ export async function POST(req: NextRequest) {
     if (preview?.retry_order_id && !preview?.items) {
       const { data: retryOrder, error: retryErr } = await supabaseAdmin
         .from('orders')
-        .select('id, order_number, total, email, customer_name, montonio_order_id, shipping_address, status')
+        .select('id, order_number, total, email, customer_name, montonio_order_id, shipping_address, status, user_id')
         .eq('id', preview.retry_order_id)
         .single()
 
       if (retryErr || !retryOrder || !['pending', 'cancelled'].includes(retryOrder.status)) {
         return NextResponse.json({ error: 'Tellimust ei leitud või makset ei saa uuesti proovida' }, { status: 400 })
+      }
+
+      const retryAccessToken = typeof preview.retry_token === 'string' ? preview.retry_token : ''
+      if (!canRetryOrder({
+        orderNumber: String(retryOrder.order_number),
+        orderUserId: retryOrder.user_id,
+        callerUserId: user_id,
+        suppliedToken: retryAccessToken,
+      })) {
+        return NextResponse.json({ error: 'Tellimuse makseõigus puudub' }, { status: 403 })
       }
 
       // Set back to pending for retry
@@ -139,7 +156,7 @@ export async function POST(req: NextRequest) {
       const retryPayload = {
         accessKey: ak2,
         merchantReference: retryOrder.order_number,
-        returnUrl: `${siteUrl2}/checkout/success?ref=${retryOrder.order_number}`,
+        returnUrl: `${siteUrl2}/checkout/success?ref=${encodeURIComponent(retryOrder.order_number)}&token=${encodeURIComponent(createOrderViewToken(String(retryOrder.order_number)))}`,
         notificationUrl: `${siteUrl2}/api/webhooks/montonio`,
         locale: 'et',
         currency: 'EUR',
@@ -187,7 +204,7 @@ export async function POST(req: NextRequest) {
       if (!retryRes.ok) {
         const err = await retryRes.text()
         console.error('Montonio retry viga:', err)
-        return NextResponse.json({ error: 'Makselingi loomine ebaõnnestus', detail: err }, { status: 502 })
+        return NextResponse.json({ error: 'Makselingi loomine ebaõnnestus' }, { status: 502 })
       }
 
       const retryData = await retryRes.json() as { paymentUrl?: string; uuid?: string }
@@ -206,16 +223,6 @@ export async function POST(req: NextRequest) {
     }
   } catch { /* not a retry request, continue to normal flow */ }
 
-  // ── Debug: Log all Montonio env vars ──────────────────────────────────────────
-  const envCheck = {
-    MONTONIO_SANDBOX: process.env.MONTONIO_SANDBOX,
-    MONTONIO_ACCESS_KEY: process.env.MONTONIO_ACCESS_KEY ? `SET (${process.env.MONTONIO_ACCESS_KEY.substring(0,20)})` : 'MISSING',
-    MONTONIO_SECRET_KEY: process.env.MONTONIO_SECRET_KEY ? `SET (${process.env.MONTONIO_SECRET_KEY.substring(0,20)})` : 'MISSING',
-    MONTONIO_LIVE_ACCESS_KEY: process.env.MONTONIO_LIVE_ACCESS_KEY ? `SET (${process.env.MONTONIO_LIVE_ACCESS_KEY.substring(0,20)})` : 'MISSING',
-    MONTONIO_LIVE_SECRET_KEY: process.env.MONTONIO_LIVE_SECRET_KEY ? `SET (${process.env.MONTONIO_LIVE_SECRET_KEY.substring(0,20)})` : 'MISSING',
-  }
-  console.log('[CHECKOUT] Montonio ENV check:', envCheck)
-
   const sandbox   = process.env.MONTONIO_SANDBOX === 'true'
   const accessKey = sandbox
     ? process.env.MONTONIO_ACCESS_KEY
@@ -224,12 +231,6 @@ export async function POST(req: NextRequest) {
     ? process.env.MONTONIO_SECRET_KEY
     : process.env.MONTONIO_LIVE_SECRET_KEY
   const siteUrl   = (process.env.NEXT_PUBLIC_SITE_URL || 'https://pumbapood.ee').replace(/\/$/, '')
-
-  console.log('[CHECKOUT] Using key mode:', { 
-    sandbox, 
-    accessKey: accessKey ? `SET (${accessKey.substring(0,20)})` : 'MISSING',
-    secretKey: secretKey ? `SET (${secretKey.substring(0,20)})` : 'MISSING',
-  })
 
   if (!accessKey || !secretKey) {
     return NextResponse.json({ error: 'Montonio API võtmed puuduvad' }, { status: 500 })
@@ -516,7 +517,7 @@ export async function POST(req: NextRequest) {
     // Auth & Order identification
     accessKey:          accessKey,
     merchantReference: orderNumber, // Use DB-generated order_number
-    returnUrl:        `${siteUrl}/checkout/success?ref=${orderNumber}`,
+    returnUrl:        `${siteUrl}/checkout/success?ref=${encodeURIComponent(orderNumber)}&token=${encodeURIComponent(createOrderViewToken(orderNumber))}`,
     notificationUrl: `${siteUrl}/api/webhooks/montonio`,
     
     // Order details
@@ -567,13 +568,6 @@ export async function POST(req: NextRequest) {
     ? 'https://sandbox-stargate.montonio.com/api/orders'
     : 'https://stargate.montonio.com/api/orders'
 
-  // ── Debug: Log request details ─────────────────────────────────────────────
-  console.log('[CHECKOUT] Montonio request:', {
-    apiUrl,
-    payload: { ...payload, accessKey: payload.accessKey ? `SET (${payload.accessKey.substring(0,20)})` : 'MISSING' },
-    tokenPreview: token.substring(0, 80) + '...',
-  })
-
   try {
     // Official format: POST /orders with { data: token }
     const res = await fetch(apiUrl, {
@@ -588,7 +582,7 @@ export async function POST(req: NextRequest) {
       const err = await res.text()
       console.error('Montonio orders API viga (status %d):', res.status, err)
       await supabaseAdmin.from('orders').update({ status: 'failed' }).eq('id', orderId)
-      return NextResponse.json({ error: 'Makselingi loomine ebaõnnestus', detail: err }, { status: 502 })
+      return NextResponse.json({ error: 'Makselingi loomine ebaõnnestus' }, { status: 502 })
     }
 
     const data = await res.json() as { paymentUrl?: string; uuid?: string }

@@ -4,25 +4,14 @@ import type { Metadata } from 'next'
 import BlockRenderer from '@/components/page-builder/BlockRenderer'
 import ShortcodeRenderer from '@/components/ShortcodeRenderer'
 import ContactForm from '@/components/ContactForm'
-import { getLocale } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import type { Section } from '@/components/page-builder/types'
-import { SITE_URL, localizedUrl } from '@/lib/config'
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 
 export const revalidate = 3600
 
-function optimizeUrl(url: string | null, maxWidth = 1920): string | null {
-  if (!url) return null
-  if (url.includes('supabase.co/storage/v1/object/public')) {
-    const sep = url.includes('?') ? '&' : '?'
-    return `${url}${sep}width=${maxWidth}&quality=80`
-  }
-  return url
-}
-
 // The CMS page slug that serves as the homepage
 const HOME_SLUG = 'esilehtx'
-
-const LOCALES = ['et', 'en', 'ru', 'lv', 'lt'] as const
 
 interface Column { title: string; text: string }
 
@@ -91,9 +80,14 @@ function pick(page: PageRow, field: 'title' | 'short_description' | 'content', l
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const page = await getHomePage()
+  const tHome = await getTranslations({ locale, namespace: 'metadata.home' })
 
-  const title = (page?.meta_title || (page ? pick(page, 'title', locale) : null) || 'Pump OÜ') ?? 'Pump OÜ'
-  const description = (page?.meta_description || (page ? pick(page, 'short_description', locale) : null)) ?? undefined
+  const title = locale === 'et'
+    ? (page?.meta_title || (page ? pick(page, 'title', locale) : null) || tHome('title'))
+    : tHome('title')
+  const description = locale === 'et'
+    ? (page?.meta_description || (page ? pick(page, 'short_description', locale) : null) || tHome('description'))
+    : tHome('description')
   const ogImg = page?.og_image_url || page?.image_url
 
   return {
@@ -101,9 +95,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     alternates: {
       canonical: localizedUrl('/', locale),
-      languages: Object.fromEntries(
-        LOCALES.map(l => [l, localizedUrl('/', l)])
-      ),
+      languages: languageAlternates('/'),
     },
     openGraph: {
       title,
@@ -149,22 +141,9 @@ export default async function HomePage() {
 
   const titleVisible = page.show_title !== false
 
-  // Collect background image URLs for preload hints
-  const bgImages: string[] = []
-  if (hasBlocks) {
-    for (const s of (page.blocks as Section[])) {
-      if (s.settings?.background_image_url) {
-        bgImages.push(s.settings.background_image_url)
-      }
-    }
-  }
-
   if (hasBlocks) {
     return (
       <div className="min-h-screen">
-        {bgImages.length > 0 && bgImages.map(url => (
-          <link key={url} rel="preload" as="image" href={url} fetchPriority="high" />
-        ))}
         {titleVisible && (
           <div className="max-w-[1200px] mx-auto px-4 md:px-6 pt-10 pb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h1>

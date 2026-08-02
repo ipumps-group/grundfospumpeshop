@@ -7,12 +7,11 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 -- Drop any existing restrictive policies on orders (if they exist)
 DROP POLICY IF EXISTS "orders_row_level_security_policy" ON public.orders;
 
--- Create a policy that allows authenticated users with manager/superadmin role to read all orders
--- The actual role check is done in the API route, this just allows authenticated users to SELECT
+-- Customers may only read their own orders. Admin APIs use service_role.
 CREATE POLICY "authenticated_can_read_orders" ON public.orders
   FOR SELECT
   TO authenticated
-  USING (true);
+  USING (auth.uid() = user_id);
 
 -- Also allow service role (for API routes using supabaseAdmin)
 CREATE POLICY "service_role_can_read_orders" ON public.orders
@@ -40,7 +39,10 @@ DROP POLICY IF EXISTS "order_items_row_level_security_policy" ON public.order_it
 CREATE POLICY "authenticated_can_read_order_items" ON public.order_items
   FOR SELECT
   TO authenticated
-  USING (true);
+  USING (EXISTS (
+    SELECT 1 FROM public.orders
+    WHERE orders.id = order_items.order_id AND orders.user_id = auth.uid()
+  ));
 
 CREATE POLICY "service_role_can_read_order_items" ON public.order_items
   FOR SELECT
@@ -58,7 +60,10 @@ ALTER TABLE public.order_status_history ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "authenticated_can_read_status_history" ON public.order_status_history
   FOR SELECT
   TO authenticated
-  USING (true);
+  USING (EXISTS (
+    SELECT 1 FROM public.orders
+    WHERE orders.id = order_status_history.order_id AND orders.user_id = auth.uid()
+  ));
 
 CREATE POLICY "service_role_can_read_status_history" ON public.order_status_history
   FOR SELECT

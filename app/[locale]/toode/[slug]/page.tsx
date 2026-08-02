@@ -1,16 +1,13 @@
 import type { Metadata } from 'next'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL, localizedUrl } from '@/lib/config'
-import { notFound } from 'next/navigation'
-import Script from 'next/script'
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 import ProductDetailClient from '@/components/ProductDetailClient'
+import JsonLd from '@/components/seo/JsonLd'
 import type { Product, Attribute, RelatedProduct, ProductDocument } from '@/components/ProductDetailClient'
+import { withVat } from '@/lib/price'
 
 export const revalidate = 3600
-
-const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
 function stripHtml(html: string): string {
   return html
@@ -53,7 +50,10 @@ export async function generateMetadata(
 
     const metadataPrice = Number(product?.sale_price ?? product?.price)
     if (!product || !product.published || !Number.isFinite(metadataPrice) || metadataPrice <= 0) {
-      return { title: 'Toode puudub' }
+      return {
+        title: 'Toode puudub',
+        robots: { index: false, follow: false },
+      }
     }
 
     const description = resolveDescription(product as Record<string, unknown>, locale)
@@ -66,9 +66,7 @@ export async function generateMetadata(
       description,
       alternates: {
         canonical,
-        languages: Object.fromEntries(
-          LOCALES.map(l => [l, localizedUrl(`/toode/${slug}`, l)])
-        ),
+        languages: languageAlternates(`/toode/${slug}`),
       },
       openGraph: {
         title,
@@ -95,7 +93,7 @@ export async function generateMetadata(
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const locale = await getLocale()
-  const t = await getTranslations('product')
+  const tNav = await getTranslations('nav')
   const { slug } = await params
 
   const { data: product } = await supabaseAdmin
@@ -106,7 +104,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   const displayPrice = Number(product?.sale_price ?? product?.price)
   if (!product || !product.published || !Number.isFinite(displayPrice) || displayPrice <= 0) {
-    notFound()
+    // Keep the product-specific empty state visible. Calling notFound() here
+    // replaces it with the generic route-level 404, which can briefly flash
+    // and then be replaced by catalogue navigation in some client transitions.
+    return (
+      <ProductDetailClient
+        product={null}
+        attributes={[]}
+        attrNameMap={{}}
+        related={[]}
+        documents={[]}
+      />
+    )
   }
 
   const [attrsResult, relatedResult, docsResult] = await Promise.all([
@@ -134,7 +143,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const related: RelatedProduct[] = (relatedResult.data || []) as RelatedProduct[]
   const documents: ProductDocument[] = (docsResult.data || []) as ProductDocument[]
 
-  let attrNameMap: Record<string, string> = {}
+  const attrNameMap: Record<string, string> = {}
   if (locale !== 'et' && attributes.length > 0) {
     const names = attributes.map(a => a.attribute_name)
     const { data: translations } = await supabaseAdmin
@@ -151,6 +160,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   const description = resolveDescription(product as Record<string, unknown>, locale)
   const availability = product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+  const productUrl = localizedUrl(`/toode/${product.slug}`, locale)
+  const vatInclusivePrice = Number(withVat(displayPrice).toFixed(2))
 
   const productJsonLd = {
     '@context': 'https://schema.org',
@@ -158,8 +169,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     name: product.name,
     description,
     sku: product.sku,
+    brand: { '@type': 'Brand', name: 'Grundfos' },
     image: product.image_url,
-    url: `${SITE_URL}/toode/${product.slug}`,
+    url: productUrl,
     ...(product.category_id || product.tags ? {
       category: product.tags
         ? product.tags.split(',').map((t: string) => t.trim()).filter(Boolean).join(', ')
@@ -167,27 +179,33 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     } : {}),
     offers: {
       '@type': 'Offer',
-      url: `${SITE_URL}/toode/${product.slug}`,
+      url: productUrl,
       priceCurrency: 'EUR',
-      price: displayPrice,
+      price: vatInclusivePrice,
       availability,
-      ...(product.sale_price ? {
-        validFrom: new Date().toISOString().split('T')[0],
-      } : {}),
+      itemCondition: 'https://schema.org/NewCondition',
       seller: {
         '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
         name: 'Pump OÜ',
       },
     },
   }
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: tNav('home'), item: localizedUrl('/', locale) },
+      { '@type': 'ListItem', position: 2, name: tNav('products'), item: localizedUrl('/tooted', locale) },
+      { '@type': 'ListItem', position: 3, name: product.name, item: productUrl },
+    ],
+  }
+
   return (
     <>
-      <Script
-        id="product-json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
+      <JsonLd id="product-json-ld" data={productJsonLd} />
+      <JsonLd id="product-breadcrumb-json-ld" data={breadcrumbJsonLd} />
       <ProductDetailClient
         product={product as Product}
         attributes={attributes}

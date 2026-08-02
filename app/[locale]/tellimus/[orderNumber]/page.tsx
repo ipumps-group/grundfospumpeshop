@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useParams, useSearchParams } from 'next/navigation'
 import OrderStatusBadge from '@/components/konto/OrderStatusBadge'
 import { getDeliveryAddressLines } from '@/lib/shipping-address'
@@ -55,6 +55,7 @@ export default function PublicOrderPage() {
   const [verified, setVerified] = useState(false)
   const [error, setError] = useState('')
   const [retrying, setRetrying] = useState(false)
+  const [orderAccessToken, setOrderAccessToken] = useState(token)
 
   const loadVerifiedOrder = useCallback(async (credentials: { email?: string; token?: string }) => {
     setLoading(true)
@@ -68,6 +69,7 @@ export default function PublicOrderPage() {
       if (res.ok) {
         setOrder(data.order)
         setItems(data.items ?? [])
+        setOrderAccessToken(data.accessToken || credentials.token || '')
         setVerified(true)
         setError('')
       } else if (res.status === 404) {
@@ -132,7 +134,10 @@ export default function PublicOrderPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ retry_order_id: order.id }),
+        body: JSON.stringify({
+          retry_order_id: order.id,
+          retry_token: orderAccessToken || undefined,
+        }),
       })
       const data = await res.json()
       if (!res.ok || !data.payment_url) {

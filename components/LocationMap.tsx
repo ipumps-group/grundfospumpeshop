@@ -15,7 +15,6 @@ export default function LocationMap() {
 
     import('leaflet').then(async (L) => {
       if (cancelled) return
-      // @ts-expect-error - CSS import has no types
       await import('leaflet/dist/leaflet.css')
 
       const DefaultIcon = L.icon({

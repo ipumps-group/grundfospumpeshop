@@ -30,7 +30,7 @@
   },
   "hero": {
     "title": "Grundfos pumps and solutions",
-    "subtitle": "Search among 321 products by name, SKU or technical parameters",
+    "subtitle": "Search products by name, SKU or technical parameters",
     "searchPlaceholder": "e.g. MAGNA3, Max Flow 5 m³/h, Rated Power 65W, SKU 59641500...",
     "searchButton": "Search",
     "searching": "Searching...",
@@ -553,11 +553,11 @@
     "siteName": "Pump OÜ",
     "home": {
       "title": "Grundfos pumps and solutions – Pump OÜ",
-      "description": "Buy Grundfos MAGNA3, Alpha, scALA and other pumps. 321 models in stock. Expert advice and installation."
+      "description": "Buy Grundfos MAGNA3, ALPHA, SCALA and other pumps. Expert advice and fast delivery."
     },
     "products": {
       "title": "All products – Pump OÜ",
-      "description": "View all Grundfos pumps. 321 models, prices incl. VAT, fast delivery."
+      "description": "Browse Grundfos pumps with VAT-inclusive prices and fast delivery."
     }
   },
   "tegevusalad": {
@@ -592,7 +592,7 @@
   },
   "cookieConsent": {
     "message": "We use cookies to operate the site and collect visit statistics.",
-    "learnMore": "Learn more",
+    "learnMore": "Privacy policy",
     "acceptAll": "Accept all",
     "essential": "Only essential"
   }

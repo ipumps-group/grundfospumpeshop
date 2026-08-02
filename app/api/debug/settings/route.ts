@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireSuperadmin } from '@/lib/api-auth'
 
 export async function GET() {
+  try { await requireSuperadmin() } catch (response) { return response as NextResponse }
   const { data, error } = await supabaseAdmin
     .from('settings')
     .select('key, value')

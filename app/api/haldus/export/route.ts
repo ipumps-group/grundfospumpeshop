@@ -1,20 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import ExcelJS from 'exceljs'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { requireSuperadmin } from '@/lib/api-auth'
 
 // GET /api/haldus/export — exports all products as a formatted .xlsx file
 
-export async function GET(req: NextRequest) {
-  // ── Auth ───────────────────────────────────────────────────────────────────
-  const token = (req.headers.get('authorization') ?? '').replace('Bearer ', '').trim()
-  if (token) {
-    const { data: { user } } = await supabaseAdmin.auth.getUser(token)
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    const { data: profile } = await supabaseAdmin
-      .from('profiles').select('role').eq('id', user.id).single()
-    if (profile?.role !== 'superadmin')
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+export async function GET() {
+  try { await requireSuperadmin() } catch (response) { return response as NextResponse }
 
   // ── Fetch data ─────────────────────────────────────────────────────────────
   const [

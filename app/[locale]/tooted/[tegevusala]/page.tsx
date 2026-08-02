@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL, localizedUrl } from '@/lib/config'
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 import SafeImage from '@/components/SafeImage'
 
 export const dynamic = 'force-dynamic'
-
-const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
 
 interface SeriesWithMeta {
   id: number
@@ -59,9 +56,7 @@ export async function generateMetadata(
       description,
       alternates: {
         canonical,
-        languages: Object.fromEntries(
-          LOCALES.map(l => [l, localizedUrl(`/tooted/${tegevusala}`, l)])
-        ),
+        languages: languageAlternates(`/tooted/${tegevusala}`),
       },
       openGraph: {
         title,

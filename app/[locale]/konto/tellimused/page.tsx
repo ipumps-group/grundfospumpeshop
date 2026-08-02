@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AccountNav from '@/components/konto/AccountNav'
 import OrderStatusBadge from '@/components/konto/OrderStatusBadge'

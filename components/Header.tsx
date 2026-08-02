@@ -203,7 +203,7 @@ export default function Header({ siteSettings: initialSettings }: HeaderProps) {
 
           <div className="flex items-center gap-3 text-[15px] text-white/60 flex-1 min-w-0">
             {siteSettings?.header_phone && (
-              <a href={`tel:${siteSettings.header_phone.replace(/\s/g, '')}`} className="flex items-center gap-1 hover:text-white/80 transition-colors flex-shrink-0">
+              <a href={`tel:${siteSettings.header_phone.replace(/\s/g, '')}`} aria-label={`Call ${siteSettings.header_phone}`} className="flex items-center gap-1 hover:text-white/80 transition-colors flex-shrink-0">
                 <Phone size={14} /><span className="hidden sm:inline">{siteSettings.header_phone}</span>
               </a>
             )}

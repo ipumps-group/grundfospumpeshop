@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useParams } from 'next/navigation'
 import { Download } from 'lucide-react'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'

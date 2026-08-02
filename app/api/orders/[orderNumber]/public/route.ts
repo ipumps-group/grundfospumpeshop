@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { verifyOrderViewToken } from '@/lib/order-view-token'
+import { createOrderViewToken, verifyOrderViewToken } from '@/lib/order-view-token'
+import { rateLimit, STRICT_RATE } from '@/lib/rate-limit'
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ orderNumber: string }> }
 ) {
   const { orderNumber } = await params
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (rateLimit(`order-view:${ip}`, STRICT_RATE.maxRequests).blocked) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
 
   let body: { email?: string; token?: string }
   try {
@@ -21,7 +26,7 @@ export async function POST(
 
   const { data: order, error: orderErr } = await supabaseAdmin
     .from('orders')
-    .select('*')
+    .select('id, order_number, status, total, created_at, email, customer_name, shipping_address, payment_method')
     .eq('order_number', orderNumber)
     .single()
 
@@ -47,11 +52,12 @@ export async function POST(
 
   const { data: items } = await supabaseAdmin
     .from('order_items')
-    .select('*')
+    .select('id, product_name, quantity, unit_price')
     .eq('order_id', order.id)
 
   return NextResponse.json({
     order,
     items: items ?? [],
+    accessToken: createOrderViewToken(orderNumber),
   })
 }

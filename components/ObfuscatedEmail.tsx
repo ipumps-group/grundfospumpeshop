@@ -36,7 +36,7 @@ export default function ObfuscatedEmail({ email: fullEmail, user, domain, classN
   }
 
   return (
-    <a href={`mailto:${email}`} className={className}>
+    <a href={`mailto:${email}`} aria-label={`Email ${email}`} className={className}>
       {prefix}<span className={textClassName}>{email}</span>
     </a>
   )

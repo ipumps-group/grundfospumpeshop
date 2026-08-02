@@ -30,7 +30,7 @@
   },
   "hero": {
     "title": "Grundfos siurbliai ir sprendimai",
-    "subtitle": "Ieškokite iš 321 produkto pagal pavadinimą, SKU arba techninius parametrus",
+    "subtitle": "Ieškokite produktų pagal pavadinimą, SKU arba techninius parametrus",
     "searchPlaceholder": "pvz. MAGNA3, Max Flow 5 m³/h, Rated Power 65W, SKU 59641500...",
     "searchButton": "Paieška",
     "searching": "Ieškau...",
@@ -551,15 +551,15 @@
   },
   "metadata": {
     "siteName": "Pump OÜ",
-    "home": { "title": "Grundfos siurbliai ir sprendimai – Pump OÜ", "description": "Pirkti Grundfos siurblius. 321 modelis sandėlyje. Konsultacijos." },
-    "products": { "title": "Visi produktai – Pump OÜ", "description": "Peržiūrėkite visus Grundfos siurblius. 321 modelis, kainos su PVM." }
+    "home": { "title": "Grundfos siurbliai ir sprendimai – Pump OÜ", "description": "Įsigykite Grundfos siurblius su ekspertų konsultacijomis ir greitu pristatymu." },
+    "products": { "title": "Visi produktai – Pump OÜ", "description": "Grundfos siurblių katalogas su PVM kainomis ir greitu pristatymu." }
   },
   "tegevusalad": { "kute": "Šildymo siurbliai", "jahutus": "Aušinimo siurbliai", "sooja-tarbevee-tsirkulatsioonipump": "Karšto vandens cirkuliacija", "puurkaevud": "Gilynių siurbliai", "drenaaz": "Drenavimo siurbliai", "salvkaevud": "Šulinių siurbliai", "rohutoste": "Slėgio didinimo siurbliai", "reovesi": "Nuotekų siurbliai" },
   "tegevusaladTitle": { "kute": "Šildymo siurbliai – {count} modeliai | Pump OÜ", "jahutus": "Aušinimas – {count} | Pump OÜ", "sooja-tarbevee-tsirkulatsioonipump": "Karštas vanduo – {count} | Pump OÜ", "puurkaevud": "Gilyniai – {count} | Pump OÜ", "drenaaz": "Drenavimas – {count} | Pump OÜ", "salvkaevud": "Šuliniai – {count} | Pump OÜ", "rohutoste": "Slėgis – {count} | Pump OÜ", "reovesi": "Nuotekos – {count} | Pump OÜ" },
   "tegevusaladDesc": { "kute": "Grundfos šildymo siurbliai namams.", "jahutus": "Aušinimo siurbliai sistemoms.", "sooja-tarbevee-tsirkulatsioonipump": "Karšto vandens cirkuliacija.", "puurkaevud": "Gilynių siurbliai šuliniams.", "drenaaz": "Drenavimo siurbliai rūsiams.", "salvkaevud": "Šulinių siurbliai paviršiams.", "rohutoste": "Slėgio didinimo siurbliai.", "reovesi": "Nuotekų siurbliai." },
   "cookieConsent": {
     "message": "Naudojame slapukus svetainės veikimui ir lankomumo statistikai.",
-    "learnMore": "Skaityti daugiau",
+    "learnMore": "Privatumo politika",
     "acceptAll": "Sutikti",
     "essential": "Tik būtini"
   }

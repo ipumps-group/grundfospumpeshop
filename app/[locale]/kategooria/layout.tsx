@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
 import { getLocale } from 'next-intl/server'
-import { routing } from '@/i18n/routing'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL, localizedUrl } from '@/lib/config'
-
-const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 
 const TEGEVUSALA_SLUGS = new Set([
   'kute', 'jahutus', 'sooja-tarbevee-tsirkulatsioonipump',
@@ -40,9 +37,7 @@ export async function generateMetadata(
       description,
       alternates: {
         canonical,
-        languages: Object.fromEntries(
-          LOCALES.map(l => [l, localizedUrl(canonicalBase, l)])
-        ),
+        languages: languageAlternates(canonicalBase),
       },
       openGraph: {
         title,

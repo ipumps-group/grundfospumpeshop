@@ -2,8 +2,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { insightsToCSV, insightsToXLSX } from '@/lib/ads/export'
+import { requireAdmin } from '@/lib/api-auth'
 
 export async function GET(request: NextRequest) {
+  try { await requireAdmin() } catch (response) { return response as NextResponse }
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   const format = searchParams.get('format') || 'csv'
@@ -46,7 +48,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (format === 'xlsx') {
-      const buf = insightsToXLSX(insights, report.title)
+      const buf = await insightsToXLSX(insights, report.title)
       return new NextResponse(new Uint8Array(buf), {
         headers: {
           'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

@@ -202,17 +202,17 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "categories_insert_authenticated" ON public.categories
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "categories_update_authenticated" ON public.categories
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "categories_delete_authenticated" ON public.categories
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -240,47 +240,47 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "pages_select_all_authenticated" ON public.pages
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "pages_insert_authenticated" ON public.pages
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "pages_update_authenticated" ON public.pages
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "pages_delete_authenticated" ON public.pages
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
--- products — public read, auth write
+-- products — published public read, service-role write
 -- ----------------------------------------
 ALTER TABLE IF EXISTS public.products ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
   CREATE POLICY "Public read products table" ON public.products
-    FOR SELECT USING (true);
+    FOR SELECT TO anon, authenticated USING (published = true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated insert products" ON public.products
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated update products table" ON public.products
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated delete products table" ON public.products
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -295,17 +295,17 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "product_attributes_insert_authenticated" ON public.product_attributes
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "product_attributes_update_authenticated" ON public.product_attributes
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "product_attributes_delete_authenticated" ON public.product_attributes
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -320,12 +320,12 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "product_categories_insert_authenticated" ON public.product_categories
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "product_categories_delete_authenticated" ON public.product_categories
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -340,17 +340,17 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "bulk_pricing_insert_authenticated" ON public.bulk_pricing
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "bulk_pricing_update_authenticated" ON public.bulk_pricing
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "bulk_pricing_delete_authenticated" ON public.bulk_pricing
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -401,22 +401,22 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "coupons_select_all_authenticated" ON public.coupons
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "coupons_insert_authenticated" ON public.coupons
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "coupons_update_authenticated" ON public.coupons
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "coupons_delete_authenticated" ON public.coupons
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -428,7 +428,7 @@ DROP POLICY IF EXISTS "orders_row_level_security_policy" ON public.orders;
 
 DO $$ BEGIN
   CREATE POLICY "authenticated_can_read_orders" ON public.orders
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO authenticated USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -455,7 +455,10 @@ DROP POLICY IF EXISTS "order_items_row_level_security_policy" ON public.order_it
 
 DO $$ BEGIN
   CREATE POLICY "authenticated_can_read_order_items" ON public.order_items
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO authenticated USING (EXISTS (
+      SELECT 1 FROM public.orders
+      WHERE orders.id = order_items.order_id AND orders.user_id = auth.uid()
+    ));
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -475,7 +478,10 @@ ALTER TABLE IF EXISTS public.order_status_history ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
   CREATE POLICY "authenticated_can_read_status_history" ON public.order_status_history
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO authenticated USING (EXISTS (
+      SELECT 1 FROM public.orders
+      WHERE orders.id = order_status_history.order_id AND orders.user_id = auth.uid()
+    ));
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -495,12 +501,12 @@ ALTER TABLE IF EXISTS public.coupon_usage ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
   CREATE POLICY "coupon_usage_select_authenticated" ON public.coupon_usage
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO authenticated USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "coupon_usage_delete_authenticated" ON public.coupon_usage
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO authenticated USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -515,17 +521,17 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "contact_submissions_select_authenticated" ON public.contact_submissions
-    FOR SELECT TO authenticated USING (true);
+    FOR SELECT TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "contact_submissions_update_authenticated" ON public.contact_submissions
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "contact_submissions_delete_authenticated" ON public.contact_submissions
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -560,17 +566,17 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "series_activity_areas_insert_authenticated" ON public.series_activity_areas
-    FOR INSERT TO authenticated WITH CHECK (true);
+    FOR INSERT TO service_role WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "series_activity_areas_update_authenticated" ON public.series_activity_areas
-    FOR UPDATE TO authenticated USING (true);
+    FOR UPDATE TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "series_activity_areas_delete_authenticated" ON public.series_activity_areas
-    FOR DELETE TO authenticated USING (true);
+    FOR DELETE TO service_role USING (true);
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ----------------------------------------
@@ -595,17 +601,17 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated upload products" ON storage.objects
-    FOR INSERT TO authenticated WITH CHECK (bucket_id = 'products');
+    FOR INSERT TO service_role WITH CHECK (bucket_id = 'products');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated update products" ON storage.objects
-    FOR UPDATE TO authenticated USING (bucket_id = 'products');
+    FOR UPDATE TO service_role USING (bucket_id = 'products') WITH CHECK (bucket_id = 'products');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated delete products" ON storage.objects
-    FOR DELETE TO authenticated USING (bucket_id = 'products');
+    FOR DELETE TO service_role USING (bucket_id = 'products');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- Pages bucket
@@ -622,10 +628,10 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated upload" ON storage.objects
-    FOR INSERT TO authenticated WITH CHECK (bucket_id = 'product-documents');
+    FOR INSERT TO service_role WITH CHECK (bucket_id = 'product-documents');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
   CREATE POLICY "Authenticated delete" ON storage.objects
-    FOR DELETE TO authenticated USING (bucket_id = 'product-documents');
+    FOR DELETE TO service_role USING (bucket_id = 'product-documents');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;

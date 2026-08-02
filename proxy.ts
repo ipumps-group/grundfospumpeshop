@@ -42,6 +42,6 @@ export default function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Exclude: api, haldus, Back, _next/static, _next/image, favicon, sitemap, robots, manifest, llms.txt, and static files
-    '/((?!api|haldus|Back|_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt|llms\\.txt|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map)$).*)',
+    '/((?!api|haldus|Back|_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt|llms\\.txt|(?:site\\.)?webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map)$).*)',
   ],
 }

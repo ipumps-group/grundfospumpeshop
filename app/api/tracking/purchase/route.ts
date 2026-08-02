@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { verifyOrderViewToken } from '@/lib/order-view-token'
+import { rateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   const ref = req.nextUrl.searchParams.get('ref')?.trim()
-  if (!ref || ref.length > 100) {
+  const token = req.nextUrl.searchParams.get('token') || ''
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (rateLimit(`purchase:${ip}`, 90).blocked) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+  if (!ref || ref.length > 100 || !verifyOrderViewToken(ref, token)) {
     return NextResponse.json({ error: 'Invalid reference' }, { status: 400 })
   }
 

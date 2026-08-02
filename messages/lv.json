@@ -30,7 +30,7 @@
   },
   "hero": {
     "title": "Grundfos sūkņi un risinājumi",
-    "subtitle": "Meklējiet no 321 produkta pēc nosaukuma, SKU vai tehniskiem parametriem",
+    "subtitle": "Meklējiet produktus pēc nosaukuma, SKU vai tehniskiem parametriem",
     "searchPlaceholder": "piem., MAGNA3, Max Flow 5 m³/h, Rated Power 65W, SKU 59641500...",
     "searchButton": "Meklēt",
     "searching": "Meklēju...",
@@ -551,15 +551,15 @@
   },
   "metadata": {
     "siteName": "Pump OÜ",
-    "home": { "title": "Grundfos sūkņi un risinājumi – Pump OÜ", "description": "Pirkt Grundfos sūkņus. 321 modelis noliktavā. Konsultācijas." },
-    "products": { "title": "Visi produkti – Pump OÜ", "description": "Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN." }
+    "home": { "title": "Grundfos sūkņi un risinājumi – Pump OÜ", "description": "Iegādājieties Grundfos sūkņus ar ekspertu konsultācijām un ātru piegādi." },
+    "products": { "title": "Visi produkti – Pump OÜ", "description": "Grundfos sūkņu katalogs ar PVN cenām un ātru piegādi." }
   },
   "tegevusalad": { "kute": "Sildīšanas sūkņi", "jahutus": "Dzesēšanas sūkņi", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija", "puurkaevud": "Urbuma sūkņi", "drenaaz": "Drenāžas sūkņi", "salvkaevud": "Akas sūkņi", "rohutoste": "Spiediena sūkņi", "reovesi": "Notekūdeņu sūkņi" },
   "tegevusaladTitle": { "kute": "Sildīšanas sūkņi – {count} modeļi | Pump OÜ", "jahutus": "Dzesēšanas sūkņi – {count} | Pump OÜ", "sooja-tarbevee-tsirkulatsioonipump": "Karstais ūdens – {count} | Pump OÜ", "puurkaevud": "Urbuma sūkņi – {count} | Pump OÜ", "drenaaz": "Drenāža – {count} | Pump OÜ", "salvkaevud": "Akas sūkņi – {count} | Pump OÜ", "rohutoste": "Spiediens – {count} | Pump OÜ", "reovesi": "Notekūdeņi – {count} | Pump OÜ" },
   "tegevusaladDesc": { "kute": "Grundfos sildīšanas sūkņi mājām.", "jahutus": "Dzesēšanas sūkņi sistēmām.", "sooja-tarbevee-tsirkulatsioonipump": "Karstā ūdens cirkulācija.", "puurkaevud": "Dziļie sūkņi urbumiem.", "drenaaz": "Drenāžas sūkņi pagrabiem.", "salvkaevud": "Akas sūkņi virsējiem ūdeņiem.", "rohutoste": "Spiediena sūkņi ūdens spiedienam.", "reovesi": "Notekūdeņu sūkņi." },
   "cookieConsent": {
     "message": "Mēs izmantojam sīkfailus vietnes darbībai un apmeklējumu statistikai.",
-    "learnMore": "Uzzināt vairāk",
+    "learnMore": "Privātuma politika",
     "acceptAll": "Piekrist",
     "essential": "Tikai obligātie"
   }

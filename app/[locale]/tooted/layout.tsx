@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
-import { routing } from '@/i18n/routing'
-import { SITE_URL, localizedUrl } from '@/lib/config'
-
-const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 
 const METADATA_BY_LOCALE: Record<string, { title: string; description: string }> = {
-  et: { title: 'Kõik tooted – Pump OÜ', description: 'Vaata kõiki Grundfos pumbad. 321 mudelit, hinnad koos käibemaksuga, kiire tarnimine.' },
-  en: { title: 'All products – Pump OÜ', description: 'View all Grundfos pumps. 321 models, prices incl. VAT, fast delivery.' },
-  ru: { title: 'Все товары – Pump OÜ', description: 'Смотрите все насосы Grundfos. 321 модель, цены с НДС, быстрая доставка.' },
-  lv: { title: 'Visi produkti – Pump OÜ', description: 'Skatiet visus Grundfos sūkņus. 321 modelis, cenas ar PVN.' },
-  lt: { title: 'Visi produktai – Pump OÜ', description: 'Peržiūrėkite visus Grundfos siurblius. 321 modelis, kainos su PVM.' },
+  et: { title: 'Kõik tooted – Pump OÜ', description: 'Vaata Grundfos pumpade valikut. Hinnad koos käibemaksuga ja kiire tarnimine.' },
+  en: { title: 'All products – Pump OÜ', description: 'Browse Grundfos pumps with VAT-inclusive prices and fast delivery.' },
+  ru: { title: 'Все товары – Pump OÜ', description: 'Каталог насосов Grundfos: цены с НДС и быстрая доставка.' },
+  lv: { title: 'Visi produkti – Pump OÜ', description: 'Grundfos sūkņu katalogs ar PVN cenām un ātru piegādi.' },
+  lt: { title: 'Visi produktai – Pump OÜ', description: 'Grundfos siurblių katalogas su PVM kainomis ir greitu pristatymu.' },
 }
 
 export async function generateMetadata(
@@ -24,9 +21,7 @@ export async function generateMetadata(
     description: meta.description,
     alternates: {
       canonical,
-      languages: Object.fromEntries(
-        LOCALES.map(l => [l, localizedUrl('/tooted', l)])
-      ),
+      languages: languageAlternates('/tooted'),
     },
     openGraph: {
       title: meta.title,

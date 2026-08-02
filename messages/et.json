@@ -30,7 +30,7 @@
   },
   "hero": {
     "title": "Grundfos pumbad ja lahendused",
-    "subtitle": "Otsi 321 toote seast nime, SKU või tehniliste parameetrite järgi",
+    "subtitle": "Otsi tooteid nime, SKU või tehniliste parameetrite järgi",
     "searchPlaceholder": "nt. MAGNA3, Max Flow 5 m³/h, Rated Power 65W, SKU 59641500...",
     "searchButton": "Otsi",
     "searching": "Otsin...",
@@ -529,11 +529,11 @@
     "siteName": "Pump OÜ",
     "home": {
       "title": "Grundfos pumbad ja lahendused – Pump OÜ",
-      "description": "Ostu Grundfos MAGNA3, Alpha, scALA ja teisi pumbad. 321 mudelit laos kohe tarniks. Ekspertnõustamine ja paigaldusteenus."
+      "description": "Osta Grundfos MAGNA3, ALPHA, SCALA ja teisi pumpasid. Ekspertnõustamine ja kiire tarne."
     },
     "products": {
       "title": "Kõik tooted – Pump OÜ",
-      "description": "Vaata kõiki Grundfos pumbad. 321 mudelit, hinnad koos käibemaksuga, kiire tarnimine."
+      "description": "Vaata Grundfos pumpade valikut. Hinnad koos käibemaksuga ja kiire tarnimine."
     }
   },
   "tegevusalad": {
@@ -594,7 +594,7 @@
   },
   "cookieConsent": {
     "message": "Kasutame küpsiseid saidi toimimiseks ja külastusstatistika kogumiseks.",
-    "learnMore": "Loe lähemalt",
+    "learnMore": "Privaatsuspoliitika",
     "acceptAll": "Nõustun",
     "essential": "Ainult vajalikud"
   }

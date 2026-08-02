@@ -1,5 +1,4 @@
-import { getLocale, getTranslations } from 'next-intl/server'
-import type { Metadata } from 'next'
+import { getLocale } from 'next-intl/server'
 import { SITE_URL, localizedUrl } from '@/lib/config'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -14,52 +13,6 @@ import { NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { getSiteSettings } from '@/lib/site-settings'
-
-const LOCALES = [...routing.locales] as readonly ['et', 'en', 'ru', 'lv', 'lt']
-
-/**
- * Homepage metadata - generates unique titles/descriptions per locale
- */
-export async function generateMetadata(
-  { params }: { params: Promise<{ locale: string }> }
-): Promise<Metadata> {
-  const locale = await getLocale()
-  const { locale: urlLocale } = await params
-  
-  const tHome = await getTranslations('metadata.home')
-  
-  const title = tHome('title' as any)
-  const description = tHome('description' as any)
-
-  const canonical = localizedUrl('/', urlLocale)
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: canonical,
-      languages: Object.fromEntries(
-        LOCALES.map(l => [l, localizedUrl('/', l)])
-      ),
-    },
-    openGraph: {
-      title,
-      description,
-      url: canonical,
-      siteName: 'Pump OÜ',
-      locale: locale,
-      type: 'website',
-      images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [`${SITE_URL}/og-default.jpg`],
-    },
-    robots: { index: true, follow: true },
-  }
-}
 
 /**
  * Organization + WebSite + LocalBusiness JSON-LD schema for all locale layouts.

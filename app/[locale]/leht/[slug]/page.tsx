@@ -10,9 +10,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import JsonLd from '@/components/seo/JsonLd'
 
 export const dynamic = 'force-dynamic'
-import { SITE_URL, localizedUrl } from '@/lib/config'
-
-const LOCALES = ['et', 'en', 'ru', 'lv', 'lt'] as const
+import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
 
 // ─── FAQPAGE SCHEMA ─────────────────────────────────────────────────────────────────────
 
@@ -65,7 +63,6 @@ function FAQPageSchema({ page, locale, slug }: { page: PageRow; locale: string; 
   const faqs = extractFAQItems(page.content, page.blocks)
   if (faqs.length === 0) return null
 
-  const pageUrl = localizedUrl(`/leht/${slug}`, locale)
 
   const schema = {
     '@context': 'https://schema.org',
@@ -168,9 +165,7 @@ export async function generateMetadata(
     description: description ?? undefined,
     alternates: {
       canonical: canonical,
-      languages: Object.fromEntries(
-        LOCALES.map(l => [l, localizedUrl(`/leht/${slug}`, l)])
-      ),
+      languages: languageAlternates(`/leht/${slug}`),
     },
     openGraph: {
       title,

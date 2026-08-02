@@ -107,6 +107,11 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DROP POLICY IF EXISTS "Authenticated insert products" ON public.products;
 DROP POLICY IF EXISTS "Authenticated update products table" ON public.products;
 DROP POLICY IF EXISTS "Authenticated delete products table" ON public.products;
+DROP POLICY IF EXISTS "Public read products table" ON public.products;
+DROP POLICY IF EXISTS "products_select_published_public" ON public.products;
+
+CREATE POLICY "products_select_published_public" ON public.products
+  FOR SELECT TO anon, authenticated USING (published = true);
 
 DO $$ BEGIN
   CREATE POLICY "products_write_service_role" ON public.products

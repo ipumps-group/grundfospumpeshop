@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { ShoppingCart, ChevronRight, Search, Loader2, Check, RotateCcw } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTranslations } from 'next-intl'
@@ -25,7 +25,6 @@ interface Product {
 
 const TEGEVUSALAD = [
   { nameKey: 'heating',           slug: 'kuttepumbad',                          id: 'heating' },
-  { nameKey: 'cooling',           slug: 'kuttepumbad',                          id: 'cooling' },
   { nameKey: 'circulation',       slug: 'tsirkulatsioonipumbad-soe-tarbevesi',  id: 'circulation' },
   { nameKey: 'borewell',          slug: 'puurkaevupumbad',                      id: 'borewell' },
   { nameKey: 'wells',             slug: 'salvkaevupumbad',                      id: 'wells' },
@@ -135,7 +134,7 @@ function MiniProductCard({ product }: { product: Product }) {
         />
       </div>
       <div className="p-3 flex flex-col flex-1">
-        {product.sku && <div className="text-[12px] text-gray-400 font-mono mb-0.5">{product.sku}</div>}
+        {product.sku && <div className="text-[12px] text-gray-600 font-mono mb-0.5">{product.sku}</div>}
         <div className="font-semibold text-gray-800 text-[14px] leading-tight mb-2 group-hover:text-[#003366] transition-colors line-clamp-2 flex-1">
           {product.name}
         </div>
@@ -361,7 +360,6 @@ export default function PumpCalculator() {
     setProducts(data ?? [])
     setTotal(count ?? 0)
     setLoading(false)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tegevusala, minHead, flowMode, flowInput, areaInput, phase, tempClass, location, canQuery])
 
   // Debounce: fire 450 ms after last change
@@ -402,7 +400,7 @@ export default function PumpCalculator() {
               <div className="flex items-center justify-between">
                 <span className="font-bold text-gray-900 text-[16px]">{t('parameters')}</span>
                 {(tegevusala || activeFilters > 0) && (
-                  <button onClick={reset} className="flex items-center gap-1 text-[13px] text-gray-400 hover:text-red-500 transition-colors">
+                  <button onClick={reset} className="flex items-center gap-1 text-[13px] text-gray-600 hover:text-red-700 transition-colors">
                     <RotateCcw size={12} /> {t('reset')}
                   </button>
                 )}
@@ -444,7 +442,7 @@ export default function PumpCalculator() {
                   <FieldLabel>{flowMode === 'direct' ? t('field3flow') : t('field3area')}</FieldLabel>
                   <button
                     onClick={() => { setFlowMode(m => m === 'direct' ? 'area' : 'direct'); setFlowInput(''); setAreaInput('') }}
-                    className="text-[12px] text-[#01a0dc] hover:underline flex-shrink-0 -mt-0.5"
+                    className="text-[12px] text-[#006b91] font-medium hover:underline flex-shrink-0 -mt-0.5"
                   >
                     {flowMode === 'direct' ? t('calcFromArea') : t('enterDirect')}
                   </button>
@@ -485,11 +483,11 @@ export default function PumpCalculator() {
                 <div className="flex gap-2">
                   <ToggleBtn active={phase === '1'} onClick={() => setPhase(p => p === '1' ? '' : '1')}>
                     <div className="font-semibold">{t('singlePhase')}</div>
-                    <div className="text-[11px] opacity-70 mt-0.5">1×230V</div>
+                    <div className="text-[11px] mt-0.5">1×230V</div>
                   </ToggleBtn>
                   <ToggleBtn active={phase === '3'} onClick={() => setPhase(p => p === '3' ? '' : '3')}>
                     <div className="font-semibold">{t('threePhase')}</div>
-                    <div className="text-[11px] opacity-70 mt-0.5">3×400V</div>
+                    <div className="text-[11px] mt-0.5">3×400V</div>
                   </ToggleBtn>
                 </div>
               </div>

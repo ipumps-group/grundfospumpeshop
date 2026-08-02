@@ -10,7 +10,13 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/haldus',
           '/konto',
+          '/*/konto',
           '/ostukorv',
+          '/*/ostukorv',
+          '/checkout',
+          '/*/checkout',
+          '/tellimus',
+          '/*/tellimus',
           '/api',
           '/Back',
           '/*?*sort=',

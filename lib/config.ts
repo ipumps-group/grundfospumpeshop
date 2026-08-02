@@ -11,9 +11,19 @@ export const DEFAULT_LOCALE = 'et' as const
 
 export function localizedUrl(path: string, locale: string): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  if (normalizedPath === '/') {
+    return locale === DEFAULT_LOCALE ? `${SITE_URL}/` : `${SITE_URL}/${locale}`
+  }
   return locale === DEFAULT_LOCALE
     ? `${SITE_URL}${normalizedPath}`
     : `${SITE_URL}/${locale}${normalizedPath}`
+}
+
+export function languageAlternates(path: string): Record<string, string> {
+  return {
+    ...Object.fromEntries(LOCALES.map(locale => [locale, localizedUrl(path, locale)])),
+    'x-default': localizedUrl(path, DEFAULT_LOCALE),
+  }
 }
 
 export const COMPANY = {

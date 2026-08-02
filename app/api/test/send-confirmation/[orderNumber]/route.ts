@@ -35,8 +35,6 @@ export async function POST(
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { orderNumber } = await params;
-  console.log('[test-confirm] Loading order:', orderNumber);
-
     const { data: order, error } = await supabaseAdmin
     .from('orders')
     .select(`
