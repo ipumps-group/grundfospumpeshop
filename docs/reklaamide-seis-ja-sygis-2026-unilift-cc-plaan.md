@@ -9,6 +9,13 @@
 
 ## 0. Uuendus 9.09.2026 — UNILIFT ilmapulss välja lülitatud, maandumisleht `/unilift`
 
+### Uuendus 14.09.2026 — Display-võrk välja lülitatud, ilmapulss tagasi
+
+| Muudatus | Tulemus |
+|---|---|
+| **Display-võrk (target_content_network) välja lülitatud** Unilift kampaanial | 8.–14.09 kulus Display-võrgus 57,77 € (84% kampaania eelarvest) — neist 574 klikki / ~51,7 € tuli Hiina B2B-portaalidelt (ecer.com, everychina.com) ja mobiilimängudelt/rakendustelt, mitte Eesti otsingutelt. Kogu eelarve suunatud nüüd Google otsinguvõrku (nagu algses plaanis). |
+| **Ilmapulss (weather-pulse) taas sisse lülitatud** | Vihmapäevadel ületas Eesti otsingunõudlus 10 € eelarve (10.–11.09 budget-lost IS 52–66%). `vercel.json` cron taastatud (05:00 UTC, `/api/cron/weather-pulse`); kehtib järgmisest deploy'st. Tasemed: kuiv 10 €, ≥4 mm/48h → 14 €, ≥10 mm/48h → 18 €. Nõuab `CRON_SECRET` Verceli keskkonnas. |
+
 Hiljem lisatud muudatused (kampaania `Unilift CC + Drenaaž - EE 2026 sügis`):
 
 | Muudatus | Tulemus |

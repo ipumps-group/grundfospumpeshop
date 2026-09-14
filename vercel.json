@@ -1,1 +1,8 @@
-{}
+{
+  "crons": [
+    {
+      "path": "/api/cron/weather-pulse",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}
