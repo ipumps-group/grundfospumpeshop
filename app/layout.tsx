@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { ConsentProvider } from '@/lib/consent-context'
+import { TrackingBody, TrackingHead } from '@/components/TrackingHead'
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -77,9 +78,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* Google tags FIRST: consent default must precede gtag.js/GTM */}
+        <TrackingHead />
         <link rel="preconnect" href="https://sdqnzyfmanflslsjhytf.supabase.co" />
       </head>
       <body className={inter.className}>
+        <TrackingBody />
         <ConsentProvider>
           {children}
         </ConsentProvider>

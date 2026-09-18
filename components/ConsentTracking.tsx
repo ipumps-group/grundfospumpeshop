@@ -1,8 +1,20 @@
 'use client'
 
+/**
+ * Consent → tag bridge. The Google tags themselves are server-rendered in
+ * <head> (components/TrackingHead.tsx) with consent mode default = denied;
+ * this component only pushes consent UPDATES into gtag:
+ *   - on mount, when the visitor has a stored consent choice (return visit)
+ *   - on every 'consent_changed' event from the cookie banner
+ * Meta Pixel has no consent-mode equivalent, so it stays consent-gated and
+ * is injected only after advertising consent.
+ */
+
 import { useEffect } from 'react'
 import { flushMetaEvents, META_PIXEL_ID } from '@/lib/meta-pixel'
 import { hasAdvertisingConsent, hasAnalyticsConsent } from '@/lib/tracking-consent'
+
+type Gtag = (...args: unknown[]) => void
 
 type MetaFbq = ((...args: unknown[]) => void) & {
   callMethod?: (...args: unknown[]) => void
@@ -13,59 +25,24 @@ type MetaFbq = ((...args: unknown[]) => void) & {
 }
 
 let metaInitialized = false
-let googleInitialized = false
 
-function enableGoogleTracking(advertising: boolean, analytics: boolean) {
-  const ga4Id = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID
-  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
-  const gtmId = process.env.NEXT_PUBLIC_GTM_CONTAINER_ID
-  if (googleInitialized || (!ga4Id && !adsId && !gtmId)) return
-
-  const trackingWindow = window as Window & { dataLayer?: unknown[] }
-  trackingWindow.dataLayer = trackingWindow.dataLayer || []
-  window.gtag = (...args: unknown[]) => trackingWindow.dataLayer?.push(args)
-  window.gtag('consent', 'default', {
-    ad_storage: advertising ? 'granted' : 'denied',
-    analytics_storage: analytics ? 'granted' : 'denied',
-    ad_user_data: advertising ? 'granted' : 'denied',
-    ad_personalization: advertising ? 'granted' : 'denied',
-  })
-  window.gtag('js', new Date())
-  if (ga4Id && analytics) window.gtag('config', ga4Id)
-  if (adsId && advertising) window.gtag('config', adsId, { send_page_view: false })
-
-  if (ga4Id || adsId) {
-    const script = document.createElement('script')
-    script.async = true
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4Id || adsId || '')}`
-    document.head.appendChild(script)
-  }
-  if (gtmId) {
-    trackingWindow.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
-    const script = document.createElement('script')
-    script.async = true
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`
-    document.head.appendChild(script)
-  }
-  googleInitialized = true
+function gtag(): Gtag | undefined {
+  return (window as Window & { gtag?: Gtag }).gtag
 }
 
-function enableTracking() {
+function pushConsentUpdate() {
   const advertising = hasAdvertisingConsent()
   const analytics = hasAnalyticsConsent()
-  if (!advertising && !analytics) return
-
-  enableGoogleTracking(advertising, analytics)
-
-  window.gtag?.('consent', 'update', {
+  gtag()?.('consent', 'update', {
     ad_storage: advertising ? 'granted' : 'denied',
     analytics_storage: analytics ? 'granted' : 'denied',
     ad_user_data: advertising ? 'granted' : 'denied',
     ad_personalization: advertising ? 'granted' : 'denied',
   })
-  if (analytics) window.gtag?.('event', 'page_view')
+}
 
-  if (!advertising || metaInitialized) return
+function enableMeta() {
+  if (metaInitialized || !hasAdvertisingConsent()) return
 
   const fbq = function (...args: unknown[]) {
     if (fbq.callMethod) fbq.callMethod(...args)
@@ -92,8 +69,16 @@ function enableTracking() {
 
 export default function ConsentTracking() {
   useEffect(() => {
-    enableTracking()
-    const onConsentChanged = () => enableTracking()
+    // Return visit with a stored choice: restore consent into gtag.
+    if (hasAdvertisingConsent() || hasAnalyticsConsent()) {
+      pushConsentUpdate()
+    }
+    if (hasAdvertisingConsent()) enableMeta()
+
+    const onConsentChanged = () => {
+      pushConsentUpdate()
+      enableMeta()
+    }
     window.addEventListener('consent_changed', onConsentChanged)
     return () => window.removeEventListener('consent_changed', onConsentChanged)
   }, [])

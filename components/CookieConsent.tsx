@@ -34,17 +34,22 @@ export default function CookieConsent() {
         localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VERSION, state }))
       } catch {}
       el.style.display = 'none'
-      if (all) {
-        try {
-          const w = window as Window & { gtag?: (...args: unknown[]) => void }
-          if (typeof w.gtag === 'function') {
-            w.gtag('consent', 'update', {
-              ad_storage: 'granted', analytics_storage: 'granted',
-              ad_user_data: 'granted', ad_personalization: 'granted',
-            })
-          }
-        } catch {}
-      }
+      // Always push the chosen state (both accept-all and essential-only) —
+      // gtag is server-rendered in <head> with default = denied.
+      try {
+        const w = window as Window & { gtag?: (...args: unknown[]) => void }
+        if (typeof w.gtag === 'function') {
+          w.gtag('consent', 'update', all
+            ? {
+                ad_storage: 'granted', analytics_storage: 'granted',
+                ad_user_data: 'granted', ad_personalization: 'granted',
+              }
+            : {
+                ad_storage: 'denied', analytics_storage: 'denied',
+                ad_user_data: 'denied', ad_personalization: 'denied',
+              })
+        }
+      } catch {}
       try { window.dispatchEvent(new CustomEvent('consent_changed', { detail: state })) } catch {}
     }
 
