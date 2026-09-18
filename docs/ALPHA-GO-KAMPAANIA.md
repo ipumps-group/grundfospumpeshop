@@ -40,7 +40,11 @@ müüakse lõpuni, kuid neid ei toodeta juurde. Seetõttu tõstetakse ALPHA GO k
   kontaktiplokk. Meta 5 keeles, OG-pilt `pages/bg/alpha-go-hero.jpg`.
   Kampaania pildid (Grundfosi kampaanialehe Scene7 key visual'id) on lokaalselt
   `public/images/alpha-go/` (3 eelise thumbnaili + äpi mobiilivaade app-phone.png).
-- [ ] (Valikuline) Suuna Google/Meta reklaamide final URL-id `/tooted/kuttepumbad` -> `/alpha-go`
+- [x] ~~(Valikuline) Suuna Google/Meta reklaamide final URL-id `/tooted/kuttepumbad` -> `/alpha-go`~~
+  **TEHTUD 18.09.2026** — Google: 3 RSA-d taasloodud uue final URL-iga `https://pumbapood.ee/alpha-go`
+  (path alpha-go/kuttepumbad), vanad eemaldatud. Meta: 6 aktiivset kuulutust said uue kreatiivi
+  lingiga `https://pumbapood.ee/alpha-go?utm_source=meta&utm_medium=paid&utm_campaign=alpha_go_sygis_2026`.
+  Skriptid: `scripts/update-campaign-landings.mjs`, `_audit-campaign-landings.mjs` (read-only kontroll).
 
 ### 2.1 Esileht (CMS `pages` tabel, slug `esilehtx`)
 - [x] **Hero (sektsioon 0):** kütte-teemaline pealkiri ja tekst + 5 keeles tõlked
@@ -75,7 +79,7 @@ Päevaeelarve kokku: Google 10 € + Meta 12 €.
 - **Tüüp:** Search, ainult Google Search (ei partnervõrgustikku)
 - **Eelarve:** 10 EUR/päev
 - **Status:** ENABLED (avaldatud 16.09.2026; kampaania id 24214062841)
-- **Landing:** https://pumbapood.ee/et/tooted/kuttepumbad
+- **Landing:** https://pumbapood.ee/alpha-go (18.09.2026 alates; varem `/et/tooted/kuttepumbad`)
 - **Ad groupid:**
   1. `ALPHA GO - tooted` — alpha go, grundfos alpha go, alpha1 go, alpha2 go jne (8 märksõna, phrase)
   2. `Küttepumbad ja tsirkulatsioonipumbad` — küttepump, tsirkulatsioonipump, keskkütte pump jne (8 märksõna, phrase)
