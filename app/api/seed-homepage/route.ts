@@ -55,11 +55,11 @@ const blocks = [
 
   // 1. Hero
   section([col([
-    heading('Grundfos pumbad ja veeautomaatika', 'h1', '#ffffff'),
+    heading('Küttehooaeg algab siit — Grundfos ALPHA GO', 'h1', '#ffffff'),
     spacer(12),
-    text('Üle 500 toote laost. Kiire tarne, ekspertnõustamine ja paigaldus üle Eesti.', '#ffffff'),
+    text('Uued ALPHA1 GO ja ALPHA2 GO asendavad enamiku vanadest tsirkulatsioonipumpadest. Grundfos GO äpp, ekspertnõustamine ja kiire tarne üle Eesti.', '#ffffff'),
     spacer(20),
-    btn('Vaata tooteid', '/tooted', '#01a0dc'),
+    btn('Vaata ALPHA GO tooteid', '/tooted/kuttepumbad', '#01a0dc'),
   ])], {
     background_type: 'color',
     background_color: '#1e2d3d',
@@ -70,7 +70,7 @@ const blocks = [
 
   // 2. Promo banner
   section([col([
-    { id: id(), type: 'image', url: '/images/promo1.jpg', alt: 'Pakkumine', link_url: '/tooted/salvkaevupumbad/grundfos-jp', link_target: '_self', object_fit: 'cover' },
+    { id: id(), type: 'image', url: '/images/promo1.jpg', alt: 'Grundfos ALPHA GO küttekampaania', link_url: '/tooted/kuttepumbad', link_target: '_self', object_fit: 'cover' },
   ])], {
     padding_top: 'small',
     padding_bottom: 'small',
@@ -109,16 +109,16 @@ const blocks = [
     width: 'full',
   }),
 
-  // 6. Paigaldus + kontaktvorm (2 veergu)
+  // 6. Tehniline tugi + kontaktvorm (2 veergu)
   section([
     col([
-      heading('Professionaalne paigaldus', 'h2', '#ffffff'),
+      heading('Tehniline tugi ja konsultatsioon', 'h2', '#ffffff'),
       spacer(12),
-      text('Meie sertifitseeritud tehnikud paigaldavad ja seadistavad teie pumbasüsteemi.', '#ffffffb3'),
+      text('Meie spetsialistid aitavad valida õige pumba, jagavad tehnilist nõu ja teevad hinnapakkumisi.', '#ffffffb3'),
       spacer(16),
-      text('✓ Üle 15 aasta kogemust\n✓ Garantii kõikidele töödele\n✓ Kiire reageerimine\n✓ Üle-eestiline teenindus', '#ffffffb3'),
+      text('Küte: Jüri Masing · +372 53 98 4499 · juri@ipumps.ee\nKüte ja veevarustus: Rivo Randmäe · +372 510 2376 · rivo@ipumps.ee\nE-poe tellimused ja üldinfo: +372 527 4403 · info@pumbapood.ee (hinnad, laoseisud ja tellimiste vastuvõtt)', '#ffffffb3'),
       spacer(20),
-      btn('+372 503 3978', 'tel:+3725033978', '#01a0dc'),
+      btn('Võta ühendust +372 527 4403', 'tel:+3725274403', '#01a0dc'),
     ], 50),
     col([
       { id: id(), type: 'contact_form' },
@@ -157,7 +157,7 @@ const blocks = [
   // 8. Eelised (4 veergu)
   section([
     col([heading('🚚 Tasuta tarne', 'h3', '#111827'), spacer(8), text('Tellimustele üle 200€', '#6b7280')], 25),
-    col([heading('🔧 Paigaldus', 'h3', '#111827'), spacer(8), text('Sertifitseeritud tehnikud', '#6b7280')], 25),
+    col([heading('🔧 Tehniline tugi', 'h3', '#111827'), spacer(8), text('Tasuta nõustamine', '#6b7280')], 25),
     col([heading('🛡 Garantii', 'h3', '#111827'), spacer(8), text('Kuni 5 aasta garantii', '#6b7280')], 25),
     col([heading('🕐 Tugi', 'h3', '#111827'), spacer(8), text('Tööpäeviti 8–17', '#6b7280')], 25),
   ], {

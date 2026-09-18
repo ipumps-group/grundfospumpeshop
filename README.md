@@ -171,6 +171,7 @@ migrations/                ← SQL schema
 - **Full reporting**: 12 report types with CSV/XLSX export
 - **Change history**: Complete audit trail
 - **Period comparison**: Current vs previous period metrics
+- **Weather-pulse cron** (`/api/cron/weather-pulse`, daily 05:00 UTC): adjusts the Unilift CC campaign daily budget (€7–15) from the Open-Meteo rain forecast. Requires `CRON_SECRET` in Vercel env. Manual run: `node scripts/weather-pulse.mjs --dry-run`
 
 ### TODO: API Credentials & Permissions
 

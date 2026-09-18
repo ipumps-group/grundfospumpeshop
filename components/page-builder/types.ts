@@ -163,6 +163,8 @@ export interface SectionSettings {
   background_type: BackgroundType
   background_color: string
   background_image_url: string | null
+  background_image_width?: number   // natural image width — with height keeps section proportional
+  background_image_height?: number
   background_overlay: number
   background_overlay_css?: string  // overrides opacity slider when set
   background_gradient_color1?: string

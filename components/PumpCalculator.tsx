@@ -194,7 +194,7 @@ export default function PumpCalculator() {
 
   // ── Form state ────────────────────────────────────────────────────────────
   const [tegevusala, setTegevusala] = useState('kuttepumbad')
-  const [minHead,    setMinHead]    = useState('10')
+  const [minHead,    setMinHead]    = useState('6')
   const [flowMode,   setFlowMode]   = useState<'direct' | 'area'>('direct')
   const [flowInput,  setFlowInput]  = useState('')
   const [areaInput,  setAreaInput]  = useState('')

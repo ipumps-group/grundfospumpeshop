@@ -342,6 +342,19 @@ function RenderSection({ section, locale, priorityBackground }: { section: Secti
     ? { maxWidth: `${settings.bg_width_custom ?? 1200}px`, width: '100%' }
     : {}
 
+  // When the background image's natural dimensions are known, keep the section
+  // at least as tall as the image proportions (via an in-flow sizer in the same
+  // grid cell, so taller content still expands the section) and center the
+  // content vertically within the banner.
+  const bgImgW = safeNumber(settings.background_image_width, 0)
+  const bgImgH = safeNumber(settings.background_image_height, 0)
+  const hasBgRatio = Boolean(bgImage && bgImgW > 0 && bgImgH > 0)
+  if (hasBgRatio) bgWidthStyle.display = 'grid'
+
+  const contentWrapStyle: React.CSSProperties = hasBgRatio
+    ? { ...contentStyle, gridArea: '1 / 1', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }
+    : contentStyle
+
   return (
     <div className="w-full flex justify-center">
       <section style={{ ...bgStyle, ...bgWidthStyle }} className={`${isBgCustom ? '' : 'w-full'} relative`}>
@@ -356,7 +369,13 @@ function RenderSection({ section, locale, priorityBackground }: { section: Secti
           />
         )}
         {overlay}
-        <div style={contentStyle} className={`${isBoxed || isCustom ? 'mx-auto' : ''} relative z-10`}>
+        {hasBgRatio && (
+          <div
+            aria-hidden
+            style={{ gridArea: '1 / 1', width: '100%', aspectRatio: `${bgImgW} / ${bgImgH}`, alignSelf: 'start', pointerEvents: 'none' }}
+          />
+        )}
+        <div style={contentWrapStyle} className={`${isBoxed || isCustom ? 'mx-auto' : ''} relative z-10`}>
           {inner}
         </div>
       </section>

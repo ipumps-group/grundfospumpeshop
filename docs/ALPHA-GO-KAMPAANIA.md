@@ -43,25 +43,25 @@ müüakse lõpuni, kuid neid ei toodeta juurde. Seetõttu tõstetakse ALPHA GO k
 - [ ] (Valikuline) Suuna Google/Meta reklaamide final URL-id `/tooted/kuttepumbad` -> `/alpha-go`
 
 ### 2.1 Esileht (CMS `pages` tabel, slug `esilehtx`)
-- [ ] **Hero (sektsioon 0):** kütte-teemaline pealkiri ja tekst + 5 keeles tõlked
-- [ ] **Promo-bänner (sektsioon 2):** suvine aia-bänner → ALPHA GO bänner
+- [x] **Hero (sektsioon 0):** kütte-teemaline pealkiri ja tekst + 5 keeles tõlked
+- [x] **Promo-bänner (sektsioon 2):** suvine aia-bänner → ALPHA GO bänner
   (uus taustapilt genereeritakse ja laaditakse storage'sse `pages/bg/`), tekstid +
   nupud: "Vaata ALPHA GO tooteid" → /tooted/kuttepumbad ja link Grundfosi kampaanialehele
-- [ ] **Slider (sektsioon 5):** `esiletostetud` kategooria sisu → ALPHA GO tooted
+- [x] **Slider (sektsioon 5):** `esiletostetud` kategooria sisu → ALPHA GO tooted
   (6× ALPHA1 GO + 6× ALPHA2 GO) + slideri pealkirjade tõlked küttekampaaniale
-- [ ] **Sektsioon 7:** "Telli meilt professionaalne paigaldus" → **"Tehniline tugi ja konsultatsioon"**:
+- [x] **Sektsioon 7:** "Telli meilt professionaalne paigaldus" → **"Tehniline tugi ja konsultatsioon"**:
   - Küte: Jüri Masing +372 53 98 4499, juri@ipumps.ee
   - Küte ja veevarustus: Rivo Randmäe +372 510 2376, rivo@ipumps.ee
   - E-poe tellimused/üldinfo: +372 527 4403, info@pumbapood.ee (hinnad, ladu, tellimused)
-- [ ] **Sektsioon 9 (eelised):** "Paigaldus / Kogenud tehnikud" → "Tehniline tugi / Tasuta nõustamine"
+- [x] **Sektsioon 9 (eelised):** "Paigaldus / Kogenud tehnikud" → "Tehniline tugi / Tasuta nõustamine"
 
 ### 2.2 Küttepumbad kategooria (/tooted/kuttepumbad)
-- [ ] Seeriate järjekord: ALPHA1 GO ja ALPHA2 GO esimeseks, uus ALPHA1 kolmandaks
-- [ ] GO seeriatele asendus-info kirjeldustes; vanadele seeriatele "asendub …" märkus
-- [ ] Kategooria kirjeldus + meta uuendatud ALPHA GO-le
+- [x] Seeriate järjekord: ALPHA1 GO ja ALPHA2 GO esimeseks, uus ALPHA1 kolmandaks
+- [x] GO seeriatele asendus-info kirjeldustes; vanadele seeriatele "asendub …" märkus
+- [x] Kategooria kirjeldus + meta uuendatud ALPHA GO-le
 
 ### 2.3 Koodi kooskõla
-- [ ] `app/api/seed-homepage/route.ts` — seemne uuendatud, et reset ei tooks tagasi vana sisu
+- [x] `app/api/seed-homepage/route.ts` — seemne uuendatud, et reset ei tooks tagasi vana sisu
 
 ---
 
@@ -97,6 +97,9 @@ Päevaeelarve kokku: Google 10 € + Meta 12 €.
 - **Skript:** `scripts/create-alpha-go-meta.mjs`
 
 ### 3.3 E-kirjad
+
+**Uuendus 18.09.2026:** e-kirjade planeerimine kliendiga pooleli — mallid ja saatmise API
+ei ole veel repos (ootab kliendi kinnitust).
 
 Kaks kampaania e-kirja malli:
 
