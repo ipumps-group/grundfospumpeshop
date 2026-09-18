@@ -1,8 +1,13 @@
 import createMiddleware from 'next-intl/middleware'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
+
+// Estonian-only campaign pages — serve them directly under the 'et' locale via an
+// internal rewrite, so browser language / NEXT_LOCALE cookie never trigger a
+// redirect to /en|ru|lv|lt/<path> (the pages themselves redirect those back).
+const ET_ONLY_PATHS = new Set(['/alpha-go', '/unilift'])
 
 /**
  * Locale resolution uses the Accept-Language header via negotiator +
@@ -19,6 +24,14 @@ const intlMiddleware = createMiddleware(routing)
  * secondary fallback.
  */
 export default function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  if (ET_ONLY_PATHS.has(pathname)) {
+    const url = request.nextUrl.clone()
+    url.pathname = `/et${pathname}`
+    return NextResponse.rewrite(url)
+  }
+
   const acceptLang = request.headers.get('accept-language')
   if (acceptLang) {
     // Keep only the first language tag before any comma or quality params.
