@@ -47,6 +47,8 @@ müüakse lõpuni, kuid neid ei toodeta juurde. Seetõttu tõstetakse ALPHA GO k
   Skriptid: `scripts/update-campaign-landings.mjs`, `_audit-campaign-landings.mjs` (read-only kontroll).
 
 ### 2.1 Esileht (CMS `pages` tabel, slug `esilehtx`)
+- [x] **Promo-bänneri nupp 2 (18.09.2026):** "Grundfosi kampaanialeht ↗" (väline grundfos.com link,
+  `_blank`) → **"ALPHA GO pakkumised"** → `/alpha-go` (`_self`; skript `scripts/update-esileht-alpha-go-nupp.mjs`)
 - [x] **Hero (sektsioon 0):** kütte-teemaline pealkiri ja tekst + 5 keeles tõlked
 - [x] **Promo-bänner (sektsioon 2):** suvine aia-bänner → ALPHA GO bänner
   (uus taustapilt genereeritakse ja laaditakse storage'sse `pages/bg/`), tekstid +
@@ -87,6 +89,18 @@ Päevaeelarve kokku: Google 10 € + Meta 12 €.
 - **Iga ad groupi all:** RSA (responsive search ad) 7 headline + 2 description
 - **Negatiivsed:** remont, varuosa, juhend, manuaal, kasutatud, rent, video jne (15 tk)
 - **Skript:** `scripts/create-alpha-go-google.mjs`
+
+**Uuendus 18.09.2026 (nädalaraport):** kampaaniale lingiti 4 sitelinki (Küttepumbad, Kõik Grundfos pumbad,
+Võta ühendust, Küsi nõu) + 4 callout'i (Ametlik Grundfos partner, Kiire tarne üle Eesti, Tootjagarantii,
+Originaaltooted) — varem olid kõik laiendused ainult pausitud "Pumbapood search - EE" kampaanias
+(skript `scripts/link-extensions-to-campaigns.mjs`).
+
+**Diagnoos 18.09.2026 (nädalaraporti "kulu 0 €" kohta):** kampaania käivitus 16.09, esimene tõeline
+kulupäev 17.09 (3962 näitamist, 325 klikki, 19,98 € — 2× ülepaisutamine 10 € eelarvest). Raporti
+"kulu 0 €/nädal" oli seega aegunud andmetest (enne kulude algust). Budget-lost IS 83% on reaalne —
+eelarve saab päevas täis. 18.09 taasloodud `/alpha-go` RSA-d on staatuses REVIEW_IN_PROGRESS
+(tavaline, kuni ~1 tööpäev). Soovitus: jälgida 2–3 päeva pärast reklaamide kinnitamist; alles siis
+kaaluda eelarve tõstmist 10 → 15 €/päev (skript `scripts/_diag-alpha-go.mjs`).
 
 ### 3.2 Meta Ads — "ALPHA GO - Küte - EE 2026 sügis"
 - **Eesmärk:** Traffic (OUTCOME_TRAFFIC)

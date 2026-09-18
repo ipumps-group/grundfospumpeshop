@@ -9,6 +9,15 @@
 
 ## 0. Uuendus 9.09.2026 — UNILIFT ilmapulss välja lülitatud, maandumisleht `/unilift`
 
+### Uuendus 18.09.2026 — nädalaraporti QS-parandused + brändikampaania eelarve
+
+| Muudatus | Tulemus |
+|---|---|
+| **Laiendused lingitud Unilift kampaaniale** | Kõik 30 sitelinki/callout'i olid seotud ainult pausitud "Pumbapood search - EE" kampaaniaga. Unilift CC kampaaniale lingitud 4 sitelinki (Unilift pumbad, Drenaažipumbad, Reoveepumbad, Küsi nõu) + 4 callout'i (Ametlik Grundfos partner, Kiire tarne üle Eesti, Tehniline nõustamine, Tootjagarantii). Skript: `scripts/link-extensions-to-campaigns.mjs`. |
+| **"Sukelpumbad Laos" pealkiri drenaaži RSA-sse** | Märksõna "sukelpump" QS 3/10 — märksõna polnud RSA pealkirjades. RSA on immutable: loodi uus RSA (7 vana + 1 uus pealkiri), vana pausitud. Skript: `scripts/add-sukelpump-headline.mjs`. |
+| **`/unilift` maandumislehe märksõnad** | QS 3/10 märksõnad "tühjenduspump" ja "drenaažipump" puudusid lehe tekstist (vastavalt 0x ja 2x). Hero tekst + meta description täiendatud mõlema märksõnaga (nüüd 2x ja 4x). Nõuab Vercel deploy'd. |
+| **Brändikampaania eelarve 3 → 5 €/päev** | "Pumbapood + Grundfos Brand Search - EE" kaotas 53% nähtavusest eelarve tõttu — ainus kampaania, mis on reaalse ostu toonud. Skript: `scripts/fix-brand-budget.mjs`. |
+
 ### Uuendus 14.09.2026 — Display-võrk välja lülitatud, ilmapulss tagasi
 
 | Muudatus | Tulemus |

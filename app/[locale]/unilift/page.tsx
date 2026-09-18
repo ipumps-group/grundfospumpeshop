@@ -15,7 +15,7 @@ const META = {
   et: {
     title: 'Grundfos UNILIFT – sukelpumbad drenaaži- ja reovee eemaldamiseks',
     description:
-      'Grundfosi UNILIFT sukelpumbad drenaaživee, heitvee ja reovee pumpamiseks. Lahendused nii koduseks hädaabiks kui ka püsipaigalduseks. Tutvu valikuga ja leia sobiv pump.',
+      'Grundfosi UNILIFT sukelpumbad: tühjenduspump ja drenaažipump heitvee, drenaaživee ja reovee pumpamiseks. Koduseks hädaabiks ja püsipaigalduseks. Tutvu valikuga.',
   },
   en: {
     title: 'Grundfos UNILIFT – submersible pumps for drainage and wastewater',
@@ -283,7 +283,8 @@ export default async function UniliftPage() {
           </p>
           <p className="mt-3 text-[16px] text-blue-100/90 leading-relaxed max-w-2xl">
             Grundfosi UNILIFT sukelpumbad on mõeldud drenaaživee, heitvee ja reovee pumpamiseks.
-            Valikus on lahendusi nii koduseks hädaabiks kui ka püsipaigalduseks ja nõudlikumateks
+            Kas vajad tühjenduspumpa keldri kiireks tühjendamiseks või drenaažipumpa püsivasse
+            paigaldusse — valikus on lahendusi nii koduseks hädaabiks kui ka nõudlikumateks
             pumpamistöödeks.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
