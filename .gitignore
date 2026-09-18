@@ -43,6 +43,12 @@ migration-log*.json
 # vercel
 .vercel
 
+# local fallback storage (weekly reports JSON when Supabase table is missing)
+/data/
+
+# local scratch/logs
+/tmp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

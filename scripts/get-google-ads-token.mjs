@@ -40,7 +40,12 @@ const CLIENT_ID = env.GOOGLE_ADS_CLIENT_ID
 const CLIENT_SECRET = env.GOOGLE_ADS_CLIENT_SECRET
 const PORT = 3005
 const REDIRECT_URI = `http://localhost:${PORT}`
-const SCOPE = 'https://www.googleapis.com/auth/adwords'
+// adwords  = Google Ads API (campaigns, weather-pulse, weekly report)
+// analytics.readonly = GA4 Data API (weekly report, ads dashboard GA4 sync)
+const SCOPE = [
+  'https://www.googleapis.com/auth/adwords',
+  'https://www.googleapis.com/auth/analytics.readonly',
+].join(' ')
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error('ERROR: GOOGLE_ADS_CLIENT_ID or GOOGLE_ADS_CLIENT_SECRET missing in .env.local')
@@ -49,9 +54,14 @@ if (!CLIENT_ID || !CLIENT_SECRET) {
 
 const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(SCOPE)}&access_type=offline&prompt=consent`
 
-console.log('\n=== GOOGLE ADS TOKEN REFRESH ===\n')
+console.log('\n=== GOOGLE TOKEN (Ads + GA4) ===\n')
 console.log('Before continuing, make sure you added this redirect URI to GCP:')
 console.log(`  ${REDIRECT_URI}\n`)
+console.log('Requested scopes:')
+console.log('  - https://www.googleapis.com/auth/adwords')
+console.log('  - https://www.googleapis.com/auth/analytics.readonly\n')
+console.log('Sign in with the Google account that has access to BOTH the')
+console.log('Google Ads account AND the GA4 property (GA4_PROPERTY_ID).\n')
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, REDIRECT_URI)

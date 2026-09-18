@@ -12,6 +12,7 @@ type Settings = Record<string, string>
 
 const DEFAULT_SETTINGS: Settings = {
   order_notification_email: '',
+  report_email_recipients: '',
   sender_email:             '',
   company_name:             '',
   company_reg:              '',
@@ -170,6 +171,19 @@ export default function SeadedPage() {
               onChange={e => set('sender_email', e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]"
               placeholder="tellimused@pumbapood.ee"
+            />
+          </div>
+          <div>
+            <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
+              Nädalaraporti saajad
+              <span className="block text-[13px] font-normal text-gray-400">Iganädalane turundusraport (reede 09:00) — mitu aadressi komaga eraldatult</span>
+            </label>
+            <input
+              type="text"
+              value={settings.report_email_recipients}
+              onChange={e => set('report_email_recipients', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-900 outline-none focus:border-[#003366]"
+              placeholder="info@pumbapood.ee"
             />
           </div>
         </div>
