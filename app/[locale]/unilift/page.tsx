@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { getLocale } from 'next-intl/server'
+import { permanentRedirect } from 'next/navigation'
 import { ArrowRight, Phone, Mail } from 'lucide-react'
 import ContactForm from '@/components/ContactForm'
-import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
+import { SITE_URL, localizedUrl } from '@/lib/config'
 
 export const revalidate = 3600
 
@@ -48,18 +49,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const m = meta(locale)
   const ogImage = `${SITE_URL}/images/unilift/unilift-hero.png`
+  // Estonian-only campaign — canonical always points to the ET URL
+  const canonical = localizedUrl(PATH, 'et')
 
   return {
     title: m.title,
     description: m.description,
-    alternates: {
-      canonical: localizedUrl(PATH, locale),
-      languages: languageAlternates(PATH),
-    },
+    alternates: { canonical },
     openGraph: {
       title: m.title,
       description: m.description,
-      url: localizedUrl(PATH, locale),
+      url: canonical,
       siteName: 'Pump OÜ',
       locale,
       type: 'website',
@@ -247,7 +247,11 @@ const SIZING_APG = {
 
 const SIZING_TABLES = [SIZING_CC, SIZING_KP, SIZING_AP, SIZING_APG]
 
-export default function UniliftPage() {
+export default async function UniliftPage() {
+  // Estonian-only campaign — /en|ru|lv|lt/unilift redirect to /unilift
+  const locale = await getLocale()
+  if (locale !== 'et') permanentRedirect(PATH)
+
   return (
     <div className="min-h-screen bg-white">
       {/* ── HERO ─────────────────────────────────────────────────────────── */}

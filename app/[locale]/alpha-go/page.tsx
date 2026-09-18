@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { getLocale } from 'next-intl/server'
+import { permanentRedirect } from 'next/navigation'
 import { ArrowRight, Phone, Mail, Smartphone, Check } from 'lucide-react'
 import ContactForm from '@/components/ContactForm'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
+import { localizedUrl } from '@/lib/config'
 
 export const revalidate = 3600
 
@@ -54,18 +55,17 @@ function meta(locale: string) {
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const m = meta(locale)
+  // Estonian-only campaign — canonical always points to the ET URL
+  const canonical = localizedUrl(PATH, 'et')
 
   return {
     title: m.title,
     description: m.description,
-    alternates: {
-      canonical: localizedUrl(PATH, locale),
-      languages: languageAlternates(PATH),
-    },
+    alternates: { canonical },
     openGraph: {
       title: m.title,
       description: m.description,
-      url: localizedUrl(PATH, locale),
+      url: canonical,
       siteName: 'Pump OÜ',
       locale,
       type: 'website',
@@ -242,6 +242,10 @@ function ModelTable({ title, image, models, products }: {
 }
 
 export default async function AlphaGoPage() {
+  // Estonian-only campaign — /en|ru|lv|lt/alpha-go redirect to /alpha-go
+  const locale = await getLocale()
+  if (locale !== 'et') permanentRedirect(PATH)
+
   const products = await getAlphaGoProducts()
 
   return (
