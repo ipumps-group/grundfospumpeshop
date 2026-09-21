@@ -79,7 +79,7 @@ Päevaeelarve kokku: Google 10 € + Meta 12 €.
 
 ### 3.1 Google Ads — "ALPHA GO - Küte - EE 2026 sügis"
 - **Tüüp:** Search, ainult Google Search (ei partnervõrgustikku)
-- **Eelarve:** 10 EUR/päev
+- **Eelarve:** 13 EUR/päev (21.09.2026 alates; varem 10 EUR/päev)
 - **Status:** ENABLED (avaldatud 16.09.2026; kampaania id 24214062841)
 - **Landing:** https://pumbapood.ee/alpha-go (18.09.2026 alates; varem `/et/tooted/kuttepumbad`)
 - **Ad groupid:**
@@ -101,6 +101,12 @@ kulupäev 17.09 (3962 näitamist, 325 klikki, 19,98 € — 2× ülepaisutamine 
 eelarve saab päevas täis. 18.09 taasloodud `/alpha-go` RSA-d on staatuses REVIEW_IN_PROGRESS
 (tavaline, kuni ~1 tööpäev). Soovitus: jälgida 2–3 päeva pärast reklaamide kinnitamist; alles siis
 kaaluda eelarve tõstmist 10 → 15 €/päev (skript `scripts/_diag-alpha-go.mjs`).
+
+**Uuendus 21.09.2026:** eelarve tõstetud 10 → 13 €/päev (budget-lost IS 55 %; osa eelarve
+ümberjaotusest — Unilift 14 → 9 €, brand 5 → 7 €, kogumaht endine 29 €/päev). Samal päeval
+kinnitati RSA-des märksõnapealkirjad HEADLINE_1 peale ("Küttepumbad Laos", "Tsirkulatsioonipumbad"),
+et parandada "tsirkulatsioonipump" QS 3/10 ja rank-lost IS-i. Skriptid: `scripts/set-budget.mjs`,
+`scripts/pin-rsa-headlines.mjs`.
 
 ### 3.2 Meta Ads — "ALPHA GO - Küte - EE 2026 sügis"
 - **Eesmärk:** Traffic (OUTCOME_TRAFFIC)

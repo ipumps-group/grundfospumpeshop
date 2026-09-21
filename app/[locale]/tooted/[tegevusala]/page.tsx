@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
+import { getCategoryContent } from '@/lib/category-content'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 import SafeImage from '@/components/SafeImage'
 
@@ -228,6 +229,59 @@ export default async function CategoryPage({
             </div>
           )}
           </ProductsLayoutWithSidebar>
+
+          {(() => {
+            const cc = getCategoryContent(tegevusala, locale)
+            if (!cc) return null
+            return (
+              <div className="mt-12 max-w-4xl">
+                <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
+                  <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">{cc.guideTitle}</h2>
+                  {cc.guideParagraphs.map((p) => (
+                    <p key={p.slice(0, 32)} className="mt-4 text-[15px] text-gray-600 leading-relaxed">{p}</p>
+                  ))}
+
+                  <h3 className="mt-8 text-xl font-bold text-[#003366]">{cc.priceTitle}</h3>
+                  <p className="mt-3 text-[15px] text-gray-600 leading-relaxed">{cc.priceIntro}</p>
+                  <div className="mt-4 overflow-x-auto rounded-xl border border-gray-200">
+                    <table className="w-full min-w-[480px] text-[14px]">
+                      <thead>
+                        <tr className="bg-[#003366] text-white text-left">
+                          {cc.priceTable.head.map((h) => (
+                            <th key={h} className="px-4 py-3 font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cc.priceTable.rows.map((row, i) => (
+                          <tr key={row[0]} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <td className="px-4 py-2.5 font-semibold text-gray-900">{row[0]}</td>
+                            <td className="px-4 py-2.5 text-gray-700">{row[1]}</td>
+                            <td className="px-4 py-2.5 text-gray-700 whitespace-nowrap">{row[2]}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+
+                <section className="mt-8 bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
+                  <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">{cc.faqTitle}</h2>
+                  <div className="mt-4 divide-y divide-gray-100">
+                    {cc.faq.map((f) => (
+                      <details key={f.q} className="group py-4">
+                        <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-semibold text-gray-800 group-open:text-[#003366]">
+                          {f.q}
+                          <span className="shrink-0 text-[#01a0dc] transition-transform group-open:rotate-45">+</span>
+                        </summary>
+                        <p className="mt-3 text-[15px] text-gray-600 leading-relaxed max-w-3xl">{f.a}</p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            )
+          })()}
         </div>
       </div>
     )

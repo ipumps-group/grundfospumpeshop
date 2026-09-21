@@ -61,13 +61,20 @@ export async function pullGsc(period: ReportPeriod): Promise<GscData> {
     }
   }
 
-  const [totalsCur, totalsPrev, queriesCur, queriesPrev, pagesCur] = await Promise.all([
+  const [totalsCur, totalsPrev, queriesCur, queriesPrev, pagesCur, queryPageCur, queryPagePrev] = await Promise.all([
     query({ startDate: period.start, endDate: period.end, dimensions: [] }),
     query({ startDate: period.prevStart, endDate: period.prevEnd, dimensions: [] }),
     query({ startDate: period.start, endDate: period.end, dimensions: ["query"], rowLimit: QUERY_ROW_LIMIT }),
     query({ startDate: period.prevStart, endDate: period.prevEnd, dimensions: ["query"], rowLimit: QUERY_ROW_LIMIT }),
     query({ startDate: period.start, endDate: period.end, dimensions: ["page"], rowLimit: 25 }),
+    /* query+page pairs → per-family carrier pages (kandjalehed), so the
+     * report can say whether Google is switching the ranking page. */
+    query({ startDate: period.start, endDate: period.end, dimensions: ["query", "page"], rowLimit: QUERY_ROW_LIMIT }),
+    query({ startDate: period.prevStart, endDate: period.prevEnd, dimensions: ["query", "page"], rowLimit: QUERY_ROW_LIMIT }),
   ])
+
+  const toQueryPage = (rows: GscRow[]) =>
+    rows.map((r) => ({ query: r.keys?.[0] ?? "?", page: r.keys?.[1] ?? "?", impressions: r.impressions }))
 
   const curQueries = (queriesCur.rows ?? []).map(toQuery)
   const prevQueries = (queriesPrev.rows ?? []).map(toQuery)
@@ -87,7 +94,7 @@ export async function pullGsc(period: ReportPeriod): Promise<GscData> {
     topQueries: byImpressions.slice(0, SNAPSHOT_QUERY_LIMIT),
     prevQueries,
     topPages,
-    families: computeFamilyStats(curQueries, prevQueries),
+    families: computeFamilyStats(curQueries, prevQueries, toQueryPage(queryPageCur.rows ?? []), toQueryPage(queryPagePrev.rows ?? [])),
     newQueries: findNewQueries(curQueries, prevQueries).slice(0, 25),
   }
 }

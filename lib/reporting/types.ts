@@ -79,6 +79,14 @@ export interface KeywordFamilyStat {
   label: string
   current: { impressions: number; clicks: number; position: number | null }
   previous: { impressions: number; clicks: number; position: number | null }
+  /**
+   * Carrier pages (kandjalehed) of the family's queries, by impressions —
+   * answers "kas Google vahetab kandjalehte?" without a manual GSC detour.
+   */
+  carrierPages?: {
+    current: { page: string; impressions: number }[]
+    previous: { page: string; impressions: number }[]
+  }
 }
 
 export interface GscData {

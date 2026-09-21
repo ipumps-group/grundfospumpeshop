@@ -9,6 +9,16 @@
 
 ## 0. Uuendus 9.09.2026 — UNILIFT ilmapulss välja lülitatud, maandumisleht `/unilift`
 
+### Uuendus 21.09.2026 — nädalaraporti (13.–19.09) parandused: RSA pin-nikud, kategooria sisu, avalehe lingid
+
+| Muudatus | Tulemus |
+|---|---|
+| **Märksõnapealkirjad kinnitatud HEADLINE_1 peale** | QS 3/10 märksõnade RSA-des polnud märksõna esikohale kinnitatud. Uued RSA-d: Unilift ("Drenaažipumbad Laos" / "Tühjenduspump Sügiseks" / "Sukelpumbad Laos" → H1 pin) ja ALPHA GO ("Küttepumbad Laos" + "Tsirkulatsioonipumbad" → H1 pin); vanad RSA-d pausitud. Skript: `scripts/pin-rsa-headlines.mjs`. Märkus: QS 3/10 peegeldab veel enne 18.09 parandusi tehtud ajalugu — peaks taastuma järgmiste nädalate jooksul. |
+| **`/tooted/veeautomaadid` kategoorialehe sisulaiend** | GSC pere "veeautomaat / hüdrofoor" langes 23,1 → 27,9; süvaanalüüs näitas, et kandjaleht on sama (kandjavahetust pole), langus ajendatud infopäringutest ("parim veeautomaat", "veeautomaat hind", "põrandal seisev/uputatav veeautomaat"). Lehele lisatud valikujuhend, hinnatabel (tegelikud kataloogihinnad) ja FAQ 5 keeles — `lib/category-content.ts` + kategoorialehe renderdus. Nõuab Vercel deploy'd. |
+| **Avalehe meta description + Grundfos siselingid** | Meta description'is oli trükk "Grunfos" ja puudusid kandvad märksõnad; nüüd "Grundfos pumbad ja lahendused ühest kohast: veeautomaadid, kütte- ja tsirkulatsioonipumbad, drenaaži- ja kaevupumbad…". Lisatud sektsioon "Grundfos pumpade valik" — siselinks märksõna-ankrutega kõigile Grundfos-kategooriatele (DB, `scripts/update-homepage-grundfos-links.mjs`; ISR ~1h). |
+| **Nädalaraporti loogika parandatud** | 1) GA4 tracking-kontroll luges nulisessioonilised päevad valesti: GA4 ei tagasta ridu ilma andmeteta — nüüd loetakse puuduvad päevad 0-sessioonilisteks (13.–19.09 nädal: 4 tööpäeva täiesti ilma — vana loogika oleks öelnud "1 tööpäeva alla 20"). 2) GSC pere-languse leiud vastavad nüüd ise küsimusele "kas Google vahetab kandjalehte?" — pere kaupa top-3 kandjalehte mõlema nädala kohta (`carrierPages`), manuaalne GSC-teekond pole enam vajalik. |
+| **Eelarvete ümberjaotus (eelarv neutraalne, 29 €/päev)** | Unilift 14 → 9 €/päev (rank-lost 53 % on piiravaks teguriks, mitte eelarve — kampaania kulutas nädala keskel 1–2 €/päev) · ALPHA GO 10 → 13 €/päev (budget-lost 55 %; esimesel täispäeval 19,60 € kulu 10 € limiidil, CPC 0,08 €) · Brand 5 → 7 €/päev (IS langenud 56 % → 33 %, nõudlus ~2× kasvanud). Unilifti weather-pulse'i astmed samuti −5 €: 18/14/10 → 13/9/5 € (route.ts + weather-pulse.mjs), et cron käsitsi tehtud muudatust üle ei kirjutaks. Skript: `scripts/set-budget.mjs`. |
+
 ### Uuendus 18.09.2026 — nädalaraporti QS-parandused + brändikampaania eelarve
 
 | Muudatus | Tulemus |
@@ -284,12 +294,12 @@ Google Adsi Unilift CC kampaania päevaeelarvet kohandatakse automaatselt ilmate
 
 | 48h sademed (max üle linnade) | Päevaeelarve | Tase |
 |---:|---:|---|
-| ≥ 10 mm | 18,00 € | tugev vihm |
-| ≥ 4 mm | 14,00 € | vihmane |
-| < 4 mm | 10,00 € | põhiline |
+| ≥ 10 mm | 13,00 € | tugev vihm |
+| ≥ 4 mm | 9,00 € | vihmane |
+| < 4 mm | 5,00 € | põhiline |
 
 - **Täitmine:** `GET /api/cron/weather-pulse` (Vercel Cron, iga päev 05:00 UTC = 08:00 EEST / 07:00 EET; kaitstud `CRON_SECRET`-iga). Manuaalne/test käivitus: `node scripts/weather-pulse.mjs [--dry-run] [--force]`.
-- **Piirid:** eelarve jääb vahemikku 10–18 €/päev; muudatus tehakse ainult kampaania aknas (8.09–30.11.2026); kui eelarve on juba õige, muudatust ei tehta.
+- **Piirid:** eelarve jääb vahemikku 5–13 €/päev (21.09.2026 alates; varem 10–18 € — langetati, sest kampaania on rank-lost piiratud ega suuda eelarvet täis kulutada); muudatus tehakse ainult kampaania aknas (8.09–30.11.2026); kui eelarve on juba õige, muudatust ei tehta.
 - Test 2.09.2026: Pärnu prognoos 14,7 mm/48h (92%) → otsus oleks olnud 18 €/päev.
 
 **Vajalik deploy ja Verceli seadistus:** `vercel.json` (cron) ja `CRON_SECRET` keskkonnamuutuja tuleb lisada Verceli projekti ning teha production-deploy, et cron tööle hakkaks.

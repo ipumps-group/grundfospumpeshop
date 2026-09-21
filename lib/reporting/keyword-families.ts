@@ -56,12 +56,35 @@ function aggregate(rows: GscQuery[]): { impressions: number; clicks: number; pos
   }
 }
 
-export function computeFamilyStats(current: GscQuery[], previous: GscQuery[]): KeywordFamilyStat[] {
+export function computeFamilyStats(
+  current: GscQuery[],
+  previous: GscQuery[],
+  currentByPage: { query: string; page: string; impressions: number }[] = [],
+  previousByPage: { query: string; page: string; impressions: number }[] = [],
+): KeywordFamilyStat[] {
+  const carriers = (
+    fam: KeywordFamilyDef,
+    rows: { query: string; page: string; impressions: number }[],
+  ): { page: string; impressions: number }[] => {
+    const byPage = new Map<string, number>()
+    for (const r of rows) {
+      if (!fam.pattern.test(r.query)) continue
+      byPage.set(r.page, (byPage.get(r.page) ?? 0) + r.impressions)
+    }
+    return [...byPage.entries()]
+      .map(([page, impressions]) => ({ page, impressions }))
+      .sort((a, b) => b.impressions - a.impressions)
+      .slice(0, 3)
+  }
   return KEYWORD_FAMILIES.map((fam) => ({
     id: fam.id,
     label: fam.label,
     current: aggregate(current.filter((q) => fam.pattern.test(q.query))),
     previous: aggregate(previous.filter((q) => fam.pattern.test(q.query))),
+    carrierPages: {
+      current: carriers(fam, currentByPage),
+      previous: carriers(fam, previousByPage),
+    },
   }))
 }
 

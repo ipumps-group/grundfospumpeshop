@@ -73,22 +73,43 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
     !noisy(f) && f.current.impressions >= 60 && f.current.position !== null && f.current.position <= 10 &&
     f.current.impressions > 0 && f.current.clicks / f.current.impressions < 0.015)
 
+  const shortUrl = (u: string) => u.replace(/^https?:\/\/[^/]+/, "")
+  const carrierOf = (f: KeywordFamilyStat) => {
+    const top = f.carrierPages?.current[0]
+    return top ? ` Kandjaleht: ${shortUrl(top.page)}.` : ""
+  }
+  const carrierName = (f: KeywordFamilyStat) => shortUrl(f.carrierPages?.current[0]?.page ?? "")
   for (const f of risers.slice(0, 5)) {
     out.push({
       area: "seo",
       severity: "positive",
       title: `„${f.label}" tõusis ${fmtPos(f.previous.position)} → ${fmtPos(f.current.position)}`,
-      detail: `${f.current.impressions} näitamist, ${f.current.clicks} klikki sel nädalal.`,
-      action: "Kinnita tõus: värskenda kandjalehte (kategooria tekstid, FAQ, tootepildid) ja lisa 1–2 siselist linki märksõna-ankruga.",
+      detail: `${f.current.impressions} näitamist, ${f.current.clicks} klikki sel nädalal.${carrierOf(f)}`,
+      action: `Kinnita tõus: värskenda kandjalehte ${carrierName(f)} (tekstid, FAQ, tootepildid) ja lisa 1–2 siselist linki märksõna-ankruga.`,
     })
   }
   for (const f of fallers.slice(0, 5)) {
+    /* Carrier-page check: is Google still ranking the same page, or did it
+     * switch? The answer decides the fix (content vs internal links). */
+    const curTop = f.carrierPages?.current[0]
+    const prevTop = f.carrierPages?.previous[0]
+    let carrierLine = ""
+    let action = "Tugevda kandjalehe sisu ja siselinke."
+    if (curTop && prevTop) {
+      if (curTop.page === prevTop.page) {
+        carrierLine = ` Kandjaleht on sama: ${shortUrl(curTop.page)} — Google ei ole lehte vahetanud.`
+        action = "Kandja on sama, seega aitab lehe tugevdamine: laienda kategooria sisu (valikujuhend, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke märksõna-ankruga."
+      } else {
+        carrierLine = ` Kandjaleht vahetus: oli ${shortUrl(prevTop.page)}, nüüd ${shortUrl(curTop.page)}.`
+        action = "Kandjaleht vahetus — suuna siselinkidega õigele lehele ja tee lehtede sihtimine selgeks (üks leht ühe kavatsuse kohta)."
+      }
+    }
     out.push({
       area: "seo",
       severity: "negative",
       title: `„${f.label}" langes ${fmtPos(f.previous.position)} → ${fmtPos(f.current.position)}`,
-      detail: `${f.current.impressions} näitamist sel nädalal (eelmine: ${f.previous.impressions}).`,
-      action: "Kontrolli, milline leht päringuid kannab (GSC → Lehed) — kas Google vahetab kandjalehte? Kui kandja on sama, tugevda lehe sisu ja siselinke; kui kandja vahetub, suuna siselinkidega õigele lehele.",
+      detail: `${f.current.impressions} näitamist sel nädalal (eelmine: ${f.previous.impressions}).${carrierLine}`,
+      action,
     })
   }
   for (const f of striking.slice(0, 4)) {
@@ -96,8 +117,8 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
       area: "seo",
       severity: "opportunity",
       title: `Löögkaugusel: „${f.label}" pos ${fmtPos(f.current.position)} (${f.current.impressions} näitamist/nädal)`,
-      detail: "Positsioon 4–15 korral piisab esimesele lehele tõusmiseks sageli sisu- ja lingitööst.",
-      action: `Täienda „${f.label}" kandjalehte: laienda kategooria sisu (valikujuhised, mahud, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke avalehelt.`,
+      detail: `Positsioon 4–15 korral piisab esimesele lehele tõusmiseks sageli sisu- ja lingitööst.${carrierOf(f)}`,
+      action: `Täienda kandjalehte ${carrierName(f)}: laienda sisu (valikujuhised, mahud, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke avalehelt.`,
     })
   }
   for (const f of lowCtr.slice(0, 3)) {
@@ -125,25 +146,39 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
   }
 }
 
-function ga4Insights(ga4: Ga4Data, out: Insight[]): void {
+function ga4Insights(ga4: Ga4Data, period: { start: string; end: string }, out: Insight[]): void {
   /* Tracking health first — broken measurement invalidates everything else.
    * Only weekdays count: weekends naturally dip, real outages break weekday
-   * numbers too. */
+   * numbers too.
+   *
+   * NB: GA4 omits days with zero sessions from the response, so a full
+   * tracking outage shows up as MISSING rows, not as 0. Fill the gaps with
+   * explicit zero-days before judging — otherwise a dead week would look
+   * "healthy" whenever a single day survived. */
+  const byDate = new Map(ga4.daily.map((d) => [d.date, d.sessions]))
+  const allDays: { date: string; sessions: number }[] = []
+  for (let t = new Date(`${period.start}T00:00:00Z`).getTime(); t <= new Date(`${period.end}T00:00:00Z`).getTime(); t += 86_400_000) {
+    const iso = new Date(t).toISOString().slice(0, 10)
+    const key = iso.replace(/-/g, "")
+    allDays.push({ date: key, sessions: byDate.get(key) ?? 0 })
+  }
   const isWeekday = (yyyymmdd: string): boolean => {
     const d = new Date(`${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}T00:00:00Z`).getUTCDay()
     return d >= 1 && d <= 5
   }
-  const weekdays = ga4.daily.filter((d) => isWeekday(d.date))
-  const base = weekdays.length > 0 ? weekdays : ga4.daily
+  const weekdays = allDays.filter((d) => isWeekday(d.date))
+  const base = weekdays.length > 0 ? weekdays : allDays
   if (base.length > 0) {
     const avg = base.reduce((s, d) => s + d.sessions, 0) / base.length
+    const zeroDays = base.filter((d) => d.sessions === 0).length
     const deadDays = base.filter((d) => d.sessions < MIN_WEEKDAY_SESSIONS).length
     if (avg < MIN_WEEKDAY_SESSIONS || deadDays >= 2) {
+      const zeroNote = zeroDays > 0 ? `, neist ${zeroDays} täiesti sessioonideta` : ""
       out.push({
         area: "ga4",
         severity: "negative",
-        title: `GA4 mõõtmine võib olla katki (keskmiselt ${round1(avg)} sessiooni/tööpäevas, ${deadDays} tööpäeva alla ${MIN_WEEKDAY_SESSIONS})`,
-        detail: `Alla ${MIN_WEEKDAY_SESSIONS} sessiooni/tööpäevas = tracking-tõrge (vt GTM/CSP/consent), mitte liikluse langus. Nädalavahetused on loomulikult madalad ega lähe arvesse.`,
+        title: `GA4 mõõtmine ${zeroDays === base.length ? "oli terve nädala katki" : "võib olla katki"} (keskmiselt ${round1(avg)} sessiooni/tööpäevas, ${deadDays} tööpäeva alla ${MIN_WEEKDAY_SESSIONS}${zeroNote})`,
+        detail: `Alla ${MIN_WEEKDAY_SESSIONS} sessiooni/tööpäevas = tracking-tõrge (vt GTM/CSP/consent), mitte liikluse langus. Päevad, mille kohta GA4 ühtki rida ei tagasta, loetakse 0-sessioonilisteks. Nädalavahetused on loomulikult madalad ega lähe arvesse.`,
         action: "Kontrolli GTM-i laadimist live-is (DevTools → Network: gtm.js), CSP päiseid ja consent-mode'i. Ära tõlgenda selle nädala GA4-numbreid enne taastumist.",
       })
       return // further GA4 conclusions are unreliable
@@ -357,7 +392,7 @@ function strategyInsights(snapshot: ReportSnapshot, out: Insight[]): void {
 export function buildInsights(snapshot: ReportSnapshot): Insight[] {
   const out: Insight[] = []
   if (snapshot.gsc) gscInsights(snapshot.gsc, out)
-  if (snapshot.ga4) ga4Insights(snapshot.ga4, out)
+  if (snapshot.ga4) ga4Insights(snapshot.ga4, snapshot.period, out)
   if (snapshot.ads) adsInsights(snapshot.ads, out)
   if (snapshot.orders) ordersInsights(snapshot.orders, snapshot.ads, out)
   strategyInsights(snapshot, out)

@@ -10,9 +10,9 @@ const CAMPAIGN_ID = '24203046624' // Unilift CC + Drenaaž - EE 2026 sügis
 const CAMPAIGN_START = '2026-09-08'
 const CAMPAIGN_END = '2026-11-30'
 const TIERS = [
-  { minRain48h: 10.0, budget: 18.0, label: 'tugev vihm' },
-  { minRain48h: 4.0, budget: 14.0, label: 'vihmane' },
-  { minRain48h: 0.0, budget: 10.0, label: 'põhiline' },
+  { minRain48h: 10.0, budget: 13.0, label: 'tugev vihm' },
+  { minRain48h: 4.0, budget: 9.0, label: 'vihmane' },
+  { minRain48h: 0.0, budget: 5.0, label: 'põhiline' },
 ]
 const CITIES = [
   { name: 'Tallinn', latitude: 59.437, longitude: 24.7536 },
