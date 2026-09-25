@@ -28,8 +28,8 @@ export function languageAlternates(path: string): Record<string, string> {
 
 export const COMPANY = {
   legalName: 'Pump OÜ',
-  regNr: '16391391',
-  vatId: 'EE102445343',
+  regNr: '16984168',
+  vatId: 'EE102736939',
   phone: '+3725274403',
   email: 'info@pumbapood.ee',
   bankAccount: 'EE192200221087019864',

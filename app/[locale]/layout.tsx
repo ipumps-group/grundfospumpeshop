@@ -35,7 +35,7 @@ async function OrganizationSchema() {
       addressRegion: 'Harju maakond',
       addressCountry: 'EE',
     },
-    vatID: 'EE102445343',
+    vatID: 'EE102736939',
     sameAs: [
       'https://www.facebook.com/ipumps',
       'https://www.instagram.com/ipumps_ee',

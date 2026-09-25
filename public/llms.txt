@@ -22,8 +22,8 @@
 ## Business facts
 
 - Legal name: Pump OÜ
-- Registration number: 16391391
-- VAT number: EE102445343
+- Registration number: 16984168
+- VAT number: EE102736939
 - Address: Vana-Narva mnt 3, Maardu, Harju maakond 74114, Estonia
 - Phone: +372 527 4403
 - Email: info@pumbapood.ee
