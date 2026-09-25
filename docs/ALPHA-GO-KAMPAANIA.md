@@ -108,6 +108,15 @@ kinnitati RSA-des märksõnapealkirjad HEADLINE_1 peale ("Küttepumbad Laos", "T
 et parandada "tsirkulatsioonipump" QS 3/10 ja rank-lost IS-i. Skriptid: `scripts/set-budget.mjs`,
 `scripts/pin-rsa-headlines.mjs`.
 
+**Uuendus 25.09.2026 (kvaliteediparandus):** QS 3/10 "tsirkulatsioonipump" põhjus oli ad relevance
+BELOW_AVERAGE — "Küttepumbad ja tsirkulatsioonipumbad" rühmas rotatsioonis vale H1. Rühm lõhestati:
+uued rühmad `Tsirkulatsioonipump` (2 mks) ja `Küttepump` (6 mks), igaühes oma 13-pealkirjaline RSA
+(H1-pin alati rühma märksõna); vana rühm pausitud. Kõik kampaania RSA-d laiendatud 12–13 pealkirja
++ 4 kirjelduseni. Lisatud structured snippet, price-laiendus (ALPHA1 GO 170,05 € / 199,12 €,
+ALPHA2 GO 303,26 €) ja call-laiendus. Maandumisleht `/alpha-go`: H1 nüüd "Kaks tsirkulatsioonipumpa
+paljude asemel", FAQ + FAQPage JSON-LD. Skriptid: `scripts/split-ad-groups-quality.mjs`,
+`scripts/add-quality-extensions.mjs`.
+
 ### 3.2 Meta Ads — "ALPHA GO - Küte - EE 2026 sügis"
 - **Eesmärk:** Traffic (OUTCOME_TRAFFIC)
 - **Status:** ACTIVE (avaldatud 16.09.2026; kampaania id 120253844082790120)

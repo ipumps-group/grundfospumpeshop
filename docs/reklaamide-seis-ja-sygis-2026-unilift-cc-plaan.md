@@ -9,6 +9,32 @@
 
 ## 0. Uuendus 9.09.2026 — UNILIFT ilmapulss välja lülitatud, maandumisleht `/unilift`
 
+### Uuendus 26.09.2026 — Ad Strength parandused: 15 pealkirja igale RSA-le + 8 sitelinki
+
+Google Ads UI näitas Ad Strength "Poor/Average": puudusid rühma populaarsete märksõnade täpsed vormid pealkirjades, pealkirjad polnud piisavalt unikaalsed ja sitelinke oli ainult 4 (soovitus 8–10).
+
+| Muudatus | Tulemus |
+|---|---|
+| **Kõik 13 RSA-d → 15 pealkirja** (3 pinned H1 märksõnavormidega + 12 unikaalset) | Lisatud täpsed märksõnavormid, mis puudusid: "Pinnavee Pump Laos", "Vihmavee Pump Laos", "Keldripump Laos", "Drenaaž Pump Laos", "Drenaažitööde Pump", "Keskkütte Pump Laos", "Põrandakütte Pump", "Küttesüsteemi Pump", "Hädapump Laos", "Veeavarii Pump", "Grundfos Edasimüüja", "Grundfos Hulgi", "ALPHA GO Hind", "Küttepumba Vahetus" jne. Kirjeldused jäid samaks (Google märkis need "unique"). Uued RSA-d märgisega `AS15` (kontrollitav `tmp/_verify-adstrength.mjs`). Skript: `scripts/improve-ad-strength.mjs` |
+| **Sitelinkid 4 → 8 kampaania kohta** | Unilift: +Tühjenduspumbad, Sukelpumbad, Edasimüüjatele, Hinnad ja valik. ALPHA GO: +Tsirkulatsioonipumbad, ALPHA1 GO al 170,05 €, Vana pumba asendus, Küsi pakkumist. Kõik kahe kirjeldusreaga. Skript: `scripts/add-more-sitelinks.mjs` |
+| **Pildiassetid kõigile kolmele kampaaniale** („Your ads aren't as prominent... add images") | 3 tootefotot kampaania kohta, igaüks kahes formaadis (1:1 1200×1200 + 1.91:1 1200×628, valge taust) = 12 unikaalset assetit, `AD_IMAGE` field type. Unilift: CC5, KP, CC komposiit · ALPHA GO: ALPHA1 GO, ALPHA2 GO, ALPHA1 GO 25-60 · Brand: CC5 + KP + ALPHA2 GO. Skript: `scripts/add-image-assets.mjs`. Tehniline märkus: v24 õige field type on `AD_IMAGE` (mitte `IMAGE`) ja **Google dedupib identse sisuga pilte** — CC5/CC7/CC9 kataloogipildid Supabase'is on sama fail (identne MD5), mistõttu esialgne "CC9" laaditi cc5-assetina. Kolmanda pildina kasutatud kohalik `unilift-cc.jpg`. **Soovitus: asendada e-poe CC5/CC7/CC9 tootepildid erinevate mudelite päris fotodega** (praegu sama placeholder igaühel). |
+
+Tähelepanek: kontol on **auto-created assets** sees — Google lisas "Küttepump" RSA-le ise 2 märksõna-pealkirja ("Küttesüsteemi pump", "Põrandakütte pump"). Uued AS15 RSA-d sisaldavad neid vormide juba ise. Ad Strength hinnang uueneb UI-s tavaliselt ~päeva jooksul; QS-komponentide taastumine jätkuvalt 2–4 nädalat.
+
+### Uuendus 25.09.2026 — nädalaraporti (18.–24.09) kvaliteediparandused: rühmade lõhestus, täis-RSA-d, laiendused, brändi CPC, maandumislehed
+
+Diagnoos live-andmetest (25.09): kõik QS 3/10 märksõnad (`tühjenduspump`, `drenaažipump`, `sukelpump`, `tsirkulatsioonipump`) olid **ad relevance = BELOW_AVERAGE** ja peaaegu kõik `/unilift` + `/alpha-go` märksõnad **maandumislehe kogemus = BELOW_AVERAGE** (brändi avalehel ABOVE_AVERAGE). Põhjus: ühes laias rühmas (17 mks) olid kõik 3 märksõnapealkirja kinnitatud korraga H1-le — rotatsioonis näidati otsingule vale pealkirja; RSA-d olid õhukesed (7–8 pealkirja / 2 kirjeldust).
+
+| Muudatus | Tulemus |
+|---|---|
+| **Reklaamirühmade lõhestus märksõnapõhiselt** | Uued kitsad rühmad: Uniliftis `Tühjenduspump` (2 mks), `Drenaažipump` (6), `Sukelpump` (3); ALPHA GO-s `Tsirkulatsioonipump` (2), `Küttepump` (6). Iga rühm = oma RSA, H1-pin alati rühma märksõna → vale pealkirja rotatsioon kaob. Hädaabi-märksõnad (üleujutus, kelder vett täis jne) → `Avariipump` rühma, vihmavee-märksõnad → `Pinnavesi` rühma. Vanad laiad rühmad (`Drenaaž ja tühjendus`, `Küttepumbad ja tsirkulatsioonipumbad`) pausitud. Skript: `scripts/split-ad-groups-quality.mjs` |
+| **Kõik RSA-d laiendatud 12–13 pealkirja + 4 kirjelduseni** | Varem 7–8 pealkirja ja 2 kirjeldust (madal Ad Strength → vähem kombinatsioone). Uued RSA-d USP-dega: tegelikud hinnad, laoseis, tarne 1–3 tööpäeva, tootjagarantii, tasuta nõustamine. Kokku 13 uut RSA-t (5 uutes rühmades + 8 olemasolevas), vanad pausitud (RSA on immutable). |
+| **Uued laiendused mõlemale kampaaniale** | Structured snippet (Types), price-laiendus tegelike kataloogihindadega (CC5 172,75 € / CC7 207,60 € / CC9 264,69 €; ALPHA1 GO 170,05 € / 199,12 € / ALPHA2 GO 303,26 €) ja call-laiendus +372 527 4403 → suurem "expected impact" Ad Rank'is. Märkus: price-laienduse keel on `en`, sest Google ei toeta eesti keelt (ainult "From"-silt on inglise keeles; tootenimed ja kirjeldused eesti keeles). Skript: `scripts/add-quality-extensions.mjs` |
+| **Brändikampaania maxCPC tõus** | Rank-lost IS 50 % oli pakkumise (mitte kvaliteedi) probleem — QS 8–10, lpExp ABOVE_AVERAGE, aga maxCPC 0,60 € kaotas oksjoni. `grundfos pump` 0,60→1,00 €, `grundfos pumbad` 0,60→0,90 €, `grundfos eesti` 0,60→0,80 €. Päevaeelarve jääb 7 €, kulu kaitstud. Skript: `scripts/raise-brand-cpc.mjs` |
+| **Maandumislehtede sisulaiendid** | `/unilift`: hinnatabel 9 CC mudeliga (live hinnad Supabase'ist, nagu `/alpha-go`-l), märksõnarikas H2 ("Tühjendus- ja drenaažipumbad"), FAQ 6 küsimust + FAQPage JSON-LD. `/alpha-go`: H1 "Kaks tsirkulatsioonipumpa paljude asemel", H2 märksõnaga, FAQ + JSON-LD. Nõuab Vercel deploy'd. |
+
+Järelkontroll: QS on ajalooline — oodatav taastumine 2–4 nädala jooksul (kontrollpunktid 02.10 ja 09.10 nädalaraportites; QS-komponendid `tmp/_qs-audit.mjs` read-only skriptiga).
+
 ### Uuendus 21.09.2026 — nädalaraporti (13.–19.09) parandused: RSA pin-nikud, kategooria sisu, avalehe lingid
 
 | Muudatus | Tulemus |

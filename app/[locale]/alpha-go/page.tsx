@@ -163,6 +163,43 @@ const REPLACEMENT_ROWS = [
   { old: 'Eraldiseisev tsirkulatsioonipump', go: 'ALPHA1 GO või ALPHA2 GO', note: 'sama ühendusmõõt' },
 ]
 
+const FAQ_ITEMS = [
+  {
+    q: 'Mis on tsirkulatsioonipump ja millal tuleks see välja vahetada?',
+    a: 'Tsirkulatsioonipump liigutab vett keskkütte- ja põrandaküttesüsteemis. Pump tasub välja vahetada, kui see on üle 10 aasta vana, teeb müra, tarbib palju elektrit või ei suuda enam süsteemi tasakaalustada. Vanad UPS ja ALPHA1 mudelid on tootmisest lõppemas — nende asemele sobib ALPHA1 GO.',
+  },
+  {
+    q: 'Millise vana tsirkulatsioonipumba ALPHA1 GO asendab?',
+    a: 'ALPHA1 GO asendab integreeritud UPS-pumbad, vana ALPHA1 ja ALPHA1 L ning sobib ka enamike eraldiseisvate tsirkulatsioonipumpade asemele — ühendusmõõt jääb samaks.',
+  },
+  {
+    q: 'Mis vahe on ALPHA1 GO ja ALPHA2 GO tsirkulatsioonipumpadel?',
+    a: 'ALPHA2 GO on tippmudel: juhendatud seadistus, täiustatud AUTOADAPT, õhu tuvastus ja eemaldamine ning tasakaalustus Grundfos GO äpis. ALPHA1 GO on kvaliteetne põhivalik iseõhutuse, kuivalt töötamise kaitse ja jõulise käivitusega.',
+  },
+  {
+    q: 'Kuidas leida õige asenduspump?',
+    a: 'Kõige lihtsam on kasutada Grundfos GO äpi GO Replace funktsiooni: skanni vana pump või otsi mudelit ja äpp soovitab kohe sobiva ALPHA GO asenduse koos vajalike adapteritega.',
+  },
+  {
+    q: 'Kas ALPHA GO tsirkulatsioonipumbad on laos ja kui kiire on tarne?',
+    a: 'Jah — ALPHA1 GO ja ALPHA2 GO mudelid on meie laos ja kohe saadaval. Tarne üle Eesti võtab tavaliselt 1–3 tööpäeva.',
+  },
+  {
+    q: 'Kas ALPHA GO sobib keskkütte- ja põrandaküttesüsteemi?',
+    a: 'Jah. ALPHA GO tsirkulatsioonipumbad on mõeldud nii radiaator- kui põrandaküttesüsteemidele ning soojuspumpade tarvis (ALPHA2 GO asendab ka UPM3/UPM4 pumbad).',
+  },
+]
+
+const FAQ_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_ITEMS.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+}
+
 function formatPrice(value: unknown): string | null {
   const n = Number(value)
   if (!Number.isFinite(n) || n <= 0) return null
@@ -250,6 +287,10 @@ export default async function AlphaGoPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+      />
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative bg-[#003366] text-white overflow-hidden">
         <div className="absolute inset-0">
@@ -270,7 +311,7 @@ export default async function AlphaGoPage() {
             Grundfos ALPHA GO
           </p>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
-            Kaks pumpa paljude asemel
+            Kaks tsirkulatsioonipumpa paljude asemel
           </h1>
           <p className="mt-5 text-[17px] md:text-lg text-blue-100 leading-relaxed max-w-2xl">
             Jäta tagasikutsumine ja raisatud aeg minevikku. Uued ALPHA1 GO ja ALPHA2 GO asendavad
@@ -323,11 +364,11 @@ export default async function AlphaGoPage() {
       <section id="tootevalik" className="scroll-mt-20 bg-[#ebf2fc] py-14">
         <div className="max-w-[1200px] mx-auto px-5 md:px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">
-            Tutvu ALPHA GO tootevalikuga
+            ALPHA GO tsirkulatsioonipumbad — tutvu valikuga
           </h2>
           <p className="mt-3 text-[16px] text-gray-600 leading-relaxed max-w-3xl">
-            Kolmeastmeline valik: tippmudel ALPHA2 GO nõudlikuks asenduseks, kvaliteetne ALPHA1 GO
-            põhitöödeks ja soodne uus ALPHA1 lihtsamatesse süsteemidesse.
+            Kolmeastmeline küttepumpade valik: tippmudel ALPHA2 GO nõudlikuks asenduseks,
+            kvaliteetne ALPHA1 GO põhitöödeks ja soodne uus ALPHA1 lihtsamatesse süsteemidesse.
           </p>
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -458,6 +499,23 @@ export default async function AlphaGoPage() {
               height={338}
               className="w-full max-w-sm h-auto rounded-2xl"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <section className="py-14">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">
+            Korduma kippuvad küsimused tsirkulatsioonipumpade kohta
+          </h2>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {FAQ_ITEMS.map((f) => (
+              <div key={f.q} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h3 className="text-[16px] font-bold text-[#003366] leading-snug">{f.q}</h3>
+                <p className="mt-2 text-[14px] text-gray-600 leading-relaxed">{f.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { getLocale } from 'next-intl/server'
 import { permanentRedirect } from 'next/navigation'
 import { ArrowRight, Phone, Mail } from 'lucide-react'
 import ContactForm from '@/components/ContactForm'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL, localizedUrl } from '@/lib/config'
 
 export const revalidate = 3600
@@ -247,13 +248,92 @@ const SIZING_APG = {
 
 const SIZING_TABLES = [SIZING_CC, SIZING_KP, SIZING_AP, SIZING_APG]
 
+// UNILIFT CC models sold in the e-shop — live prices merged from the products table at runtime
+const CC_MODELS = [
+  { slug: 'unilift-cc5---m1-1x230v-50hz', model: 'UNILIFT CC5 M1', control: 'Käsitsi (ilma ujuklülitita)' },
+  { slug: 'unilift-cc5-a1-1x220-240v-schuko', model: 'UNILIFT CC5 A1', control: 'Automaatne (ujuklüliti, Schuko)' },
+  { slug: 'unilift-cc5---a1-float-arm-hu', model: 'UNILIFT CC5 A1 float arm', control: 'Automaatne (ujukvars)' },
+  { slug: 'unilift-cc7---m1', model: 'UNILIFT CC7 M1', control: 'Käsitsi (ilma ujuklülitita)' },
+  { slug: 'unilift-cc7---a1-1x220-240v-10m-schuko', model: 'UNILIFT CC7 A1 10m', control: 'Automaatne (ujuklüliti, 10 m kaabel)' },
+  { slug: 'unilift-cc7---a1-10m-float-arm-hu', model: 'UNILIFT CC7 A1 10m float arm', control: 'Automaatne (ujukvars, 10 m kaabel)' },
+  { slug: 'unilift-cc9---m1', model: 'UNILIFT CC9 M1', control: 'Käsitsi (ilma ujuklülitita)' },
+  { slug: 'unilift-cc9---a1-1230v-50hz-schuko', model: 'UNILIFT CC9 A1', control: 'Automaatne (ujuklüliti, Schuko)' },
+  { slug: 'unilift-cc9---a1-10m-aisi316-hu', model: 'UNILIFT CC9 A1 10m AISI316', control: 'Automaatne (ujukvars, roostevaba)' },
+]
+
+const FAQ_ITEMS = [
+  {
+    q: 'Mis vahe on tühjenduspumbal ja drenaažipumbal?',
+    a: 'Mõlemad on sukelpumbad. Tühjenduspump on mõeldud eelkõige ajutiseks vee eemaldamiseks — näiteks üleujutuse korral keldrist või basseini ja mahuti tühjendamiseks. Drenaažipump sobib ka püsivamaks kasutuseks drenaaži- ja pinnavee ärajuhtimiseks hoone ümbert. UNILIFT CC ja KP sobivad hästi mõlemaks.',
+  },
+  {
+    q: 'Millist sukelpumpa valida keldri tühjendamiseks?',
+    a: 'Väiksema veehulga ja madalama tõstekõrguse korral piisab UNILIFT CC5. Suurema veehulga, kõrgema tõste või pikema äraveo jaoks vali CC7, CC9 või roostevabast terasest UNILIFT KP. Täpse valiku aitavad teha allpool olevad dimensioneerimistabelid.',
+  },
+  {
+    q: 'Kui madalale suudab tühjenduspump vee eemaldada?',
+    a: 'UNILIFT CC eemaldab vee kuni 3 mm jääktasemeni — põrand praktiliselt kuivaks. See teeb CC eriti heaks valikuks üleujutuste ja veekahjude likvideerimiseks.',
+  },
+  {
+    q: 'Kas tühjenduspumbad on laos ja kui kiire on tarne?',
+    a: 'Kõik UNILIFT CC mudelid on meie laos ja kohe saadaval. Tarne üle Eesti võtab tavaliselt 1–3 tööpäeva.',
+  },
+  {
+    q: 'Kas drenaažipump talub mustast vett ja tahkeid osakesi?',
+    a: 'UNILIFT CC ja KP läbivad kuni 10 mm tahkeid osakesi, UNILIFT AP kuni 50 mm. Fekaalreovee pumpamiseks on mõeldud purustiga UNILIFT APG.',
+  },
+  {
+    q: 'Kas saan nõu pumba valiku ja paigalduse kohta?',
+    a: 'Jah — meie spetsialistid aitavad tasuta valida õige pumba, jagavad tehnilist nõu ja teevad hinnapakkumise. Helista +372 527 4403 või kirjuta info@pumbapood.ee.',
+  },
+]
+
+const FAQ_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_ITEMS.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+}
+
+function formatPrice(value: unknown): string | null {
+  const n = Number(value)
+  if (!Number.isFinite(n) || n <= 0) return null
+  return `${n.toFixed(2).replace('.', ',')} €`
+}
+
+async function getCcPrices(): Promise<Map<string, string | null>> {
+  const map = new Map<string, string | null>()
+  try {
+    const { data } = await supabaseAdmin
+      .from('products')
+      .select('slug, price')
+      .in('slug', CC_MODELS.map((m) => m.slug))
+      .eq('published', true)
+    for (const p of data || []) {
+      map.set(String(p.slug), formatPrice(p.price))
+    }
+  } catch (e) {
+    console.error('[unilift] product fetch error:', e)
+  }
+  return map
+}
+
 export default async function UniliftPage() {
   // Estonian-only campaign — /en|ru|lv|lt/unilift redirect to /unilift
   const locale = await getLocale()
   if (locale !== 'et') permanentRedirect(PATH)
 
+  const prices = await getCcPrices()
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+      />
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative bg-[#003366] text-white overflow-hidden">
         <div className="absolute inset-0">
@@ -301,11 +381,11 @@ export default async function UniliftPage() {
       {/* ── INTRO + 4 PRODUCT GROUP CARDS ────────────────────────────────── */}
       <section id="tootevalik" className="scroll-mt-20 max-w-[1200px] mx-auto px-5 md:px-6 py-14">
         <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">
-          Tutvu UNILIFTi tootevalikuga
+          Tühjendus- ja drenaažipumbad — tutvu UNILIFTi valikuga
         </h2>
         <p className="mt-3 text-[16px] text-gray-600 leading-relaxed max-w-3xl">
-          UNILIFTi valikust leiad sobiva pumba nii keldri tühjendamiseks, mahuti või basseini veest
-          tühjaks pumpamiseks kui ka heit- ja reovee eemaldamiseks.
+          UNILIFTi valikust leiad sobiva sukelpumba nii keldri tühjendamiseks, mahuti või basseini
+          veest tühjaks pumpamiseks kui ka heit- ja reovee eemaldamiseks.
         </p>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -334,6 +414,56 @@ export default async function UniliftPage() {
               </div>
             </Link>
           ))}
+        </div>
+
+        {/* ── UNILIFT CC mudelid ja hinnad (live) ── */}
+        <div className="mt-12">
+          <h3 className="text-lg font-bold text-[#003366]">UNILIFT CC mudelid ja hinnad</h3>
+          <p className="mt-2 text-[14px] text-gray-600 leading-relaxed max-w-3xl">
+            Kõik CC mudelid on laos ja kohe saadaval — tarne üle Eesti 1–3 tööpäeva. M-mudelid on
+            käsitsi juhitavad, A-mudelitel on automaatne ujuklüliti.
+          </p>
+          <p className="mt-4 text-[13px] text-gray-400 md:hidden">← Libista tabelit küljele →</p>
+          <div
+            className="mt-2 md:mt-4 overflow-x-auto rounded-2xl border border-gray-200 touch-pan-x"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            <table className="w-full min-w-[560px] text-[14px]">
+              <thead>
+                <tr className="bg-[#003366] text-white text-left">
+                  <th className="px-4 py-3 font-semibold">Mudel</th>
+                  <th className="px-4 py-3 font-semibold">Juhtimine</th>
+                  <th className="px-4 py-3 font-semibold text-right">Hind</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CC_MODELS.map((m, i) => (
+                  <tr key={m.slug} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-4 py-2.5">
+                      <Link
+                        href={`/toode/${m.slug}`}
+                        className="font-semibold text-[#003366] underline decoration-[#01a0dc] underline-offset-2 hover:text-[#01a0dc] transition-colors"
+                      >
+                        {m.model}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2.5 text-gray-700">{m.control}</td>
+                    <td className="px-4 py-2.5 text-right font-semibold text-[#003366] whitespace-nowrap">
+                      {prices.get(m.slug) ?? '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-[14px]">
+            <Link
+              href="/tooted/drenaazipumbad/unilift-cc"
+              className="inline-flex items-center gap-1.5 font-semibold text-[#01a0dc] hover:text-[#003366] transition-colors"
+            >
+              Vaata kogu UNILIFT CC valikut e-poes <ArrowRight size={16} />
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -533,6 +663,23 @@ export default async function UniliftPage() {
           seiskumistasemest. Täpne dimensioneerimine sõltub konkreetsest paigaldusest – vajadusel
           võta meiega ühendust.
         </p>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <section className="bg-[#ebf2fc] py-14">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">
+            Korduma kippuvad küsimused
+          </h2>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {FAQ_ITEMS.map((f) => (
+              <div key={f.q} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h3 className="text-[16px] font-bold text-[#003366] leading-snug">{f.q}</h3>
+                <p className="mt-2 text-[14px] text-gray-600 leading-relaxed">{f.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ── CONTACT BLOCK (same as front page) ───────────────────────────── */}
