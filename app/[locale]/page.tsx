@@ -144,6 +144,51 @@ export default async function HomePage() {
   if (hasBlocks) {
     return (
       <div className="min-h-screen">
+        {locale === 'et' && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: [
+                  {
+                    '@type': 'Question',
+                    name: 'Milliseid Grundfos pumapasi leiate Pumbapoest?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'Meie valikust leiad kõik peamised Grundfos seeriad: veeautomaadid ja hüdrofoorid (SCALA1, SCALA2, JP), kütte- ja tsirkulatsioonipumbad (ALPHA GO, MAGNA3), drenaaži- ja tühjenduspumbad (Unilift), puurkaevupumbad (SQ, SQE) ja reoveepumbad.',
+                    },
+                  },
+                  {
+                    '@type': 'Question',
+                    name: 'Kas olete ametlik Grundfos edasimüüja Eestis?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'Jah — Pumbapood.ee (Pump OÜ) on ametlik Grundfos partner. Kõik tooted on originaalsed, kehtib tootjagarantii ja pakume tehnilist tuge.',
+                    },
+                  },
+                  {
+                    '@type': 'Question',
+                    name: 'Kui kiire on tarne?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'Laos olevad Grundfos pumbad jõuavad üle Eesti tavaliselt 1–3 tööpäevaga. Suurematele projektidele ja eritellimustele kokkuleppel.',
+                    },
+                  },
+                  {
+                    '@type': 'Question',
+                    name: 'Kas aitate pumba valikul ja paigaldusel?',
+                    acceptedAnswer: {
+                      '@type': 'Answer',
+                      text: 'Jah — tasuta nõustamine aitab valida õige pumba vastavalt veeallikale, kraanikohtadele ja rõhuvajadusele. Helista +372 527 4403, kirjuta info@pumbapood.ee või võta ühendust.',
+                    },
+                  },
+                ],
+              }),
+            }}
+          />
+        )}
         {titleVisible && (
           <div className="max-w-[1200px] mx-auto px-4 md:px-6 pt-10 pb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h1>

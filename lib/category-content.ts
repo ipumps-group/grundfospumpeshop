@@ -38,6 +38,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Veeautomaat (hüdrofoor) hoiab majas veerõhu püsivana: pump käivitub ja seiskub automaatselt vastavalt veevõtule. Õige valik sõltub eelkõige veeallikast (kaev, salvkaev või tsentraalvõrk), vajalikust vooluhulgast ehk kraanikohtade arvust ja müratasemest.",
       "Põrandal seisev veeautomaat (SCALA1, SCALA2, JP) paigaldatakse kuiva ruumi ja imeb vett kaevust kuni 8 m sügavuselt. Kui kaevupind on madalamal või soovid pumpa kaevu sisse, on õige valik uputatav veeautomaat SBA, mis töötab vaikselt ja ei vaja kuiva paigaldusruumi.",
       "Eramule 3–6 kraanikohaga on parim valik SCALA2, mis hoiab rõhu täiesti püsivana ka mitme tarbija korral. Soodsam alternatiiv on SCALA1 või klassikaline JP hüdrofoor, suvilasse ja aeda piisab enamasti JP-st.",
+      "Kontorisse ja ärihoonesse vali vaikne veeautomaat, mis peab vastu üheaegsele kasutusele — 5–20 töötajaga kontorisse sobib hästi Grundfos SCALA2 nii köögi, tualettruumi kui ka muudeks veevõttudeks; väiksemasse kontorisse piisab SCALA1-st.",
     ],
     priceTitle: "Veeautomaadi hind",
     priceIntro:
@@ -74,6 +75,10 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Kas veeautomaati saab kasutada ka aiakastmiseks?",
         a: "Jah — SCALA1 ja JP sobivad hästi ka aiakastmiseks ja vihmavee kasutamiseks. Kui kastmine on peamine kasutus, vaata ka meie kastmispumpasid salvkaevupumpade valikus (SB, SBA, JP).",
       },
+      {
+        q: "Milline veeautomaat sobib kontorisse?",
+        a: "Kontorisse sobib vaikne ja automaatne veeautomaat, mis hoiab ühtlase veerõhu ka siis, kui mitu kraani on korraga avatud. 5–20 töötajaga kontorisse soovitame Grundfos SCALA2 — vaikne, püsiva rõhuga ja integreeritud automaatikaga. Väiksemasse kontorisse või äripinnale piisab SCALA1-st, suurematesse hoonetesse sobib ka CMB rõhutõstepump.",
+      },
     ],
   },
   en: {
@@ -82,6 +87,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "A water booster keeps the water pressure in your home constant: the pump starts and stops automatically as you use water. The right choice depends mainly on the water source (borehole, shallow well or mains), the required flow (number of taps) and the noise level.",
       "A floor-standing booster (SCALA1, SCALA2, JP) is installed in a dry room and draws water from wells up to 8 m deep. If the water level is deeper or you want the pump inside the well, the submersible SBA booster is the right choice — silent and needing no dry installation space.",
       "For a detached house with 3–6 taps, SCALA2 is the best choice, keeping the pressure perfectly constant even with several simultaneous users. A more affordable alternative is SCALA1 or the classic JP hydrophore; for a summer cottage or garden, JP is usually enough.",
+      "For an office or commercial building choose a quiet booster that handles simultaneous use — Grundfos SCALA2 suits a 5–20 person office for the kitchen, restrooms and other taps; a smaller office is fine with SCALA1.",
     ],
     priceTitle: "Water booster prices",
     priceIntro:
@@ -118,6 +124,10 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Can a water booster be used for garden irrigation?",
         a: "Yes — SCALA1 and JP are well suited for garden irrigation and rainwater reuse. If irrigation is the main use, also see our irrigation pumps in the shallow-well pump range (SB, SBA, JP).",
       },
+      {
+        q: "Which water booster suits an office?",
+        a: "An office needs a quiet, automatic booster that keeps pressure steady when several taps run at once. For a 5–20 person office we recommend Grundfos SCALA2 — quiet, constant pressure, integrated automation. A smaller office or retail space is fine with SCALA1; larger buildings can use a CMB booster set.",
+      },
     ],
   },
   ru: {
@@ -126,6 +136,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Насосная станция (гидрофор) поддерживает постоянное давление воды в доме: насос включается и выключается автоматически по мере разбора воды. Правильный выбор зависит от источника воды (скважина, колодец или центральная сеть), требуемого расхода (числа точек разбора) и уровня шума.",
       "Напольная станция (SCALA1, SCALA2, JP) устанавливается в сухом помещении и забирает воду из скважины глубиной до 8 м. Если зеркало воды глубже или насос нужен внутри скважины, правильный выбор — погружная станция SBA: бесшумная и не требующая сухого помещения.",
       "Для частного дома с 3–6 точками разбора лучший выбор — SCALA2: давление остаётся полностью постоянным даже при нескольких одновременно открытых кранах. Более доступная альтернатива — SCALA1 или классический гидрофор JP; для дачи и сада обычно достаточно JP.",
+      "Для офиса и коммерческого здания выберите бесшумную станцию, выдерживающую одновременное потребление — Grundfos SCALA2 подходит для офиса на 5–20 сотрудников (кухня, санузлы и другие точки); в небольшой офис достаточно SCALA1.",
     ],
     priceTitle: "Цена насосной станции",
     priceIntro:
@@ -162,6 +173,10 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Можно ли использовать станцию для полива сада?",
         a: "Да — SCALA1 и JP хорошо подходят для полива и использования дождевой воды. Если полив — основное применение, посмотрите также поливочные насосы в разделе колодезных насосов (SB, SBA, JP).",
       },
+      {
+        q: "Какая насосная станция подходит для офиса?",
+        a: "В офис нужна тихая автоматическая станция, поддерживающая постоянное давление при одновременно открытых кранах. Для офиса на 5–20 сотрудников рекомендуем Grundfos SCALA2 — тихая, с постоянным давлением и встроенной автоматикой. В небольшой офис или магазин достаточно SCALA1; для крупных зданий подойдёт повысительный насос CMB.",
+      },
     ],
   },
   lv: {
@@ -170,6 +185,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Ūdens automāts uztur pastāvīgu ūdens spiedienu mājā: sūknis ieslēdzas un izslēdzas automātiski atbilstoši ūdens patēriņam. Pareizā izvēle galvenokārt atkarīga no ūdens avota (urbums, akas vai centrālais tīkls), nepieciešamās plūsmas (krānu skaits) un trokšņa līmeņa.",
       "Uz grīdas novietojams automāts (SCALA1, SCALA2, JP) tiek uzstādīts sausā telpā un sūc ūdeni no akas līdz 8 m dziļumam. Ja ūdens līmenis ir dziļāks vai sūknis jānovieto akā, pareizā izvēle ir iegremdējamais SBA automāts — kluss un bez sausas uzstādīšanas vietas.",
       "Privātmājai ar 3–6 krāniem labākā izvēle ir SCALA2, kas uztur spiedienu pilnīgi nemainīgu pat vairākiem vienlaicīgiem lietotājiem. Lētāka alternatīva ir SCALA1 vai klasiskais JP hidrofors; vasarnīcai vai dārzam parasti pietiek ar JP.",
+      "Birojam un komerciālai ēkai izvēlieties klusu ūdens automātu, kas iztur vienlaicīgu ūdens ņemšanu — Grundfos SCALA2 ir piemērots 5–20 darbinieku birojam (virtuvei, tualetēm un citiem punktiem); mazākam birojam pietiek ar SCALA1.",
     ],
     priceTitle: "Ūdens automāta cena",
     priceIntro:
@@ -206,6 +222,10 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Vai ūdens automātu var izmantot dārza laistīšanai?",
         a: "Jā — SCALA1 un JP lieliski der dārza laistīšanai un lietus ūdens izmantošanai. Ja laistīšana ir galvenais mērķis, skatiet arī laistīšanas sūkņus akas sūkņu klāstā (SB, SBA, JP).",
       },
+      {
+        q: "Kurš ūdens automāts ir piemērots birojam?",
+        a: "Birojam vajag klusu, automātisku ūdens automātu, kas uztur stabilu spiedienu arī tad, ja vienlaikus ir atvērti vairāki krāni. 5–20 darbinieku birojam iesakām Grundfos SCALA2 — kluss, ar stabilu spiedienu un integrētu automātiku. Mazākam birojam vai telpai pietiek ar SCALA1; lielākām ēkām der CMB spiediena paaugstināšanas sūknis.",
+      },
     ],
   },
   lt: {
@@ -214,6 +234,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Vandens automatas palaiko pastovų vandens slėgį name: siurblys įsijungia ir išsijungia automatiškai pagal vandens sunaudojimą. Tinkamas pasirinkimas priklauso nuo vandens šaltinio (gręžinys, šulinys arba centrinis tinklas), reikalingo srauto (čiaupų skaičiaus) ir triukšmo lygio.",
       "Ant grindų statomas automatas (SCALA1, SCALA2, JP) montuojamas sausoje patalpoje ir siurbia vandenį iš iki 8 m gylio šulinio. Jei vandens lygis gilesnis arba siurblio reikia pačiame šulinyje, tinkamas pasirinkimas – panardinamas automatas SBA: tylus ir jam nereikia sausos patalpos.",
       "Individualiam namui su 3–6 čiaupais geriausias pasirinkimas – SCALA2: slėgis išlieka visiškai pastovus net esant keliems vienu metu atidarytiems čiaupams. Pigesnė alternatyva – SCALA1 arba klasikinis JP hidroforas; vasarnamiui ar sodui dažniausiai pakanka JP.",
+      "Biurui ir komerciniam pastui rinkitės tylų vandens automatą, atlaikantį vienalaikį naudojimą – Grundfos SCALA2 tinka 5–20 darbuotojų biurui (virtuvei, tualetams ir kitiems taškams); mažesniam biurui pakanka SCALA1.",
     ],
     priceTitle: "Vandens automato kaina",
     priceIntro:
@@ -249,6 +270,10 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       {
         q: "Ar vandens automatą galima naudoti sodo laistymui?",
         a: "Taip – SCALA1 ir JP puikiai tinka sodo laistymui ir lietaus vandens naudojimui. Jei laistymas yra pagrindinis tikslas, taip pat žiūrėkite laistymo siurblius šulininių siurblių skyriuje (SB, SBA, JP).",
+      },
+      {
+        q: "Kuris vandens automatas tinka biurui?",
+        a: "Biurui reikia tylaus, automatinio vandens automato, išlaikančio stabilų slėgį net atidarius kelis čiaupus. 5–20 darbuotojų biurui rekomenduojame Grundfos SCALA2 – tylų, su stabiliu slėgiu ir integruota automatika. Mažesniam biurui ar patalpai pakanka SCALA1; didesniems pastatams tinka CMB slėgio didinimo siurblys.",
       },
     ],
   },

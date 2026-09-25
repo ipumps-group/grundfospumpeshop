@@ -20,18 +20,31 @@ async function mutate(endpoint, ops) { const tk = await token(); const hd = { Au
 const SHOP = 'https://pumbapood.ee'
 const UNILIFT = 'Unilift CC + Drenaaž - EE 2026 sügis'
 const ALPHA = 'ALPHA GO - Küte - EE 2026 sügis'
+const BRAND = 'Pumbapood + Grundfos Brand Search - EE'
 
 // linkText <=25, description1/2 <=35
 const SITELINKS = [
   { campaign: UNILIFT, linkText: 'Tühjenduspumbad', desc1: 'Tühjenduspumbad kohe laost', desc2: 'Tarne 1-3 tööpäeva', url: `${SHOP}/tooted/drenaazipumbad/unilift-cc` },
   { campaign: UNILIFT, linkText: 'Sukelpumbad', desc1: 'Sukelpumbad igaks juhuks', desc2: 'Ametlik Grundfos partner', url: `${SHOP}/tooted/drenaazipumbad` },
-  { campaign: UNILIFT, linkText: 'Edasimüüjatele', desc1: 'Hulgihinnad ja B2B tugi', desc2: 'Küsi pakkumist täna', url: `${SHOP}/leht/edasimyujatele` },
+  { campaign: UNILIFT, linkText: 'Edasimüüjatele', desc1: 'Hulgihinnad ja B2B tugi', desc2: 'Küsi pakkumist täna', url: `${SHOP}/leht/kontakt` },
   { campaign: UNILIFT, linkText: 'Hinnad ja valik', desc1: 'Hinnad alates 172,75 €', desc2: 'Laos ja kohe saadaval', url: `${SHOP}/unilift` },
   { campaign: ALPHA, linkText: 'Tsirkulatsioonipumbad', desc1: 'Tsirkulatsioonipumbad laos', desc2: 'Tarne 1-3 tööpäeva', url: `${SHOP}/alpha-go` },
   { campaign: ALPHA, linkText: 'ALPHA1 GO al 170,05 €', desc1: 'ALPHA1 GO alates 170,05 €', desc2: 'ALPHA2 GO tippmudel', url: `${SHOP}/alpha-go` },
   { campaign: ALPHA, linkText: 'Vana pumba asendus', desc1: 'Asendab vanu pumpasid', desc2: 'Grundfos GO äpiga', url: `${SHOP}/alpha-go` },
-  { campaign: ALPHA, linkText: 'Küsi pakkumist', desc1: 'Hulgihinnad ettevõtetele', desc2: 'Arvega ost ettevõttele', url: `${SHOP}/leht/edasimyujatele` },
+  { campaign: ALPHA, linkText: 'Küsi pakkumist', desc1: 'Hulgihinnad ettevõtetele', desc2: 'Arvega ost ettevõttele', url: `${SHOP}/leht/kontakt` },
+  // Brand: 8 sitelinki (kvaliteedistandard)
+  { campaign: BRAND, linkText: 'Küttepumbad', desc1: 'Grundfos küttepumbad', desc2: 'ALPHA GO ja ALPHA1', url: `${SHOP}/tooted/kuttepumbad` },
+  { campaign: BRAND, linkText: 'Drenaažipumbad', desc1: 'Unilift CC, KP ja AP', desc2: 'Laos ja kohe saadaval', url: `${SHOP}/tooted/drenaazipumbad` },
+  { campaign: BRAND, linkText: 'Veeautomaadid', desc1: 'Veeautomaadid ja hüdrofoorid', desc2: 'Hinnad alates 235 €', url: `${SHOP}/tooted/veeautomaadid` },
+  { campaign: BRAND, linkText: 'Puurkaevupumbad', desc1: 'SQ ja SQE seeria', desc2: 'Tehniline nõustamine', url: `${SHOP}/tooted/puurkaevupumbad` },
+  { campaign: BRAND, linkText: 'Reoveepumbad', desc1: 'Purustiga pumbad', desc2: 'Sololift lahendused', url: `${SHOP}/tooted/reoveepumbad` },
+  { campaign: BRAND, linkText: 'ALPHA GO pakkumised', desc1: 'Uued küttepumbad', desc2: 'Asendab vanu mudeleid', url: `${SHOP}/alpha-go` },
+  { campaign: BRAND, linkText: 'Küsi nõu', desc1: 'Tasuta konsultatsioon', desc2: 'Vastame kiiresti', url: `${SHOP}/leht/kontakt` },
+  { campaign: BRAND, linkText: 'Kõik tooted', desc1: 'Üle 500 toote', desc2: 'Hinnad ja mudelid', url: `${SHOP}/tooted` },
 ]
+
+// Katkised URL-id (nt /leht/edasimyujatele annab 404) -> suunatakse ümber
+const URL_FIXES = [{ from: '/leht/edasimyujatele', to: `${SHOP}/leht/kontakt` }]
 
 // Valideerimine
 for (const s of SITELINKS) {
@@ -43,8 +56,21 @@ console.log(DRY ? '=== DRY RUN ===' : '=== ADD MORE SITELINKS ===')
 
 const camps = await gaql(`SELECT campaign.name, campaign.resource_name, campaign.status FROM campaign WHERE campaign.status = 'ENABLED'`)
 const campByName = new Map(camps.map((c) => [c.campaign.name, c.campaign]))
-const existing = await gaql(`SELECT campaign.name, campaign.status, campaign_asset.field_type, asset.sitelink_asset.link_text FROM campaign_asset WHERE campaign.status = 'ENABLED' AND campaign_asset.field_type = 'SITELINK'`)
+const existing = await gaql(`SELECT campaign.name, campaign.status, campaign_asset.field_type, asset.resource_name, asset.sitelink_asset.link_text, asset.final_urls FROM campaign_asset WHERE campaign.status = 'ENABLED' AND campaign_asset.field_type = 'SITELINK'`)
 const existingTexts = new Set(existing.map((e) => `${e.campaign.name}|||${e.asset?.sitelinkAsset?.linkText}`))
+
+// Paranda katkised sitelinkide URL-id (nt /leht/edasimyujatele = 404)
+for (const e of existing) {
+  const urls = e.asset?.finalUrls || []
+  for (const fix of URL_FIXES) {
+    if (!urls.some((u) => u.includes(fix.from))) continue
+    console.log(`\n[!] Parandan katkise URL-i: "${e.asset.sitelinkAsset.linkText}" ${urls.join(',')} -> ${fix.to}`)
+    if (DRY) continue
+    const r = await mutate('assets', [{ update: { resourceName: e.asset.resourceName, finalUrls: [fix.to] }, updateMask: 'finalUrls' }])
+    if (!r?.results) { console.error('  URL-i parandus ebaõnnestus: ' + JSON.stringify(r).slice(0, 500)); process.exit(1) }
+    console.log('  Parandatud')
+  }
+}
 
 for (const s of SITELINKS) {
   const camp = campByName.get(s.campaign)
