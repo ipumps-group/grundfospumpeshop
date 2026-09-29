@@ -5,18 +5,6 @@ import { rateLimit, AI_RATE } from '@/lib/rate-limit'
 
 const client = new Anthropic()
 
-// Activity area slug → display name translations for prompt use
-const AREA_NAMES: Record<string, { et: string; en: string; ru: string; lv: string; lt: string }> = {
-  'kuttepumbad':                              { et: 'Küte', en: 'Heating', ru: 'Отопление', lv: 'Apkure', lt: 'Šildymas' },
-  'tsirkulatsioonipumbad-soe-tarbevesi':      { et: 'Soe tarbevesi', en: 'Hot water', ru: 'Горячая вода', lv: 'Karstais ūdens', lt: 'Karštas vanduo' },
-  'puurkaevupumbad':                          { et: 'Puurkaev', en: 'Borewell', ru: 'Скважина', lv: 'Urbums', lt: 'Gręžinys' },
-  'drenaazipumbad':                           { et: 'Drenaaž', en: 'Drainage', ru: 'Дренаж', lv: 'Drenāža', lt: 'Drenažas' },
-  'salvkaevupumbad':                          { et: 'Salvkaev', en: 'Well', ru: 'Колодец', lv: 'Aka', lt: 'Šulinys' },
-  'veeautomaadid':                            { et: 'Veeautomaat', en: 'Garden watering', ru: 'Гидрофор', lv: 'Dārza laistīšana', lt: 'Sodo laistymas' },
-  'rohutostepumbad':                          { et: 'Rõhutõste', en: 'Pressure booster', ru: 'Повышение давления', lv: 'Spiediena paaugstināšana', lt: 'Slėgio didinimas' },
-  'reoveepumbad':                             { et: 'Reovesi', en: 'Sewage', ru: 'Канализация', lv: 'Notekūdeņi', lt: 'Nuotekos' },
-}
-
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for') || 'unknown'
   const rl = rateLimit(ip, AI_RATE.maxRequests)
@@ -27,6 +15,15 @@ export async function POST(req: NextRequest) {
 
   const normalized = query.trim().toLowerCase()
   const cacheKey   = `search:${normalized}`
+
+  // Fetch active activity areas from the DB — drives cache validation and the
+  // prompt, so search always follows the real category tree.
+  const { data: areaRows } = await supabaseAdmin
+    .from('activity_areas')
+    .select('slug, name_et')
+    .eq('is_active', true)
+    .order('sort_order')
+  const areaNames = new Map((areaRows || []).map(a => [a.slug, a.name_et] as const))
 
   // 1. Check synonym cache in settings table (validate cached slugs still exist)
   const { data: cached } = await supabaseAdmin
@@ -48,7 +45,7 @@ export async function POST(req: NextRequest) {
       const cachedSlug = parts.length === 2 ? parts[1] : cached.value
       const cachedType = parts.length === 2 ? parts[0] as 'tegevusala' | 'seeria' : 'tegevusala'
       // Validate cached slug against current DB state
-      if (cachedType === 'tegevusala' && AREA_NAMES[cachedSlug]) {
+      if (cachedType === 'tegevusala' && areaNames.has(cachedSlug)) {
         return NextResponse.json({ categorySlug: cachedSlug, categoryType: cachedType })
       }
       if (cachedType === 'seeria') {
@@ -69,6 +66,7 @@ export async function POST(req: NextRequest) {
 
   // 2. Fetch all products with their names, descriptions, and category/series info
   let productCatalog = ''
+  const areasWithProducts = new Set<string>()
   try {
     const { data: products } = await supabaseAdmin
       .from('products')
@@ -80,6 +78,7 @@ export async function POST(req: NextRequest) {
       const byArea: Record<string, { names: string[]; descs: string[] }> = {}
       for (const p of products) {
         const area = p.primary_activity_area_slug || 'other'
+        if (areaNames.has(area)) areasWithProducts.add(area)
         if (!byArea[area]) byArea[area] = { names: [], descs: [] }
         byArea[area].names.push(p.name.replace(/Grundfos\s*/g, ''))
         for (const d of [p.short_description_et, p.short_description_en, p.short_description_ru, p.short_description_lv, p.short_description_lt]) {
@@ -88,9 +87,8 @@ export async function POST(req: NextRequest) {
       }
       const lines: string[] = []
       for (const [slug, data] of Object.entries(byArea)) {
-        const areaName = AREA_NAMES[slug]
-        const langLabels = areaName ? `${areaName.et} / ${areaName.en} / ${areaName.ru} / ${areaName.lv} / ${areaName.lt}` : slug
-        lines.push(`=== ${slug} (${langLabels}) ===`)
+        const areaName = areaNames.get(slug)
+        lines.push(`=== ${slug}${areaName ? ` (${areaName})` : ''} ===`)
         const uniqueNames = [...new Set(data.names)].slice(0, 20)
         lines.push(`  Products: ${uniqueNames.join(' | ')}`)
         const uniqueDescs = [...new Set(data.descs)].slice(0, 3)
@@ -141,7 +139,7 @@ ${productCatalog}
 Product series: ${seriesLines || 'none listed'}
 
 VALID CATEGORY SLUGS (use ONLY one of these):
-kuttepumbad, tsirkulatsioonipumbad-soe-tarbevesi, puurkaevupumbad, drenaazipumbad, salvkaevupumbad, veeautomaadid, rohutostepumbad, reoveepumbad
+${[...areaNames.keys()].filter(slug => areasWithProducts.has(slug)).join(', ') || 'none'}
 
 VALID SERIES SLUGS (use ONLY one of these):
 ${seriesSlugs || 'none'}
@@ -168,7 +166,7 @@ If absolutely nothing matches, reply with "none".`,
       : 'none'
 
     if (text !== 'none') {
-      if (AREA_NAMES[text]) {
+      if (areaNames.has(text) && areasWithProducts.has(text)) {
         resultSlug = text
         resultType = 'tegevusala'
       } else {

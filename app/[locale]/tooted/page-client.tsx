@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { withVat, fmt } from '@/lib/price'
-import { matchSearchKeyword } from '@/lib/search-keywords'
+import { matchSearchKeyword, type SearchKeyword, type SearchTree } from '@/lib/search-keywords'
 
 // ŌöĆŌöĆŌöĆ T├£├£BID ŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆŌöĆ
 
@@ -578,24 +578,32 @@ function TootedPageContent({
 
 
 
+  // Search tree built from the ACTUAL categories/series loaded from the DB —
+  // the matcher can only redirect to pages that really have products.
+  const searchTree: SearchTree = {
+    categories: tegevusalad.map(c => ({ slug: c.slug, name: c.name_et })),
+    series: seeriad.map(s => ({ slug: s.slug, name: s.name_et, parentSlug: s.parent_slug, productCount: 1 })),
+  }
+
+  const goToSearchTarget = (kw: SearchKeyword) => {
+    setInputQuery('')
+    if (kw.type === 'leht') router.push(`/${kw.slug}`)
+    else if (kw.type === 'seeria' && kw.parentSlug) router.push(`/tooted/${kw.parentSlug}/${kw.slug}`)
+    else if (kw.type === 'tegevusala') router.push(`/tooted/${kw.slug}`)
+  }
+
   // Handle Enter key — check keywords, AI cache, then search
   const handleSearchKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key !== 'Enter' || !inputQuery.trim()) return
     const q = inputQuery.trim()
-    // 1. Hardcoded keyword map
-    const kw = matchSearchKeyword(q)
+    // 1. Match against the actual category tree (aliases, series, campaign pages)
+    const kw = matchSearchKeyword(q, searchTree)
     if (kw) {
-      setInputQuery('')
-      if (kw.type === 'seeria') {
-        const areaSlug = kw.parentSlug || seeriad.find(c => c.slug === kw.slug)?.parent_slug
-        if (areaSlug) router.push(`/tooted/${areaSlug}/${kw.slug}`)
-      } else {
-        router.push(`/tooted/${kw.slug}`)
-      }
+      goToSearchTarget(kw)
       return
     }
     const qLower = q.toLowerCase().replace(/-/g, ' ')
-    // 2. Check AI cache — previously learned terms
+    // 2. Check AI cache — previously learned terms (validated against the tree)
     try {
       const { data: cached } = await supabase
         .from('settings')
@@ -606,77 +614,37 @@ function TootedPageContent({
         const parts = cached.value.split(':')
         const cacheType = parts.length === 2 ? parts[0] : 'tegevusala'
         const cacheSlug = parts.length === 2 ? parts[1] : cached.value
-        setInputQuery('')
         if (cacheType === 'seeria') {
           const s = seeriad.find(c => c.slug === cacheSlug)
-          const parentSlug = s?.parent_slug
-          if (parentSlug) router.push(`/tooted/${parentSlug}/${cacheSlug}`)
-        } else {
+          if (s?.parent_slug) {
+            setInputQuery('')
+            router.push(`/tooted/${s.parent_slug}/${cacheSlug}`)
+            return
+          }
+        } else if (tegevusalad.some(c => c.slug === cacheSlug)) {
+          setInputQuery('')
           router.push(`/tooted/${cacheSlug}`)
+          return
         }
-        return
+        // Stale/invalid cache entry — ignore and fall through to text search
       }
     } catch {}
-    // 3. Check DB slugs and names
-    for (const area of tegevusalad) {
-      const slugNorm = area.slug.replace(/-/g, ' ')
-      if (slugNorm.includes(qLower) || area.name_et.toLowerCase().includes(qLower)) {
-        setInputQuery('')
-        router.push(`/tooted/${area.slug}`)
-        return
-      }
-    }
-    for (const series of seeriad) {
-      const slugNorm = series.slug.replace(/-/g, ' ')
-      if (slugNorm.includes(qLower) || series.name_et.toLowerCase().includes(qLower)) {
-        setInputQuery('')
-        const parentSlug = series.parent_slug
-        if (parentSlug) router.push(`/tooted/${parentSlug}/${series.slug}`)
-        return
-      }
-    }
-    // 4. No match — run the search (SQL + AI fallback)
-    setQuery(inputQuery.trim())
+    // 3. No match — run the search (SQL + AI fallback)
+    setQuery(q)
     setPage(1)
   }
 
   // On query change (Enter or URL load), check keyword/slug matches first
   useEffect(() => {
     if (loading || !query.trim()) return
-    const q = query.trim().toLowerCase().replace(/-/g, ' ')
-    // 1. Check keyword map
-    const kw = matchSearchKeyword(query.trim())
+    const kw = matchSearchKeyword(query.trim(), searchTree)
     if (kw) {
-      setInputQuery('')
-      if (kw.type === 'seeria') {
-        const areaSlug = kw.parentSlug || seeriad.find(c => c.slug === kw.slug)?.parent_slug
-        if (areaSlug) router.push(`/tooted/${areaSlug}/${kw.slug}`)
-      } else {
-        router.push(`/tooted/${kw.slug}`)
-      }
+      goToSearchTarget(kw)
       return
     }
-    // 2. Check DB slugs and names
-    for (const area of tegevusalad) {
-      const slugNorm = area.slug.replace(/-/g, ' ')
-      if (slugNorm.includes(q) || area.name_et.toLowerCase().includes(q)) {
-        setInputQuery('')
-        router.push(`/tooted/${area.slug}`)
-        return
-      }
-    }
-    for (const series of seeriad) {
-      const slugNorm = series.slug.replace(/-/g, ' ')
-      if (slugNorm.includes(q) || series.name_et.toLowerCase().includes(q)) {
-        setInputQuery('')
-        const parentSlug = series.parent_slug
-        if (parentSlug) router.push(`/tooted/${parentSlug}/${series.slug}`)
-        return
-      }
-    }
-    // 3. No match — let SQL + AI fallback handle it
+    // No match — let SQL + AI fallback handle it
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, query])
+  }, [loading, query, tegevusalad, seeriad])
 
   // When SQL finds no results, consult AI for a category suggestion
   const aiRef = useRef('')

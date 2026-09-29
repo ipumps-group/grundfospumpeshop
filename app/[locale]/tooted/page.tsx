@@ -4,43 +4,81 @@ import { redirect } from 'next/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { fetchSidebarData } from '@/lib/fetch-sidebar-data'
-import { matchSearchKeyword } from '@/lib/search-keywords'
+import { matchSearchKeyword, type SearchTree } from '@/lib/search-keywords'
 import SafeImage from '@/components/SafeImage'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
 import TootedPageClient from './page-client'
 
 export const dynamic = 'force-dynamic'
 
-async function resolveSeriesSlug(hardcodedSlug: string): Promise<string | null> {
-  // 1. Try exact match
-  const { data: exact } = await supabaseAdmin
-    .from('product_series')
-    .select('slug')
-    .eq('slug', hardcodedSlug)
-    .eq('is_active', true)
-    .maybeSingle()
-  if (exact) return exact.slug
+// Build the search tree from the ACTUAL catalogue: only activity areas and
+// product series that have published products. Mirrors the category page's
+// own logic (area ← series_activity_areas ← series with products), so a
+// search redirect can never land on an empty category/series page.
+async function getSearchTree(): Promise<SearchTree> {
+  const empty: SearchTree = { categories: [], series: [] }
+  try {
+    const [{ data: areas }, { data: saa }, { data: allSeries }, { data: products }] = await Promise.all([
+      supabaseAdmin.from('activity_areas').select('id, slug, name_et').eq('is_active', true),
+      supabaseAdmin.from('series_activity_areas').select('series_id, activity_area_id'),
+      supabaseAdmin.from('product_series').select('id, slug, name').eq('is_active', true),
+      supabaseAdmin.from('products').select('series_slug, primary_activity_area_slug').eq('published', true),
+    ])
+    if (!areas || !allSeries) return empty
 
-  // 2. Try to find by extracting the product name from the slug (e.g. "grundfos-alpha" -> "alpha")
-  const namePart = hardcodedSlug.replace(/^grundfos-?/i, '').replace(/-/g, ' ')
-  const { data: byName } = await supabaseAdmin
-    .from('product_series')
-    .select('slug, name')
-    .eq('is_active', true)
-    .ilike('name', `%${namePart}%`)
-    .limit(1)
-  if (byName && byName.length > 0) return byName[0].slug
+    // Product counts per series slug, and per (series slug, area slug)
+    const countBySeries = new Map<string, number>()
+    const areaCountBySeries = new Map<string, Map<string, number>>()
+    for (const p of products || []) {
+      if (!p.series_slug) continue
+      countBySeries.set(p.series_slug, (countBySeries.get(p.series_slug) ?? 0) + 1)
+      if (p.primary_activity_area_slug) {
+        const m = areaCountBySeries.get(p.series_slug) ?? new Map<string, number>()
+        m.set(p.primary_activity_area_slug, (m.get(p.primary_activity_area_slug) ?? 0) + 1)
+        areaCountBySeries.set(p.series_slug, m)
+      }
+    }
 
-  // 3. Try matching the full slug as a LIKE pattern
-  const { data: byLike } = await supabaseAdmin
-    .from('product_series')
-    .select('slug')
-    .eq('is_active', true)
-    .ilike('slug', `%${namePart}%`)
-    .limit(1)
-  if (byLike && byLike.length > 0) return byLike[0].slug
+    const areaSlugById = new Map(areas.map(a => [a.id, a.slug] as const))
+    const mappedAreasBySeriesId = new Map<string, string[]>()
+    for (const row of saa || []) {
+      const slug = areaSlugById.get(row.activity_area_id)
+      if (!slug) continue
+      const arr = mappedAreasBySeriesId.get(row.series_id) ?? []
+      arr.push(slug)
+      mappedAreasBySeriesId.set(row.series_id, arr)
+    }
 
-  return null
+    const series: SearchTree['series'] = []
+    const categorySlugs = new Set<string>()
+    for (const s of allSeries) {
+      const productCount = countBySeries.get(s.slug) ?? 0
+      if (productCount === 0) continue
+      const mapped = mappedAreasBySeriesId.get(s.id) ?? []
+      const areaCounts = areaCountBySeries.get(s.slug) ?? new Map<string, number>()
+
+      // Parent category: the products' majority area, preferring mapped areas
+      let parentSlug: string | null = null
+      let best = -1
+      for (const [area, n] of areaCounts) {
+        if (n > best && (mapped.length === 0 || mapped.includes(area))) { parentSlug = area; best = n }
+      }
+      if (!parentSlug) parentSlug = mapped[0] ?? null
+      if (!parentSlug) continue
+
+      series.push({ slug: s.slug, name: s.name, parentSlug, productCount })
+      for (const a of (mapped.length > 0 ? mapped : [parentSlug])) categorySlugs.add(a)
+    }
+
+    return {
+      categories: areas
+        .filter(a => categorySlugs.has(a.slug))
+        .map(a => ({ slug: a.slug, name: a.name_et })),
+      series,
+    }
+  } catch {
+    return empty
+  }
 }
 
 async function CatalogView() {
@@ -176,15 +214,14 @@ export default async function TootedPage({
 
   // Has search query -> check keywords first (server-side redirect avoids flash of "no products")
   if (q?.trim()) {
-    const kw = matchSearchKeyword(q.trim())
+    const tree = await getSearchTree()
+    const kw = matchSearchKeyword(q.trim(), tree)
     if (kw) {
-      if (kw.type === 'seeria' && kw.parentSlug) {
-        // Validate & resolve series slug against DB (hardcoded slug may not match actual DB value)
-        const resolvedSlug = await resolveSeriesSlug(kw.slug)
-        if (resolvedSlug) {
-          redirect(`/tooted/${kw.parentSlug}/${resolvedSlug}`)
-        }
-      } else {
+      if (kw.type === 'leht') {
+        redirect(`/${kw.slug}`)
+      } else if (kw.type === 'seeria' && kw.parentSlug) {
+        redirect(`/tooted/${kw.parentSlug}/${kw.slug}`)
+      } else if (kw.type === 'tegevusala') {
         redirect(`/tooted/${kw.slug}`)
       }
     }
