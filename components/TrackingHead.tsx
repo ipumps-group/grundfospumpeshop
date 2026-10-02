@@ -41,7 +41,11 @@ export function TrackingHead() {
   const gtagConfig = [
     "gtag('js',new Date());",
     GA4_ID ? `gtag('config','${GA4_ID}');` : '',
-    ADS_ID ? `gtag('config','${ADS_ID}',{send_page_view:false});` : '',
+    /* send_page_view default (true): Google Ads'i remarketing-nimekirjad
+     * ("All visitors") täituvad page_view-hittidest. Varem oli false —
+     * nimekirjas oli ~8 kasutajat (ainult konverteerujad). Consent Mode
+     * blokeerib ad_personalization'i ikkagi ilma nõusolekuta. */
+    ADS_ID ? `gtag('config','${ADS_ID}');` : '',
   ].join('')
 
   const gtmSnippet = GTM_ID
