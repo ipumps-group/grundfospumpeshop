@@ -128,10 +128,19 @@ export interface AdsTerm {
   conversions: number
 }
 
+/** QS-komponendi hinnang Google'ilt (quality_info enum). Null kui andmeid pole. */
+export type QsComponentRating = "ABOVE_AVERAGE" | "AVERAGE" | "BELOW_AVERAGE" | null
+
 export interface AdsKeyword {
   keyword: string
   matchType: string
   qualityScore: number | null
+  /** Oodatud CTR (search_predicted_ctr) — QS-komponent. */
+  predictedCtr: QsComponentRating
+  /** Reklaami asjakohasus (creative_quality_score) — QS-komponent. */
+  adRelevance: QsComponentRating
+  /** Maandumislehe kogemus (post_click_quality_score) — QS-komponent. */
+  lpExperience: QsComponentRating
   campaign: string
   cost: number
   clicks: number
@@ -147,6 +156,43 @@ export interface AdsData {
   topTerms: AdsTerm[]
   keywords: AdsKeyword[]
   totals: { cost: number; clicks: number; impressions: number; conversions: number }
+}
+
+/* ---------- Meta (Facebook/Instagram) Marketing API ---------- */
+
+export interface MetaCampaign {
+  name: string
+  status: string
+  /** Kampaania eesmärk (nt OUTCOME_TRAFFIC, OUTCOME_SALES) — määrab, milleks Meta optimeerib. */
+  objective: string | null
+  /** Päevaeelarve eurodes (null kui lifetime-eelarve). */
+  dailyBudget: number | null
+  cost: number
+  clicks: number
+  impressions: number
+  /** Maandumislehe vaated (Meta omistus) — täpsem liiklusmõõt kui klikk. */
+  landingPageViews: number
+  /** view_content sündmused (poe tootevaated, pixel+CAPI). */
+  viewContent: number
+  addToCart: number
+  purchases: number
+  purchaseValue: number
+}
+
+export interface MetaData {
+  available: boolean
+  campaigns: MetaCampaign[]
+  totals: {
+    cost: number
+    prevCost: number
+    clicks: number
+    impressions: number
+    landingPageViews: number
+    viewContent: number
+    addToCart: number
+    purchases: number
+    purchaseValue: number
+  }
 }
 
 export interface OrdersPeriod {
@@ -182,6 +228,7 @@ export interface ReportSnapshot {
   ga4: Ga4Data | null
   gsc: GscData | null
   ads: AdsData | null
+  meta: MetaData | null
   orders: OrdersData | null
   /** Per-source failure notes (a failing API must not kill the whole report). */
   errors: string[]

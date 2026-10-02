@@ -141,13 +141,16 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     bucket.conversions += t.conversions
   }
 
-  /* --- keywords + quality score --- */
+  /* --- keywords + quality score (koos QS-komponentidega) --- */
   let keywordRows: Row[]
   try {
     keywordRows = await run(
       `SELECT campaign.name, ad_group_criterion.keyword.text,
               ad_group_criterion.keyword.match_type,
               ad_group_criterion.quality_info.quality_score,
+              ad_group_criterion.quality_info.search_predicted_ctr,
+              ad_group_criterion.quality_info.creative_quality_score,
+              ad_group_criterion.quality_info.post_click_quality_score,
               metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
        FROM keyword_view
        WHERE ${between} AND ad_group_criterion.status != 'REMOVED'
@@ -171,10 +174,15 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     const c = r.ad_group_criterion ?? {}
     const kw = (c.keyword ?? {}) as Record<string, unknown>
     const qi = (c.quality_info ?? {}) as Record<string, unknown> | undefined
+    const rating = (v: unknown): AdsKeyword["predictedCtr"] =>
+      v === "ABOVE_AVERAGE" || v === "AVERAGE" || v === "BELOW_AVERAGE" ? v : null
     return {
       keyword: String(kw.text ?? "?"),
       matchType: String(kw.match_type ?? "?"),
       qualityScore: qi?.quality_score === undefined ? null : num(qi.quality_score),
+      predictedCtr: rating(qi?.search_predicted_ctr),
+      adRelevance: rating(qi?.creative_quality_score),
+      lpExperience: rating(qi?.post_click_quality_score),
       campaign: String(field(r, "campaign", "name") ?? "?"),
       cost: micros(m.cost_micros),
       clicks: num(m.clicks),

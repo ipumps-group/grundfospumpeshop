@@ -208,6 +208,59 @@ function ordersSection(orders: OrderRow[]): { html: string; text: string[] } {
   return { html, text }
 }
 
+/* ---------- channel comparison (Meta vs Google) ---------- */
+
+function channelsSection(report: StoredReport): { html: string; text: string[] } {
+  const s = report.snapshot
+  const meta = s.meta?.available ? s.meta : null
+  const ads = s.ads?.available ? s.ads : null
+  if (!meta && !ads) return { html: "", text: [] }
+
+  const paidSocial = s.ga4?.channels.find((c) => c.channel === "Paid Social")?.sessions ?? null
+  const paidSearch = s.ga4?.channels.find((c) => c.channel === "Paid Search")?.sessions ?? null
+  const money = (n: number) => `${n.toFixed(2).replace(".", ",")} €`
+  const cps = (cost: number, sessions: number | null) =>
+    sessions !== null && sessions > 0 ? money(cost / sessions) : "–"
+
+  const rows: string[] = []
+  const textRows: string[] = []
+  const addRow = (channel: string, cost: number, sessions: number | null, platformClicks: string, conv: string) => {
+    rows.push(
+      `<tr>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};font-weight:bold">${escapeHtml(channel)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};text-align:right">${money(cost)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};text-align:right">${sessions === null ? "–" : Math.round(sessions)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};text-align:right">${cps(cost, sessions)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${MUTED};text-align:right">${escapeHtml(platformClicks)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${MUTED};text-align:right">${escapeHtml(conv)}</td>` +
+      `</tr>`,
+    )
+    textRows.push(
+      `- ${channel}: kulu ${money(cost)}, GA4 sessioonid ${sessions === null ? "–" : Math.round(sessions)}, €/sessioon ${cps(cost, sessions)}, ${platformClicks}, ${conv}`,
+    )
+  }
+  if (meta) {
+    addRow("Meta (FB/IG)", meta.totals.cost, paidSocial, `${meta.totals.clicks} klikki · ${meta.totals.landingPageViews} LP-vaadet`, `${meta.totals.purchases} ostu (Meta)`)
+  }
+  if (ads) {
+    addRow("Google Ads", ads.totals.cost, paidSearch, `${ads.totals.clicks} klikki`, `${ads.totals.conversions.toFixed(1).replace(".", ",")} konv (Ads)`)
+  }
+
+  const html =
+    `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Kanalite võrdlus</h2>` +
+    `<p style="font-size:14px;color:${MUTED};margin:4px 0 8px">€/sessioon = kanali kulu / GA4 sessioonid. Odav sessioon ei tähenda müüki — konversioonitõde on DB tellimused (nõusolekurežiim piirab platvormide omistust).</p>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${BORDER};border-radius:12px;overflow:hidden">` +
+    `<tr style="background:#f8fafc">` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED}">Kanal</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Kulu</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">GA4 sess.</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">€/sessioon</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Platvorm</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Konversioonid</td>` +
+    `</tr>${rows.join("")}</table>`
+  return { html, text: ["KANALITE VÕRDLUS", ...textRows, ""] }
+}
+
 export function buildReportEmail(report: StoredReport, adminUrl: string): { subject: string; html: string; text: string } {
   const s = report.snapshot
   const subject = `Pumbapood nädalaraport ${s.period.start} – ${s.period.end}`
@@ -223,6 +276,9 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   }
   if (s.ads?.available) {
     cards.push(scoreCard("Ads kulu", `${s.ads.totals.cost.toFixed(0)} €`, `${s.ads.totals.clicks} klikki · ${s.ads.totals.conversions.toFixed(1).replace(".", ",")} konv (Ads)`))
+  }
+  if (s.meta?.available) {
+    cards.push(scoreCard("Meta kulu", `${s.meta.totals.cost.toFixed(0)} €`, `${s.meta.totals.clicks} klikki · ${s.meta.totals.purchases} ostu (Meta)`))
   }
   if (s.orders) {
     cards.push(scoreCard("Tellimused", String(s.orders.current.orders), deltaSub(s.orders.current.orders, s.orders.previous.orders) + ` · ${s.orders.current.revenue.toFixed(0)} €`))
@@ -259,6 +315,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   const narrativeHtml = report.narrative ? markdownToHtml(report.narrative) : ""
   const changes = changesSection(report.changes ?? [])
   const ordersHtml = ordersSection(s.orders?.orders ?? [])
+  const channels = channelsSection(report)
   const errorsNote = s.errors.length
     ? `<p style="font-size:13px;color:#92400e;background:#fef3c7;border-radius:8px;padding:8px 12px">Osaliselt puuduvad andmed: ${escapeHtml(s.errors.join(" · "))}</p>`
     : ""
@@ -273,6 +330,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   ${errorsNote}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cards.join("")}</tr></table>
   ${changes.html}
+  ${channels.html}
   ${ordersHtml.html}
   ${narrativeHtml}
   <h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Leiud ja järgmised sammud</h2>
@@ -281,7 +339,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
     Täisraport tabelite ja trendidega: <a href="${escapeHtml(adminUrl)}" style="color:#1d4ed8">${escapeHtml(adminUrl)}</a>
   </p>
   <p style="font-size:12px;color:#9aa5b1;margin-top:16px;border-top:1px solid #edf0f4;padding-top:10px">
-    Automaatne nädalaraport (reede 09:00) · Andmed: GSC, GA4, Google Ads API, tellimuste andmebaas · Andmete lõppkuupäev on ~2 päeva tagasi (Google'i viive).
+    Automaatne nädalaraport (reede 09:00) · Andmed: GSC, GA4, Google Ads API, Meta Marketing API, tellimuste andmebaas · Andmete lõppkuupäev on ~2 päeva tagasi (Google'i viive).
   </p>
 </div>
 </body></html>`
@@ -291,6 +349,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
     "",
   ]
   textLines.push(...changes.text)
+  textLines.push(...channels.text)
   textLines.push(...ordersHtml.text)
   if (report.narrative) {
     textLines.push(report.narrative.replace(/\*\*/g, "").replace(/^#{2,4}\s*/gm, ""), "")

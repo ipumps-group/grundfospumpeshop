@@ -22,6 +22,7 @@ const SYSTEM_PROMPT = `Oled Pumbapoe (pumbapood.ee, Pump OÜ) peamine turundusst
 KONTEKST, mida tead:
 ${STRATEGY_CONTEXT}
 - Päris tellimused (Supabase orders) on konversioonitõde, mitte GA4 key events ega Ads'i „conversions" — viimased on nõusolekurežiimi tõttu alampiir.
+- Meta (Facebook/Instagram): meta.cost/clicks/purchases on Meta omistus. TRAFFIC-eesmärgiga kampaania optimeerib klikke, mitte ostjaid — ära hinda Metat müügikanalina, kui purchases=0 ja eesmärk on liiklus. Meta klikk ≠ külastus (landingPageViews ja GA4 Paid Social sessioonid on tõepärasem liiklusmõõt).
 - GSC positsioon = näitamistega kaalutud keskmine. <10 näitamist/nädal = statistiline müra, mitte trend. ±2 positsiooni = stabiilne.
 - changes: selle raporti põhinäitajate muutus VÕRRELDES EELMISE SALVESTATUD RAPORTIGA (direction improved/worsened/unchanged). Too „Kokkuvõttes" välja, mis on eelmise raportiga võrreldes paranenud ja mis halvenenud.
 - „Konkurentsianalüüs" põhineb Ads'i rank-lost impression share'il ja GSC positsiooniliikumistel (Semrush-tüüpi tööriista pole).
@@ -88,6 +89,17 @@ interface Digest {
      *  brand spend and must not be reported as such. */
     searchTermsCoveragePct: number | null
     topTerms: { term: string; cost: number; clicks: number; conversions: number }[]
+  }
+  meta?: {
+    cost: number
+    prevCost: number
+    clicks: number
+    landingPageViews: number
+    viewContent: number
+    addToCart: number
+    purchases: number
+    purchaseValue: number
+    campaigns: { name: string; objective: string | null; cost: number; clicks: number; purchases: number }[]
   }
   orders?: {
     orders: number
@@ -184,6 +196,27 @@ function buildDigest(snapshot: ReportSnapshot, insights: Insight[], changes: Rep
       nonBrandCost: r1(a.nonBrand.cost),
       searchTermsCoveragePct: a.totals.cost > 0 ? r1(((a.brand.cost + a.nonBrand.cost) / a.totals.cost) * 100) : null,
       topTerms: a.topTerms.slice(0, 15).map((t) => ({ term: t.term, cost: r1(t.cost), clicks: t.clicks, conversions: r1(t.conversions) })),
+    }
+  }
+
+  if (snapshot.meta) {
+    const m = snapshot.meta
+    d.meta = {
+      cost: r1(m.totals.cost),
+      prevCost: r1(m.totals.prevCost),
+      clicks: m.totals.clicks,
+      landingPageViews: m.totals.landingPageViews,
+      viewContent: m.totals.viewContent,
+      addToCart: m.totals.addToCart,
+      purchases: m.totals.purchases,
+      purchaseValue: r1(m.totals.purchaseValue),
+      campaigns: m.campaigns.map((c) => ({
+        name: c.name,
+        objective: c.objective,
+        cost: r1(c.cost),
+        clicks: c.clicks,
+        purchases: c.purchases,
+      })),
     }
   }
 

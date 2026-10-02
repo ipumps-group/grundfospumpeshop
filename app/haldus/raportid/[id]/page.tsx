@@ -9,7 +9,7 @@ import { markdownToHtml } from '@/lib/reporting/email-html'
 interface ReportSummary {
   id: number
   weekEnd: string
-  stats: { gscClicksPerDay: number | null; sessions: number | null; adsCost: number | null; orders: number | null }
+  stats: { gscClicksPerDay: number | null; sessions: number | null; adsCost: number | null; metaCost: number | null; orders: number | null }
 }
 
 const SEV_META: Record<Insight['severity'], { label: string; classes: string }> = {
@@ -251,6 +251,13 @@ export default function ReportDetailPage() {
             </span>
           </Card>
         )}
+        {s.meta?.available && (
+          <Card label="Meta kulu" value={fmtMoney(s.meta.totals.cost)}>
+            <span className="text-gray-400">
+              {s.meta.totals.clicks} klikki · {s.meta.totals.landingPageViews} LP-vaadet · {s.meta.totals.purchases} ostu (Meta)
+            </span>
+          </Card>
+        )}
         {s.orders && (
           <>
             <Card label="Tellimused" value={String(s.orders.current.orders)}>
@@ -316,6 +323,7 @@ export default function ReportDetailPage() {
             <Trend label="GSC klikke/päevas" values={trend.map((t) => t.stats.gscClicksPerDay)} />
             <Trend label="Sessioonid" values={trend.map((t) => t.stats.sessions)} />
             <Trend label="Ads kulu €" values={trend.map((t) => t.stats.adsCost)} />
+            <Trend label="Meta kulu €" values={trend.map((t) => t.stats.metaCost)} />
             <Trend label="Tellimused" values={trend.map((t) => t.stats.orders)} />
           </div>
         </div>
@@ -451,6 +459,56 @@ export default function ReportDetailPage() {
         </div>
       )}
 
+      {/* Channel comparison (Meta vs Google) */}
+      {(s.meta?.available || s.ads?.available) && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-x-auto">
+          <h2 className="text-[18px] font-bold text-gray-900 mb-1">Kanalite võrdlus</h2>
+          <p className="text-[13px] text-gray-500 mb-3">
+            €/sessioon = kanali kulu / GA4 sessioonid. Odav sessioon ei tähenda müüki — konversioonitõde on DB tellimused (nõusolekurežiim piirab platvormide omistust).
+          </p>
+          <table className="w-full text-[14px] min-w-[640px]">
+            <thead>
+              <tr className="text-left text-gray-500 border-b border-gray-100">
+                <th className="py-2 pr-3 font-medium">Kanal</th>
+                <th className="py-2 pr-3 font-medium text-right">Kulu</th>
+                <th className="py-2 pr-3 font-medium text-right">GA4 sessioonid</th>
+                <th className="py-2 pr-3 font-medium text-right">€/sessioon</th>
+                <th className="py-2 pr-3 font-medium text-right">Platvormi klikid</th>
+                <th className="py-2 font-medium text-right">Konversioonid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {s.meta?.available && (() => {
+                const sess = s.ga4?.channels.find((c) => c.channel === 'Paid Social')?.sessions ?? null
+                return (
+                  <tr className="border-b border-gray-50 last:border-0">
+                    <td className="py-2 pr-3 font-medium text-gray-900">Meta (FB/IG)</td>
+                    <td className="py-2 pr-3 text-right">{fmtMoney(s.meta.totals.cost)}</td>
+                    <td className="py-2 pr-3 text-right">{sess === null ? '–' : Math.round(sess)}</td>
+                    <td className="py-2 pr-3 text-right">{sess !== null && sess > 0 ? fmtMoney(s.meta.totals.cost / sess) : '–'}</td>
+                    <td className="py-2 pr-3 text-right text-gray-500">{s.meta.totals.clicks} klikki · {s.meta.totals.landingPageViews} LP-vaadet</td>
+                    <td className="py-2 text-right text-gray-500">{s.meta.totals.purchases} ostu (Meta)</td>
+                  </tr>
+                )
+              })()}
+              {s.ads?.available && (() => {
+                const sess = s.ga4?.channels.find((c) => c.channel === 'Paid Search')?.sessions ?? null
+                return (
+                  <tr className="border-b border-gray-50 last:border-0">
+                    <td className="py-2 pr-3 font-medium text-gray-900">Google Ads</td>
+                    <td className="py-2 pr-3 text-right">{fmtMoney(s.ads.totals.cost)}</td>
+                    <td className="py-2 pr-3 text-right">{sess === null ? '–' : Math.round(sess)}</td>
+                    <td className="py-2 pr-3 text-right">{sess !== null && sess > 0 ? fmtMoney(s.ads.totals.cost / sess) : '–'}</td>
+                    <td className="py-2 pr-3 text-right text-gray-500">{s.ads.totals.clicks} klikki</td>
+                    <td className="py-2 text-right text-gray-500">{s.ads.totals.conversions.toFixed(1).replace('.', ',')} konv (Ads)</td>
+                  </tr>
+                )
+              })()}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Ads campaigns */}
       {s.ads?.available && s.ads.campaigns.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-x-auto">
@@ -487,6 +545,44 @@ export default function ReportDetailPage() {
             Brändi päringud: {fmtMoney(s.ads.brand.cost)} / {s.ads.brand.clicks} klikki · mitte-brändi: {fmtMoney(s.ads.nonBrand.cost)} / {s.ads.nonBrand.clicks} klikki.
             {s.ads.totals.cost > 0 ? ` Otsingupäringute andmed katavad ${Math.round(((s.ads.brand.cost + s.ads.nonBrand.cost) / s.ads.totals.cost) * 100)} % kogukulust — ülejäänud osa jaotab Google privaatsuskünnise tõttu („Muud otsingupäringud"), see EI OLE brändi- ega konkurentide kulu.` : ''}
             {" „Kaotatud (koht)“ = konkurentsikaotus (ad rank), „kaotatud (eelarve)“ = eelarve piirang."}
+          </p>
+        </div>
+      )}
+
+      {/* Meta campaigns */}
+      {s.meta?.available && s.meta.campaigns.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-x-auto">
+          <h2 className="text-[18px] font-bold text-gray-900 mb-3">Meta kampaaniad</h2>
+          <table className="w-full text-[14px] min-w-[820px]">
+            <thead>
+              <tr className="text-left text-gray-500 border-b border-gray-100">
+                <th className="py-2 pr-3 font-medium">Kampaania</th>
+                <th className="py-2 pr-3 font-medium">Eesmärk</th>
+                <th className="py-2 pr-3 font-medium text-right">Kulu</th>
+                <th className="py-2 pr-3 font-medium text-right">Klikid</th>
+                <th className="py-2 pr-3 font-medium text-right">LP-vaated</th>
+                <th className="py-2 pr-3 font-medium text-right">Tootevaated</th>
+                <th className="py-2 pr-3 font-medium text-right">Ostukorv</th>
+                <th className="py-2 font-medium text-right">Ostud</th>
+              </tr>
+            </thead>
+            <tbody>
+              {s.meta.campaigns.map((c) => (
+                <tr key={c.name} className="border-b border-gray-50 last:border-0">
+                  <td className="py-2 pr-3 text-gray-900 font-medium">{c.name}</td>
+                  <td className="py-2 pr-3 text-gray-500">{c.objective?.replace('OUTCOME_', '') ?? '–'}</td>
+                  <td className="py-2 pr-3 text-right">{fmtMoney(c.cost)}</td>
+                  <td className="py-2 pr-3 text-right">{c.clicks}</td>
+                  <td className="py-2 pr-3 text-right">{c.landingPageViews}</td>
+                  <td className="py-2 pr-3 text-right">{c.viewContent}</td>
+                  <td className="py-2 pr-3 text-right">{c.addToCart}</td>
+                  <td className="py-2 text-right">{c.purchases > 0 ? `${c.purchases} (${fmtMoney(c.purchaseValue)})` : '0'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="text-[13px] text-gray-500 mt-3">
+            TRAFFIC-eesmärk optimeerib klikke, SALES ostjaid. Meta klikk ≠ külastus — LP-vaated ja GA4 Paid Social sessioonid on tõepärasem liiklusmõõt. Ostu-omistus on nõusolekurežiimi tõttu alampiir.
           </p>
         </div>
       )}

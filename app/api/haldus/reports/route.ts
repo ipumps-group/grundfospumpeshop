@@ -45,6 +45,7 @@ export async function GET() {
           gscImpressionsPerDay: s.gsc ? Math.round(s.gsc.current.impressions / s.gsc.current.days) : null,
           sessions: s.ga4 ? Math.round(s.ga4.current.sessions) : null,
           adsCost: s.ads?.available ? Math.round(s.ads.totals.cost * 100) / 100 : null,
+          metaCost: s.meta?.available ? Math.round(s.meta.totals.cost * 100) / 100 : null,
           orders: s.orders ? s.orders.current.orders : null,
           revenue: s.orders ? s.orders.current.revenue : null,
         },

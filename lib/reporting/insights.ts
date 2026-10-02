@@ -292,13 +292,92 @@ function adsInsights(ads: AdsData, out: Insight[]): void {
   }
 
   const lowQs = ads.keywords.filter((k) => k.qualityScore !== null && k.qualityScore <= 4 && k.impressions >= 20).slice(0, 4)
+  const QS_LABEL: Record<string, string> = { ABOVE_AVERAGE: "üle keskmise", AVERAGE: "keskmine", BELOW_AVERAGE: "alla keskmise" }
+  const qsComp = (label: string, v: string | null) => (v ? `${label} ${QS_LABEL[v] ?? v}` : null)
   for (const k of lowQs) {
+    const comps = [
+      qsComp("oodatud CTR", k.predictedCtr),
+      qsComp("reklaami asjakohasus", k.adRelevance),
+      qsComp("maandumisleht", k.lpExperience),
+    ].filter(Boolean).join(", ")
+    const weak: string[] = []
+    if (k.adRelevance === "BELOW_AVERAGE") weak.push("asjakohasus")
+    if (k.lpExperience === "BELOW_AVERAGE") weak.push("maandumisleht")
+    if (k.predictedCtr === "BELOW_AVERAGE") weak.push("oodatud CTR")
+    const action =
+      weak.length === 0
+        ? "Komponendid pole punased — madal skoor on ajalooline (QS uueneb 2–4 nädalaga). Jätkake praegust kursi ja kontrollige uuesti järgmise raportiga."
+        : `Nõrgad komponendid: ${weak.join(" + ")}. QS on mahajääv signaal (uueneb 2–4 nädalaga) — kui märksõna on reklaami pealkirjas ja maandumislehe H1-s olemas, anna komponentidele tõusta aega; maandumislehe puhul kontrolli ka lehe laadimiskiirust (LCP < 2,5 s).`
     out.push({
       area: "ads",
       severity: "warning",
       title: `Quality Score ${k.qualityScore}/10: „${k.keyword}"`,
-      detail: `${k.impressions} näitamist, CPC tõenäoliselt ülehinnatud madala kvaliteedi tõttu.`,
-      action: "Kontrolli oodatud CTR-i, reklaami asjakohasust ja maandumislehte — lisa märksõna reklaami pealkirja ja maandumislehe pealkirja.",
+      detail: `${k.impressions} näitamist. Komponendid: ${comps || "–"}. Madal skoor võib olla veel eelmise seisu ajalugu.`,
+      action,
+    })
+  }
+}
+
+/** € / GA4-sessioon kanali kohta; null kui sessioone pole või kanal puudub. */
+function costPerSession(cost: number | null, sessions: number | null): number | null {
+  if (cost === null || sessions === null || sessions <= 0) return null
+  return cost / sessions
+}
+
+function metaInsights(meta: NonNullable<ReportSnapshot["meta"]>, ga4: Ga4Data | null, ads: AdsData | null, out: Insight[]): void {
+  if (!meta.available) return
+  const t = meta.totals
+
+  if (t.cost === 0 && t.impressions === 0) {
+    out.push({
+      area: "ads",
+      severity: "warning",
+      title: "Metas polnud sel nädalal liiklust",
+      detail: "Ükski kampaania ei teinud kulu ega näitamisi.",
+      action: "Kontrolli Meta Ads Manager'is, kas kampaaniad on peatatud või eelarve otsas.",
+    })
+    return
+  }
+
+  /* Funnel: klikk → maandumisleht → tootevaade → ostukorv → ost. Meta klikk
+   * ei ole külastus — LP-view ja GA4 Paid Social sessioon on tõepärasemad. */
+  const lpRate = t.clicks > 0 ? t.landingPageViews / t.clicks : 0
+  const trafficOnly = meta.campaigns.every((c) => (c.objective ?? "").includes("TRAFFIC"))
+  if (t.cost >= 30 && t.purchases === 0 && t.addToCart === 0) {
+    out.push({
+      area: "ads",
+      severity: "warning",
+      title: `Meta kulu ${t.cost.toFixed(2).replace(".", ",")} € — 0 ostukorvi ja 0 ostu`,
+      detail: `${t.clicks} klikki, ${t.landingPageViews} maandumislehe vaadet (${Math.round(lpRate * 100)} % klikkidest), ${t.viewContent} tootevaadet.${trafficOnly ? " Mõlemad kampaaniad töötavad TRAFFIC-eesmärgil — Meta optimeerib klikke, mitte ostjaid." : ""} DB tellimused on konversiooni tõde.`,
+      action: trafficOnly
+        ? "Otsus: kas Meta roll on teadlikkus (siis mõõda LP-vaate hinda) või müük — müügi korral lülita vähemalt üks kampaania SALES-eesmärgile (CAPI ostusündmus on seadistatud), et Meta optimeeriks ostjatele."
+        : "Kontrolli, kas ostu- ja ostukorvisündmused jõuavad Metani (Events Manager: purchase/add_to_cart, CAPI) ja kas maandumisleht viib toote juurde.",
+    })
+  } else if (t.purchases > 0) {
+    out.push({
+      area: "ads",
+      severity: "positive",
+      title: `Meta tõi ${t.purchases} ostu (${t.purchaseValue.toFixed(2).replace(".", ",")} €)`,
+      detail: `Kulu ${t.cost.toFixed(2).replace(".", ",")} € → ostu hind ${(t.cost / t.purchases).toFixed(2).replace(".", ",")} € (Meta omistus; DB tellimused on tõde).`,
+      action: "Võrdle ostu hinda Google Ads'i omaga ja jälgi, kas DB tellimuste arv kajastab Meta panust.",
+    })
+  }
+
+  /* D6: kanalite €/sessioon võrdlus — vastus küsimusele „kumb kanal on
+   * kasulikum". GA4 Paid Social ≈ Meta, Paid Search ≈ Google Ads. */
+  const paidSocial = ga4?.channels.find((c) => c.channel === "Paid Social")?.sessions ?? null
+  const paidSearch = ga4?.channels.find((c) => c.channel === "Paid Search")?.sessions ?? null
+  const metaCps = costPerSession(t.cost, paidSocial)
+  const adsCps = ads?.available ? costPerSession(ads.totals.cost, paidSearch) : null
+  if (metaCps !== null || adsCps !== null) {
+    const metaTxt = metaCps !== null ? `Meta ${t.cost.toFixed(2).replace(".", ",")} € / ${Math.round(paidSocial!)} sessiooni = ${metaCps.toFixed(2).replace(".", ",")} €/sessioon` : "Meta: GA4 sessioonid puuduvad"
+    const adsTxt = adsCps !== null ? `Google ${ads!.totals.cost.toFixed(2).replace(".", ",")} € / ${Math.round(paidSearch!)} sessiooni = ${adsCps.toFixed(2).replace(".", ",")} €/sessioon` : "Google: GA4 sessioonid puuduvad"
+    out.push({
+      area: "strategy",
+      severity: "opportunity",
+      title: "Kanalite hind: Meta vs Google (€/sessioon)",
+      detail: `${metaTxt}; ${adsTxt}. Odavam sessioon EI tähenda kasulikumat kanalit — otsinguliiklus on ostukavatsusega, sotsiaalmeedia on katkestusliiklus. Konversioone võrdle DB tellimuste kaudu.`,
+      action: "Õiglane €/tellimus võrdlus on võimalik alles siis, kui Meta kampaania optimeerib ostudele (SALES-eesmärk). Seni: Google = otsemüük, Meta = teadlikkus (mõõda LP-vaate ja kaasatud sessiooni hinda).",
     })
   }
 }
@@ -394,6 +473,7 @@ export function buildInsights(snapshot: ReportSnapshot): Insight[] {
   if (snapshot.gsc) gscInsights(snapshot.gsc, out)
   if (snapshot.ga4) ga4Insights(snapshot.ga4, snapshot.period, out)
   if (snapshot.ads) adsInsights(snapshot.ads, out)
+  if (snapshot.meta) metaInsights(snapshot.meta, snapshot.ga4, snapshot.ads, out)
   if (snapshot.orders) ordersInsights(snapshot.orders, snapshot.ads, out)
   strategyInsights(snapshot, out)
 
