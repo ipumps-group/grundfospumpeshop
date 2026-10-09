@@ -169,7 +169,7 @@ const RSA = {
       h('Kaks Pumpa Paljude Asemel'), h('Küsi Pakkumist Täna'),
     ],
     descriptions: [
-      'Uued ALPHA GO küttepumbad asendavad enamiku vanu UPS ja ALPHA pumapasid.',
+      'Uued ALPHA GO küttepumbad asendavad enamiku vanu UPS ja ALPHA pumpasid.',
       'Grundfos GO äpp juhendab asenduse ja seadistuse. Küsi nõu spetsialistidelt.',
       'ALPHA1 GO 25-80 ja ALPHA2 GO 25-75 katavad ligikaudu 70% integreeritud pumpadest.',
       'Ametlik Grundfos edasimüüja. Laos Eestis, tarne 1-3 tööpäeva.',

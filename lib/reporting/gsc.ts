@@ -67,7 +67,7 @@ export async function pullGsc(period: ReportPeriod): Promise<GscData> {
     query({ startDate: period.start, endDate: period.end, dimensions: ["query"], rowLimit: QUERY_ROW_LIMIT }),
     query({ startDate: period.prevStart, endDate: period.prevEnd, dimensions: ["query"], rowLimit: QUERY_ROW_LIMIT }),
     query({ startDate: period.start, endDate: period.end, dimensions: ["page"], rowLimit: 25 }),
-    /* query+page pairs → per-family carrier pages (kandjalehed), so the
+    /* query+page pairs → per-family carrier pages (maandumislehed), so the
      * report can say whether Google is switching the ranking page. */
     query({ startDate: period.start, endDate: period.end, dimensions: ["query", "page"], rowLimit: QUERY_ROW_LIMIT }),
     query({ startDate: period.prevStart, endDate: period.prevEnd, dimensions: ["query", "page"], rowLimit: QUERY_ROW_LIMIT }),

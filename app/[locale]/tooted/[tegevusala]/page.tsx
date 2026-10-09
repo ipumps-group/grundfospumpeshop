@@ -3,8 +3,10 @@ import { Link } from '@/i18n/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
-import { getCategoryContent } from '@/lib/category-content'
+import { getCategoryContent, getCategoryProductLinks, getCategoryGuideImage } from '@/lib/category-content'
+import { linkifyProducts } from '@/lib/linkify-products'
 import ProductsLayoutWithSidebar from '@/components/ProductsLayoutWithSidebar'
+import FaqAccordion from '@/components/FaqAccordion'
 import SafeImage from '@/components/SafeImage'
 
 export const dynamic = 'force-dynamic'
@@ -228,18 +230,47 @@ export default async function CategoryPage({
               ))}
             </div>
           )}
-          </ProductsLayoutWithSidebar>
-
           {(() => {
             const cc = getCategoryContent(tegevusala, locale)
             if (!cc) return null
+            const productLinks = getCategoryProductLinks(tegevusala)
+            const guideImage = getCategoryGuideImage(tegevusala)
+            const faqJsonLd = {
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: cc.faq.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: f.a },
+              })),
+            }
             return (
-              <div className="mt-12 max-w-4xl">
+              <div className="mt-12">
+                <script
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+                />
                 <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                   <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">{cc.guideTitle}</h2>
-                  {cc.guideParagraphs.map((p) => (
-                    <p key={p.slice(0, 32)} className="mt-4 text-[15px] text-gray-600 leading-relaxed">{p}</p>
-                  ))}
+                  <div className="md:flex md:items-start md:gap-8">
+                    <div className="flex-1 min-w-0">
+                      {cc.guideParagraphs.map((p) => (
+                        <p key={p.slice(0, 32)} className="mt-4 text-[15px] text-gray-600 leading-relaxed">{linkifyProducts(p, productLinks)}</p>
+                      ))}
+                    </div>
+                    {guideImage && (
+                      <Link
+                        href={guideImage.href}
+                        className="mt-6 md:mt-4 md:w-56 lg:w-64 shrink-0 bg-gray-50 rounded-xl border border-gray-100 p-6 flex items-center justify-center hover:border-[#003366]/30 transition-colors"
+                      >
+                        <SafeImage
+                          src={guideImage.src}
+                          alt={guideImage.alt}
+                          className="h-40 md:h-48 object-contain"
+                        />
+                      </Link>
+                    )}
+                  </div>
 
                   <h3 className="mt-8 text-xl font-bold text-[#003366]">{cc.priceTitle}</h3>
                   <p className="mt-3 text-[15px] text-gray-600 leading-relaxed">{cc.priceIntro}</p>
@@ -255,7 +286,7 @@ export default async function CategoryPage({
                       <tbody>
                         {cc.priceTable.rows.map((row, i) => (
                           <tr key={row[0]} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td className="px-4 py-2.5 font-semibold text-gray-900">{row[0]}</td>
+                            <td className="px-4 py-2.5 font-semibold text-gray-900">{linkifyProducts(row[0], productLinks)}</td>
                             <td className="px-4 py-2.5 text-gray-700">{row[1]}</td>
                             <td className="px-4 py-2.5 text-gray-700 whitespace-nowrap">{row[2]}</td>
                           </tr>
@@ -267,21 +298,17 @@ export default async function CategoryPage({
 
                 <section className="mt-8 bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                   <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">{cc.faqTitle}</h2>
-                  <div className="mt-4 divide-y divide-gray-100">
-                    {cc.faq.map((f) => (
-                      <details key={f.q} className="group py-4">
-                        <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-semibold text-gray-800 group-open:text-[#003366]">
-                          {f.q}
-                          <span className="shrink-0 text-[#01a0dc] transition-transform group-open:rotate-45">+</span>
-                        </summary>
-                        <p className="mt-3 text-[15px] text-gray-600 leading-relaxed max-w-3xl">{f.a}</p>
-                      </details>
-                    ))}
-                  </div>
+                  <FaqAccordion
+                    items={cc.faq.map((f) => ({
+                      q: linkifyProducts(f.q, productLinks),
+                      a: linkifyProducts(f.a, productLinks),
+                    }))}
+                  />
                 </section>
               </div>
             )
           })()}
+          </ProductsLayoutWithSidebar>
         </div>
       </div>
     )

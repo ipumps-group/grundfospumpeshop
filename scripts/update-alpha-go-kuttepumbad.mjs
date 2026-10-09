@@ -40,7 +40,7 @@ for (const [slug, sort] of Object.entries(ORDER)) {
 
 // 3) Kategooria kirjeldus + meta
 const { error: aErr } = await admin.from('activity_areas').update({
-  description: 'Uued Grundfos ALPHA GO tsirkulatsioonipumbad keskkütte- ja põrandaküttesüsteemidele. ALPHA1 GO ja ALPHA2 GO asendavad enamiku vanu UPS, ALPHA1, ALPHA1 L, ALPHA2 ja ALPHA3 pumapasid — Grundfos GO äpiga on asendus ja seadistus kiire ning täpne.',
+  description: 'Uued Grundfos ALPHA GO tsirkulatsioonipumbad keskkütte- ja põrandaküttesüsteemidele. ALPHA1 GO ja ALPHA2 GO asendavad enamiku vanu UPS, ALPHA1, ALPHA1 L, ALPHA2 ja ALPHA3 pumpasid — Grundfos GO äpiga on asendus ja seadistus kiire ning täpne.',
   meta_description: 'Grundfos ALPHA GO küttepumbad — ALPHA1 GO ja ALPHA2 GO asendavad UPS, ALPHA1, ALPHA1 L, ALPHA2 ja ALPHA3 tsirkulatsioonipumbad. Kiire tarne ja tasuta nõustamine.',
 }).eq('slug', 'kuttepumbad')
 if (aErr) { console.error('activity_area VIGA:', aErr.message); process.exit(1) }

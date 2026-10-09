@@ -43,7 +43,7 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
       severity: "negative",
       title: `Orgaanilised klikid languses (${round1(curPerDay)} → ${round1(prevPerDay)} klikki/päevas, ${Math.round(clicksDelta)} %)`,
       detail: "GSC klikkide päevamaht kukkus võrreldes eelmise nädalaga üle 15 %.",
-      action: "Kontrolli peatabeli langenud perekondi: kas langus on ühes klastris või laiem? Ühe klastri langus → vaata selle kandjalehte (kategooria/toode); laiem langus → kontrolli indekseerimist (GSC Pages) ja võimalikke tehnilisi tõrkeid.",
+      action: "Kontrolli peatabeli langenud perekondi: kas langus on ühes klastris või laiem? Ühe klastri langus → vaata selle maandumislehte (kategooria/toode); laiem langus → kontrolli indekseerimist (GSC Pages) ja võimalikke tehnilisi tõrkeid.",
     })
   } else if (clicksDelta !== null && clicksDelta >= 15) {
     out.push({
@@ -51,7 +51,7 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
       severity: "positive",
       title: `Orgaanilised klikid tõusmas (${round1(prevPerDay)} → ${round1(curPerDay)} klikki/päevas, +${Math.round(clicksDelta)} %)`,
       detail: "GSC klikkide päevamaht kasvab nädalaga üle 15 %.",
-      action: "Tuvasta tõusu kandjad peatabelist ja kinnita tõus nende lehtede sisu/linkidega — tõusvad kategooria- ja tootelehed reageerivad täiendustele kõige kiiremini.",
+      action: "Tuvasta tõusu maandumislehed peatabelist ja kinnita tõus nende lehtede sisu/linkidega — tõusvad kategooria- ja tootelehed reageerivad täiendustele kõige kiiremini.",
     })
   }
 
@@ -76,7 +76,7 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
   const shortUrl = (u: string) => u.replace(/^https?:\/\/[^/]+/, "")
   const carrierOf = (f: KeywordFamilyStat) => {
     const top = f.carrierPages?.current[0]
-    return top ? ` Kandjaleht: ${shortUrl(top.page)}.` : ""
+    return top ? ` Maandumisleht: ${shortUrl(top.page)}.` : ""
   }
   const carrierName = (f: KeywordFamilyStat) => shortUrl(f.carrierPages?.current[0]?.page ?? "")
   for (const f of risers.slice(0, 5)) {
@@ -85,7 +85,7 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
       severity: "positive",
       title: `„${f.label}" tõusis ${fmtPos(f.previous.position)} → ${fmtPos(f.current.position)}`,
       detail: `${f.current.impressions} näitamist, ${f.current.clicks} klikki sel nädalal.${carrierOf(f)}`,
-      action: `Kinnita tõus: värskenda kandjalehte ${carrierName(f)} (tekstid, FAQ, tootepildid) ja lisa 1–2 siselist linki märksõna-ankruga.`,
+      action: `Kinnita tõus: värskenda maandumislehte ${carrierName(f)} (tekstid, FAQ, tootepildid) ja lisa 1–2 siselist linki märksõna-ankruga.`,
     })
   }
   for (const f of fallers.slice(0, 5)) {
@@ -94,14 +94,14 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
     const curTop = f.carrierPages?.current[0]
     const prevTop = f.carrierPages?.previous[0]
     let carrierLine = ""
-    let action = "Tugevda kandjalehe sisu ja siselinke."
+    let action = "Tugevda maandumislehe sisu ja siselinke."
     if (curTop && prevTop) {
       if (curTop.page === prevTop.page) {
-        carrierLine = ` Kandjaleht on sama: ${shortUrl(curTop.page)} — Google ei ole lehte vahetanud.`
-        action = "Kandja on sama, seega aitab lehe tugevdamine: laienda kategooria sisu (valikujuhend, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke märksõna-ankruga."
+        carrierLine = ` Maandumisleht on sama: ${shortUrl(curTop.page)} — Google ei ole lehte vahetanud.`
+        action = "Maandumisleht on sama, seega aitab lehe tugevdamine: laienda kategooria sisu (valikujuhend, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke märksõna-ankruga."
       } else {
-        carrierLine = ` Kandjaleht vahetus: oli ${shortUrl(prevTop.page)}, nüüd ${shortUrl(curTop.page)}.`
-        action = "Kandjaleht vahetus — suuna siselinkidega õigele lehele ja tee lehtede sihtimine selgeks (üks leht ühe kavatsuse kohta)."
+        carrierLine = ` Maandumisleht vahetus: oli ${shortUrl(prevTop.page)}, nüüd ${shortUrl(curTop.page)}.`
+        action = "Maandumisleht vahetus — suuna siselinkidega õigele lehele ja tee lehtede sihtimine selgeks (üks leht ühe kavatsuse kohta)."
       }
     }
     out.push({
@@ -116,9 +116,9 @@ function gscInsights(gsc: GscData, out: Insight[]): void {
     out.push({
       area: "seo",
       severity: "opportunity",
-      title: `Löögkaugusel: „${f.label}" pos ${fmtPos(f.current.position)} (${f.current.impressions} näitamist/nädal)`,
+      title: `Käeulatuses: „${f.label}" pos ${fmtPos(f.current.position)} (${f.current.impressions} näitamist/nädal)`,
       detail: `Positsioon 4–15 korral piisab esimesele lehele tõusmiseks sageli sisu- ja lingitööst.${carrierOf(f)}`,
-      action: `Täienda kandjalehte ${carrierName(f)}: laienda sisu (valikujuhised, mahud, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke avalehelt.`,
+      action: `Täienda maandumislehte ${carrierName(f)}: laienda sisu (valikujuhised, mahud, hinnavahemik, FAQ), optimeeri title/meta ja lisa siselinke avalehelt.`,
     })
   }
   for (const f of lowCtr.slice(0, 3)) {
@@ -386,19 +386,27 @@ function ordersInsights(orders: OrdersData, ads: AdsData | null, out: Insight[])
   const c = orders.current
   const p = orders.previous
 
-  if (c.orders < WEEKLY_ORDERS_GOAL) {
+  /* Tellimuste aken ulatub raporti koostamiseni (reede hommik, ~9 päeva —
+   * vt orders.ts). Nädala eesmärk skaleeritakse akna pikkusega, et hinnang
+   * oleks õiglane (7-päevane aken → 5, 9-päevane aken → 6). */
+  const windowDays = orders.window
+    ? Math.round((new Date(`${orders.window.end}T00:00:00Z`).getTime() - new Date(`${orders.window.start}T00:00:00Z`).getTime()) / 86_400_000) + 1
+    : 7
+  const goal = Math.max(1, Math.round((WEEKLY_ORDERS_GOAL * windowDays) / 7))
+
+  if (c.orders < goal) {
     out.push({
       area: "orders",
       severity: "warning",
-      title: `Tellimusi tuli ${c.orders} (eesmärk ≥${WEEKLY_ORDERS_GOAL}/nädal)`,
-      detail: `Eelmine nädal: ${p.orders}. Päris tellimused (DB) on konversioonide tõde — GA4 key events ja Ads'i „conversions" on modelleeritud hinnangud.`,
+      title: `Tellimusi tuli ${c.orders} (eesmärk ≥${goal}/${windowDays} päeva)`,
+      detail: `Eelmine aken: ${p.orders}. Päris tellimused (DB) on konversioonide tõde — GA4 key events ja Ads'i „conversions" on modelleeritud hinnangud.`,
       action: "Kui liiklus on korras, aga tellimusi pole, on probleem konversioonis: kontrolli laoseisu ja hindu top-toodetel, lihtsusta kassat ja too tarneinfo tootelehel selgemalt esile.",
     })
   } else {
     out.push({
       area: "orders",
       severity: "positive",
-      title: `Tellimusi tuli ${c.orders} (eesmärk ≥${WEEKLY_ORDERS_GOAL}/nädal täidetud)`,
+      title: `Tellimusi tuli ${c.orders} (eesmärk ≥${goal}/${windowDays} päeva täidetud)`,
       detail: `Eelmine nädal: ${p.orders} · käive ${c.revenue.toFixed(2).replace(".", ",")} € · keskmine tellimus ${c.avgOrderValue.toFixed(2).replace(".", ",")} €.`,
       action: "Hoia kursis, millised tooted tellimusi toovad (toodete tabel allpool) — tugevda nende lehti ja laoseisu veelgi.",
     })

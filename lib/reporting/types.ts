@@ -4,8 +4,7 @@
  * as JSONB in weekly_reports (or data/weekly-reports.json as fallback) so
  * week-over-week trends survive beyond GSC's 16-month window.
  *
- * Pumbapood is an e-shop: Supabase `orders` are the conversion ground truth
- * (the SPS report used contact-form submissions the same way).
+ * Pumbapood is an e-shop: Supabase `orders` are the conversion ground truth.
  */
 
 export interface ReportPeriod {
@@ -80,8 +79,8 @@ export interface KeywordFamilyStat {
   current: { impressions: number; clicks: number; position: number | null }
   previous: { impressions: number; clicks: number; position: number | null }
   /**
-   * Carrier pages (kandjalehed) of the family's queries, by impressions —
-   * answers "kas Google vahetab kandjalehte?" without a manual GSC detour.
+   * Carrier pages (maandumislehed) of the family's queries, by impressions —
+   * answers "kas Google vahetab maandumislehte?" without a manual GSC detour.
    */
   carrierPages?: {
     current: { page: string; impressions: number }[]
@@ -220,6 +219,38 @@ export interface OrdersData {
   topProducts: { name: string; quantity: number; revenue: number }[]
   /** Nädala tellimused kvaliteedikontrolliks — uusimad ees. */
   orders: OrderRow[]
+  /**
+   * Tegelik andmeaken: tellimused salvestuvad reaalajas, seega ulatub aken
+   * raporti koostamiseni (reede hommik), mitte Google'i ~2-päevase viivitusega
+   * perioodi lõpuni. Eelmine aken on sama pikk, et nädalavõrdlus oleks õiglane.
+   */
+  window?: { start: string; end: string; prevStart: string; prevEnd: string }
+}
+
+/**
+ * „Lehekülje arendus" — mis täiendusi poel ja süsteemis vahetult enne raportit
+ * tehti (git-põhine, site-changes.ts). Raport võtab inimkeeles kokku, mis
+ * täiendusi said tehtud enne järgmist raportit.
+ */
+export type SiteChangeGroupKey = "content" | "seo" | "technical"
+
+export interface SiteChangeGroup {
+  key: SiteChangeGroupKey
+  /** Commitide arv selles grupis (items on lühendatud väljavõte). */
+  count: number
+  /** Puhastatud inimkeelsed lühikirjeldused (kuni 8). */
+  items: string[]
+}
+
+export interface SiteChanges {
+  /** Ajavahemik (ISO): eelmise nädala raporti genereerimisaeg → selle raporti oma. */
+  since: string
+  until: string
+  /** Aknasse jäänud commitide koguarv (0 = muudatusi ei tehtud). */
+  commits: number
+  groups: SiteChangeGroup[]
+  /** LLM-i kokkuvõte inimkeeles; puudub, kui LLM seadistamata või ebaõnnestus. */
+  summary?: string
 }
 
 export interface ReportSnapshot {
@@ -230,6 +261,8 @@ export interface ReportSnapshot {
   ads: AdsData | null
   meta: MetaData | null
   orders: OrdersData | null
+  /** Poel ja süsteemis tehtud täiendused alates eelmisest raportist — valikuline (vanades raportites/git-history puududes puudub). */
+  siteChanges?: SiteChanges
   /** Per-source failure notes (a failing API must not kill the whole report). */
   errors: string[]
 }

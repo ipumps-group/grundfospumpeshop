@@ -10,7 +10,7 @@ import { sendReportEmail } from '@/lib/reporting/notify'
  * Protected by CRON_SECRET like /api/cron/weather-pulse. `?send=0` generates
  * and stores the report without sending the e-mail (manual testing).
  *
- * Requires env (Pumbapood's OWN credentials, NOT the SPS ones):
+ * Requires env (Pumbapood's OWN credentials):
  * GOOGLE_ADS_CLIENT_ID/SECRET/REFRESH_TOKEN + GOOGLE_ADS_DEVELOPER_TOKEN +
  * GOOGLE_ADS_CUSTOMER_ID (Ads + GA4 OAuth), GA4_PROPERTY_ID,
  * GSC_SERVICE_ACCOUNT_EMAIL / GSC_SERVICE_ACCOUNT_KEY (+ GSC_SITE_URL),

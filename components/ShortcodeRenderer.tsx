@@ -4,9 +4,10 @@ import FeaturedProductsSlider from './FeaturedProductsSlider'
 import PumpCalculator from './PumpCalculator'
 import ContactForm from './ContactForm'
 import ObfuscatedEmail from './ObfuscatedEmail'
+import ShopCtaButton from './ShopCtaButton'
 import { COMPANY } from '@/lib/config'
 
-// Supported shortcodes:  [slider]  [calculator]  [contact_form]
+// Supported shortcodes:  [slider]  [calculator]  [contact_form]  [email]  [shop_button]
 
 const SHORTCODE_RE = /(\[[a-z_]+\])/g
 
@@ -37,6 +38,7 @@ export default function ShortcodeRenderer({ html, className, style, pageId }: Pr
             case 'calculator':   return <PumpCalculator key={i} />
             case 'contact_form': return <ContactForm key={i} pageId={pageId} />
             case 'email':        return <ObfuscatedEmail key={i} email={COMPANY.email} />
+            case 'shop_button':  return <ShopCtaButton key={i} />
             default:             return <span key={i}>{part}</span>
           }
         }

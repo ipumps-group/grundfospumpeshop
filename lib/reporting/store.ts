@@ -1,9 +1,8 @@
 /**
  * Storage for weekly marketing reports. Primary: weekly_reports table in
  * Supabase (migration migrations/006_weekly_reports.sql). Fallback:
- * data/weekly-reports.json when Supabase is unreachable (same pattern as
- * the SPS report's JSON fallback). One report per week — re-generating the
- * same week upserts (replaces) it.
+ * data/weekly-reports.json when Supabase is unreachable. One report per
+ * week — re-generating the same week upserts (replaces) it.
  */
 
 import { supabaseAdmin } from "@/lib/supabase-admin"

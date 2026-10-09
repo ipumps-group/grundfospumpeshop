@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import type { Insight, ReportChange, StoredReport } from '@/lib/reporting/types'
-import { markdownToHtml } from '@/lib/reporting/email-html'
+import { markdownToHtml, siteChangesFallbackLines } from '@/lib/reporting/email-html'
 
 interface ReportSummary {
   id: number
@@ -314,6 +314,26 @@ export default function ReportDetailPage() {
           </>
         )}
       </div>
+
+      {/* „Lehekülje arendus" — git-põhised täiendused kahe raporti vahel */}
+      {s.siteChanges && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="text-[18px] font-bold text-gray-900 mb-1">
+            Lehekülje arendus (alates {s.siteChanges.since.slice(0, 10).split('-').reverse().join('.')})
+          </h2>
+          {s.siteChanges.commits === 0 ? (
+            <p className="text-[14px] text-gray-500">Ülevaatusperioodil poel muudatusi ei tehtud.</p>
+          ) : s.siteChanges.summary ? (
+            <div dangerouslySetInnerHTML={{ __html: markdownToHtml(s.siteChanges.summary) }} />
+          ) : (
+            <ul className="list-disc pl-6 text-[14px] text-gray-700 space-y-1">
+              {siteChangesFallbackLines(s.siteChanges).map((l) => (
+                <li key={l}>{l}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* 8-week trends */}
       {trend.length > 1 && (

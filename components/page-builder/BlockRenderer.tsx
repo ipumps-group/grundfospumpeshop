@@ -5,8 +5,10 @@ import LocationMap from '@/components/LocationMap'
 import ShortcodeRenderer from '@/components/ShortcodeRenderer'
 import SearchBarBlockRenderer from './SearchBarBlockRenderer'
 import TegevusaladBlockRenderer from './TegevusaladBlockRenderer'
+import FaqAccordion from '@/components/FaqAccordion'
+import { sanitizeCmsHtml } from '@/lib/sanitize-cms-html'
 import Image from 'next/image'
-import type { Section, ContentBlock, HeadingBlock, TextBlock, ImageBlock, ButtonBlock, VideoBlock, DividerBlock, SpacerBlock } from './types'
+import type { Section, ContentBlock, HeadingBlock, TextBlock, ImageBlock, ButtonBlock, VideoBlock, DividerBlock, SpacerBlock, FaqBlock } from './types'
 
 // ─── Video URL parser ──────────────────────────────────────────────────────
 
@@ -221,6 +223,28 @@ function RenderBlock({ block, locale }: { block: ContentBlock; locale: string })
       return <TegevusaladBlockRenderer block={block as import('./types').TegevusaladBlock} />
     case 'map':
       return <LocationMap />
+    case 'faq': {
+      const b = block as FaqBlock
+      const title = textByLocale(b as unknown as Record<string, unknown>, 'title', locale)
+      const items = (b.items || [])
+        .map(item => ({
+          q: textByLocale(item as unknown as Record<string, unknown>, 'question', locale),
+          a: textByLocale(item as unknown as Record<string, unknown>, 'answer', locale),
+        }))
+        .filter(i => i.q && i.a)
+      if (items.length === 0) return null
+      return (
+        <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
+          {title && <h2 className="text-2xl md:text-3xl font-bold text-[#003366]">{title}</h2>}
+          <FaqAccordion
+            items={items.map(i => ({
+              q: i.q,
+              a: <span dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(i.a) }} />,
+            }))}
+          />
+        </section>
+      )
+    }
     default:
       return null
   }

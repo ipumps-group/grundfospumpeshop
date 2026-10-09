@@ -97,6 +97,8 @@ messages/              # Tõlked (JSON)
 
 ## 📊 Ads Control Panel
 
+Reklaamide kvaliteedistandard (kohustuslik kõigile kampaaniatele): [`docs/reklaamide-kvaliteedi-juhend.md`](docs/reklaamide-kvaliteedi-juhend.md) — kõik asset-väljad täidetud, sh pildid.
+
 A production-ready advertising management panel built into the admin (`/haldus/ads`).
 
 ### Access

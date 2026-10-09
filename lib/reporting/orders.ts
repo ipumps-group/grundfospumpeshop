@@ -1,14 +1,14 @@
 /**
  * Order aggregates for the weekly report. Real orders in Supabase are the
- * ground truth for conversions (same role as form submissions in the SPS
- * report): GA4 key events and Ads "conversions" are modelled/attributed
- * estimates, the DB is what actually sold.
+ * ground truth for conversions: GA4 key events and Ads "conversions" are
+ * modelled/attributed estimates, the DB is what actually sold.
  *
  * Schema: orders (status, total, customer_name, ...) + order_items
  * (order_id, product_name, quantity, unit_price) joined via order_id.
  */
 
 import { supabaseAdmin } from "@/lib/supabase-admin"
+import { isoDate } from "./google-auth"
 import type { OrderRow, OrdersData, OrdersPeriod, ReportPeriod } from "./types"
 
 /** Statuses that count as real business. pending = invoice/bank-link unpaid yet, still a real order. */
@@ -72,10 +72,40 @@ function aggregate(rows: DbOrder[]): OrdersPeriod {
   return out
 }
 
-export async function pullOrders(period: ReportPeriod): Promise<OrdersData> {
+/** ISO-kuupäeva nihutamine päevade võrra (UTC). */
+function shiftDays(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+/** Kahe ISO-kuupäeva vahe päevades, KAASA ARVATUD mõlemad otsad. */
+function inclusiveDays(start: string, end: string): number {
+  const ms = new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()
+  return Math.round(ms / 86_400_000) + 1
+}
+
+/**
+ * Tellimuste tegelik aken: tellimused salvestuvad reaalajas, seega peab raport
+ * kajastama KÕIKI tellimusi kuni genereerimishetkeni (reede hommik) — Google'i
+ * statistika ~2-päevane viivitus ei tohi päris tellimusi raportist välja jätta.
+ * Eelmine aken on sama pikk ja lõpeb vahetult enne käesoleva algust, et
+ * nädalavõrdlus oleks õiglane.
+ */
+export function ordersWindow(period: ReportPeriod, now?: Date): { start: string; end: string; prevStart: string; prevEnd: string } {
+  const start = period.start
+  const end = now ? isoDate(now) : period.end
+  const days = Math.max(inclusiveDays(start, end), 1)
+  const prevEnd = shiftDays(start, -1)
+  const prevStart = shiftDays(prevEnd, -(days - 1))
+  return { start, end, prevStart, prevEnd }
+}
+
+export async function pullOrders(period: ReportPeriod, now?: Date): Promise<OrdersData> {
+  const win = ordersWindow(period, now)
   const [curRows, prevRows] = await Promise.all([
-    fetchOrders(period.start, period.end),
-    fetchOrders(period.prevStart, period.prevEnd),
+    fetchOrders(win.start, win.end),
+    fetchOrders(win.prevStart, win.prevEnd),
   ])
 
   const validCur = curRows.filter((r) => !DEAD_STATUSES.has((r.status ?? "").toLowerCase()))
@@ -119,5 +149,6 @@ export async function pullOrders(period: ReportPeriod): Promise<OrdersData> {
     previous: aggregate(prevRows),
     topProducts,
     orders: validCur.map(toOrderRow),
+    window: win,
   }
 }

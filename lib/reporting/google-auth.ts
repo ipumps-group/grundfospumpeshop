@@ -1,6 +1,5 @@
 /**
- * Google API auth for the weekly report — Pumbapood's OWN credentials only
- * (do NOT point these at the SPS project's service account):
+ * Google API auth for the weekly report — Pumbapood's OWN credentials only:
  *
  *   1. GA4 + Google Ads: OAuth refresh-token flow, same credentials the
  *      existing integrations use (lib/ads/ga4.ts, weather-pulse cron):

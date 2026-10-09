@@ -10,6 +10,7 @@ import ColorOrGradientField from './ColorOrGradientField'
 import type {
   ContentBlock, HeadingBlock, TextBlock, ImageBlock,
   ButtonBlock, VideoBlock, DividerBlock, SpacerBlock, SearchBarBlock, TegevusaladBlock, Alignment,
+  FaqBlock, FaqItem,
 } from './types'
 
 const inp = 'w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] focus:border-[#003366] outline-none transition-colors bg-white'
@@ -20,6 +21,7 @@ const LABELS: Record<string, string> = {
   button: 'Nupp', video: 'Video', divider: 'Eraldusjooon', spacer: 'Tühik',
   search_bar: 'Otsinguriba',
   tegevusalad: 'Tegevusalad',
+  faq: 'KKK (FAQ)',
 }
 
 function AlignBtns({ value, onChange }: { value: Alignment; onChange: (a: Alignment) => void }) {
@@ -404,6 +406,57 @@ export default function BlockEditor({ block, onChange, onMoveUp, onMoveDown, onD
               Kontaktvorm — renderdatakse automaatselt.
             </p>
           )}
+
+          {/* FAQ */}
+          {block.type === 'faq' && (() => {
+            const b = block as FaqBlock
+            const items = b.items || []
+            const setItems = (items: FaqItem[]) => upd({ items } as Partial<ContentBlock>)
+            const setItem = (i: number, fields: Partial<FaqItem>) =>
+              setItems(items.map((it, idx) => (idx === i ? { ...it, ...fields } : it)))
+            return (
+              <>
+                <div>
+                  <label className={lbl}>Pealkiri</label>
+                  <input type="text" value={b.title ?? ''} onChange={e => upd({ title: e.target.value } as Partial<ContentBlock>)}
+                    className={inp} placeholder="Korduma kippuvad küsimused" />
+                </div>
+                <div className="space-y-3">
+                  {items.map((it, i) => (
+                    <div key={i} className="border border-gray-200 rounded-lg p-2.5 space-y-2 bg-gray-50/50">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-semibold text-gray-400 uppercase">Küsimus {i + 1}</span>
+                        <div className="flex items-center gap-1">
+                          <button type="button" disabled={i === 0}
+                            onClick={() => { const c = [...items]; [c[i - 1], c[i]] = [c[i], c[i - 1]]; setItems(c) }}
+                            className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-25 rounded">
+                            <ChevronUp size={14} />
+                          </button>
+                          <button type="button" disabled={i === items.length - 1}
+                            onClick={() => { const c = [...items]; [c[i], c[i + 1]] = [c[i + 1], c[i]]; setItems(c) }}
+                            className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-25 rounded">
+                            <ChevronDown size={14} />
+                          </button>
+                          <button type="button" onClick={() => setItems(items.filter((_, idx) => idx !== i))}
+                            className="p-1 text-gray-400 hover:text-red-500 rounded">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                      <input type="text" value={it.question} onChange={e => setItem(i, { question: e.target.value })}
+                        className={inp} placeholder="Küsimus" />
+                      <textarea value={it.answer} onChange={e => setItem(i, { answer: e.target.value })}
+                        className={`${inp} min-h-[64px]`} placeholder="Vastus (HTML lubatud, nt lingid)" />
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setItems([...items, { question: '', answer: '' }])}
+                    className="w-full border border-dashed border-gray-300 rounded-lg py-2 text-[13px] text-gray-400 hover:border-[#003366]/50 hover:text-[#003366] transition-colors">
+                    + Lisa küsimus
+                  </button>
+                </div>
+              </>
+            )
+          })()}
 
           {/* TEGEVUSALAD */}
           {block.type === 'tegevusalad' && (() => {

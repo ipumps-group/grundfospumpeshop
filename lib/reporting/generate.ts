@@ -9,6 +9,7 @@
 import { collectSnapshot } from "./snapshot"
 import { buildInsights } from "./insights"
 import { computeChanges } from "./changes"
+import { collectSiteChanges } from "./site-changes"
 import { generateNarrative } from "./llm"
 import { getPreviousReport, saveWeeklyReport } from "./store"
 import type { StoredReport } from "./types"
@@ -17,6 +18,15 @@ export async function generateWeeklyReport(): Promise<StoredReport> {
   const snapshot = await collectSnapshot()
   const previous = await getPreviousReport(snapshot.period.start)
   const changes = computeChanges(snapshot, previous)
+
+  /* „Lehekülje arendus" (git-põhine täienduste kokkuvõte): aken = eelmise
+   * NÄDALA raporti genereerimisest tänaseni. getPreviousReport filtreerib
+   * käesoleva nädala raporti välja, seega „Genereeri kohe" uuesti käivitades
+   * aken nulli ei kaha (raport upsert'itakse sama nädala peale). */
+  const changesSince = previous?.snapshot.generatedAt ?? `${snapshot.period.start}T00:00:00.000Z`
+  const siteChanges = await collectSiteChanges(changesSince, snapshot.generatedAt)
+  if (siteChanges) snapshot.siteChanges = siteChanges
+
   const insights = buildInsights(snapshot)
   const narrative = (await generateNarrative(snapshot, insights, changes)) ?? ""
 

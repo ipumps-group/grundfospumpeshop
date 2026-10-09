@@ -6,8 +6,7 @@ import { useRouter } from '@/i18n/navigation'
 import { Search, ChevronDown, LayoutGrid, List } from 'lucide-react'
 import { ViewModeProvider, useViewMode } from '@/lib/ViewModeContext'
 import { useTranslations } from 'next-intl'
-import { supabase } from '@/lib/supabase'
-import { FiltersPanel, type Category } from '@/components/ProductFiltersSidebar'
+import ShopNavSidebar from '@/components/ShopNavSidebar'
 
 const SORT_OPTIONS = [
   { value: 'name_asc',   labelKey: 'sortNameAsc' },
@@ -26,13 +25,6 @@ export default function ProductsLayoutWithSidebar({ children }: { children: Reac
 
 function ProductsLayoutInner({ children }: { children: React.ReactNode }) {
   const { viewMode, setViewMode } = useViewMode()
-  const [tegevusalad, setTegevusalad] = useState<Category[]>([])
-  const [seeriad, setSeeriad] = useState<Category[]>([])
-  const [selectedAla, setSelectedAla] = useState('')
-  const [selectedSeeria, setSelectedSeeria] = useState('')
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [priceMin, setPriceMin] = useState('')
-  const [priceMax, setPriceMax] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOpen, setSortOpen] = useState(false)
   const router = useRouter()
@@ -43,76 +35,8 @@ function ProductsLayoutInner({ children }: { children: React.ReactNode }) {
   const tCommon = useTranslations('common')
 
   useEffect(() => {
-    if (currentTegevusala) setSelectedAla(currentTegevusala)
-    if (currentSeeria) setSelectedSeeria(currentSeeria)
     setSortOpen(false)
   }, [currentTegevusala, currentSeeria])
-
-  useEffect(() => {
-    async function load() {
-      const { data: areas } = await supabase
-        .from('activity_areas')
-        .select('id, slug, name_et, sort_order')
-        .eq('is_active', true)
-        .order('sort_order')
-
-      const { data: allSeries } = await supabase
-        .from('product_series')
-        .select('id, slug, name, sort_order, activity_areas!primary_activity_area_id(slug)')
-        .eq('is_active', true)
-        .order('name')
-
-      const { data: saa } = await supabase
-        .from('series_activity_areas')
-        .select('series_id, activity_area_id')
-
-      const { data: products } = await supabase
-        .from('products')
-        .select('series_slug')
-        .eq('published', true)
-
-      // Series that have published products
-      const seriesWithProducts = new Set((products || []).map(p => p.series_slug).filter(Boolean))
-      // Series objects that have products
-      const activeSeries = (allSeries || []).filter(s => seriesWithProducts.has(s.slug))
-      // Activity area IDs linked to those series
-      const saaMap = new Map<number, Set<unknown>>()
-      for (const r of saa || []) {
-        if (!saaMap.has(r.activity_area_id)) saaMap.set(r.activity_area_id, new Set())
-        saaMap.get(r.activity_area_id)!.add(r.series_id)
-      }
-      const areaIdsWithProducts = new Set(
-        activeSeries
-          .map(s => (s as any).activity_areas?.slug)
-          .filter(Boolean) as string[]
-      )
-
-      if (areas) {
-        setTegevusalad(areas
-          .filter(a => areaIdsWithProducts.has(a.slug))
-          .map(a => ({ slug: a.slug, name_et: a.name_et, parent_slug: null })))
-      }
-
-      if (allSeries) {
-        setSeeriad(activeSeries
-          .map(s => ({ slug: s.slug, name_et: (s as any).name.replace(/Grundfos\s*/g, ''), parent_slug: (s as any).activity_areas?.slug || null })))
-      }
-    }
-    load()
-  }, [])
-
-  const handleSetAla = (v: string) => {
-    router.push(v ? `/tooted/${v}` : '/tooted')
-  }
-
-  const handleSetSeeria = (v: string) => {
-    if (v) {
-      const series = seeriad.find(c => c.slug === v) ?? seeriad.flatMap(c => c.children || []).find(c => c.slug === v)
-      const areaSlug = series?.parent_slug || currentTegevusala
-      if (areaSlug) router.push(`/tooted/${areaSlug}/${v}`)
-    } else if (currentTegevusala) router.push(`/tooted/${currentTegevusala}`)
-    else router.push('/tooted')
-  }
 
   const handleSearch = (q: string) => {
     if (q.trim()) router.push(`/tooted?q=${encodeURIComponent(q.trim())}`)
@@ -174,18 +98,7 @@ function ProductsLayoutInner({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="flex gap-6">
-        <aside className="hidden lg:block w-60 flex-shrink-0">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
-            <FiltersPanel
-              tegevusalad={tegevusalad} seeriad={seeriad}
-              selectedAla={selectedAla} setSelectedAla={handleSetAla}
-              selectedSeeria={selectedSeeria} setSelectedSeeria={handleSetSeeria}
-              inStockOnly={inStockOnly} setInStockOnly={setInStockOnly}
-              priceMin={priceMin} setPriceMin={setPriceMin}
-              priceMax={priceMax} setPriceMax={setPriceMax}
-            />
-          </div>
-        </aside>
+        <ShopNavSidebar />
         <div className="flex-1 min-w-0">
           {children}
         </div>

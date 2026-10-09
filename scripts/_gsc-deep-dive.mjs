@@ -4,7 +4,7 @@
  *     pasted numbers (veeautomaat 41 imp/pos 27.9 vs 43/23.1; grundfos
  *     79 imp/11 clicks/pos 11.7 vs 16.0).
  *  2. For both families pull query+page rows for current AND previous week
- *     to answer: is Google switching the carrier page (kandjaleht)?
+ *     to answer: is Google switching the carrier page (maandumisleht)?
  *  3. Show which queries inside each family moved.
  */
 import { env } from './env.mjs'

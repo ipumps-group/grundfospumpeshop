@@ -161,6 +161,14 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react'],
   },
 
+  /* data/git-history.json (nädalaraporti „Lehekülje arendus" sektsioon) loetakse
+   * dünaamiliselt fs-iga, seega tracer seda ise ei leia — lisa kaasa kahe
+   * serverless-funktsiooni paketti, mis raportit genereerivad (cron + admin POST). */
+  outputFileTracingIncludes: {
+    '/api/cron/weekly-report*': ['./data/git-history.json'],
+    '/api/haldus/reports*': ['./data/git-history.json'],
+  },
+
   // ─── SOURCE MAPS (disable in prod) ───────────────────────────────────
   productionBrowserSourceMaps: false,
 

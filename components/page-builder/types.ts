@@ -129,6 +129,31 @@ export interface MapBlock {
   type: 'map'
 }
 
+export interface FaqItem {
+  question: string
+  answer: string
+  question_en?: string
+  question_ru?: string
+  question_lv?: string
+  question_lt?: string
+  answer_en?: string
+  answer_ru?: string
+  answer_lv?: string
+  answer_lt?: string
+}
+
+/** FAQ accordion — rendered with the same styling as the category-page FAQ. */
+export interface FaqBlock {
+  id: string
+  type: 'faq'
+  title?: string
+  title_en?: string
+  title_ru?: string
+  title_lv?: string
+  title_lt?: string
+  items: FaqItem[]
+}
+
 export type ContentBlock =
   | HeadingBlock
   | TextBlock
@@ -143,6 +168,7 @@ export type ContentBlock =
   | SearchBarBlock
   | TegevusaladBlock
   | MapBlock
+  | FaqBlock
 
 export interface Column {
   id: string

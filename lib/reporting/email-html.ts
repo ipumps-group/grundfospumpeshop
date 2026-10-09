@@ -5,7 +5,7 @@
  * narrative (when present), grouped insights, link to the full admin report.
  */
 
-import type { Insight, OrderRow, ReportChange, StoredReport } from "./types"
+import type { Insight, OrderRow, ReportChange, SiteChanges, StoredReport } from "./types"
 import { summarizeChanges } from "./changes"
 
 const BRAND = "#003366"
@@ -163,6 +163,60 @@ function changesSection(changes: ReportChange[]): { html: string; text: string[]
   return { html, text }
 }
 
+/* ---------- „Lehekülje arendus" (git-põhised täiendused kahe raporti vahel) ---------- */
+
+const SITE_CHANGE_GROUP_LABELS: Record<SiteChanges["groups"][number]["key"], string> = {
+  content: "Sisu ja lehed",
+  seo: "SEO ja nähtavus",
+  technical: "Tehnilised täiendused",
+}
+
+const etCount = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+
+/**
+ * „Lehekülje arendus" reeglipõhine kokkuvõte (fallback LLM-summaryle).
+ * Jagatud admin-UIga — admin kasutab samu ridu, kui summary puudub.
+ */
+export function siteChangesFallbackLines(changes: SiteChanges): string[] {
+  return changes.groups.map((group) => {
+    if (group.key === "technical") {
+      return `${SITE_CHANGE_GROUP_LABELS[group.key]}: ${etCount(group.count, "muudatus", "muudatust")}.`
+    }
+    const shown = group.items.slice(0, 4)
+    const rest = group.count - shown.length
+    return `${SITE_CHANGE_GROUP_LABELS[group.key]}: ${etCount(group.count, "muudatus", "muudatust")} — ${shown.join("; ")}${rest > 0 ? ` (ja ${rest} veel)` : ""}.`
+  })
+}
+
+/** „Lehekülje arendus" sektsioon: LLM-summary kui olemas, muidu struktureeritud read. */
+function siteChangesSection(changes: SiteChanges): { html: string; text: string[] } {
+  const since = changes.since.slice(0, 10).split("-").reverse().join(".")
+  const heading = `Lehekülje arendus (alates ${since})`
+  if (changes.commits === 0) {
+    const note = "Ülevaatusperioodil poel muudatusi ei tehtud."
+    return {
+      html: `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">${escapeHtml(heading)}</h2>` +
+        `<p style="font-size:15px;color:#2d3748;margin:4px 0 8px">${escapeHtml(note)}</p>`,
+      text: [heading.toUpperCase(), note, ""],
+    }
+  }
+  if (changes.summary) {
+    return {
+      html: `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">${escapeHtml(heading)}</h2>` + markdownToHtml(changes.summary),
+      text: [heading.toUpperCase(), changes.summary, ""],
+    }
+  }
+  const lines = siteChangesFallbackLines(changes)
+  return {
+    html:
+      `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">${escapeHtml(heading)}</h2>` +
+      `<ul style="margin:6px 0;padding-left:22px">` +
+      lines.map((l) => `<li style="margin:4px 0;font-size:15px;line-height:1.5;color:#2d3748">${escapeHtml(l)}</li>`).join("") +
+      `</ul>`,
+    text: [heading.toUpperCase(), ...lines.map((l) => `- ${l}`), ""],
+  }
+}
+
 /* ---------- week's orders ---------- */
 
 const STATUS_LABELS: Record<string, string> = {
@@ -175,7 +229,7 @@ const STATUS_LABELS: Record<string, string> = {
   failed: "Ebaõnnestunud",
 }
 
-function ordersSection(orders: OrderRow[]): { html: string; text: string[] } {
+function ordersSection(orders: OrderRow[], window?: { start: string; end: string }): { html: string; text: string[] } {
   if (orders.length === 0) return { html: "", text: [] }
   const rows = orders
     .slice(0, 15)
@@ -192,13 +246,19 @@ function ordersSection(orders: OrderRow[]): { html: string; text: string[] } {
       )
     })
     .join("\n")
+  /* Tellimused on arvestatud kuni raporti koostamiseni (reede hommik) — Google'i
+   * ~2-päevane viivitus ei tohi päris tellimusi raportist välja jätta. */
+  const windowNote = window
+    ? `Tellimuste aken: ${window.start} – ${window.end} (kõik tellimused kuni raporti koostamiseni; Google'i statistika lõppeb ~2 päeva varem).`
+    : null
   const html =
     `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Nädala tellimused</h2>` +
-    `<p style="font-size:15px;color:#2d3748;margin:4px 0 8px"><strong>${orders.length} tellimust</strong> — DB on konversioonide tõde (GA4/Ads konversioonid on nõusolekurežiimi tõttu alampiir).</p>` +
+    `<p style="font-size:15px;color:#2d3748;margin:4px 0 8px"><strong>${orders.length} tellimust</strong> — DB on konversioonide tõde (GA4/Ads konversioonid on nõusolekurežiimi tõttu alampiir).${windowNote ? ` ${escapeHtml(windowNote)}` : ""}</p>` +
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${BORDER};border-radius:12px;overflow:hidden">${rows}</table>`
   const text = [
     "NÄDALA TELLIMUSED",
     `${orders.length} tellimust`,
+    ...(windowNote ? [windowNote] : []),
     ...orders.slice(0, 15).map((o) => {
       const date = o.createdAt.slice(0, 10).split("-").reverse().slice(0, 2).join(".")
       return `- ${date} ${o.customer || "—"} [${o.total.toFixed(2)} €; ${STATUS_LABELS[o.status] ?? o.status}] ${o.summary}`
@@ -314,8 +374,9 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
 
   const narrativeHtml = report.narrative ? markdownToHtml(report.narrative) : ""
   const changes = changesSection(report.changes ?? [])
-  const ordersHtml = ordersSection(s.orders?.orders ?? [])
+  const ordersHtml = ordersSection(s.orders?.orders ?? [], s.orders?.window)
   const channels = channelsSection(report)
+  const siteChanges = s.siteChanges ? siteChangesSection(s.siteChanges) : null
   const errorsNote = s.errors.length
     ? `<p style="font-size:13px;color:#92400e;background:#fef3c7;border-radius:8px;padding:8px 12px">Osaliselt puuduvad andmed: ${escapeHtml(s.errors.join(" · "))}</p>`
     : ""
@@ -330,6 +391,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   ${errorsNote}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cards.join("")}</tr></table>
   ${changes.html}
+  ${siteChanges ? siteChanges.html : ""}
   ${channels.html}
   ${ordersHtml.html}
   ${narrativeHtml}
@@ -339,7 +401,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
     Täisraport tabelite ja trendidega: <a href="${escapeHtml(adminUrl)}" style="color:#1d4ed8">${escapeHtml(adminUrl)}</a>
   </p>
   <p style="font-size:12px;color:#9aa5b1;margin-top:16px;border-top:1px solid #edf0f4;padding-top:10px">
-    Automaatne nädalaraport (reede 09:00) · Andmed: GSC, GA4, Google Ads API, Meta Marketing API, tellimuste andmebaas · Andmete lõppkuupäev on ~2 päeva tagasi (Google'i viive).
+    Automaatne nädalaraport (reede 09:00) · Andmed: GSC, GA4, Google Ads API, Meta Marketing API, tellimuste andmebaas · GSC/GA4/Ads/Meta andmed lõppevad ~2 päeva tagasi (Google'i viive); tellimused ja poe täiendused on arvestatud kuni raporti koostamiseni.
   </p>
 </div>
 </body></html>`
@@ -349,6 +411,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
     "",
   ]
   textLines.push(...changes.text)
+  if (siteChanges) textLines.push(...siteChanges.text)
   textLines.push(...channels.text)
   textLines.push(...ordersHtml.text)
   if (report.narrative) {

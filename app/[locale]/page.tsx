@@ -142,49 +142,42 @@ export default async function HomePage() {
   const titleVisible = page.show_title !== false
 
   if (hasBlocks) {
+    // FAQPage JSON-LD from the faq blocks (localized; answers stripped of tags)
+    const stripTags = (html: string) => html.replace(/<[^>]+>/g, '')
+    const byLocale = (obj: Record<string, unknown>, field: string): string => {
+      if (locale !== 'et') {
+        const val = obj[`${field}_${locale}`]
+        if (typeof val === 'string' && val) return val
+      }
+      return typeof obj[field] === 'string' ? (obj[field] as string) : ''
+    }
+    const faqSchemaItems: { name: string; text: string }[] = []
+    for (const section of (page.blocks as Section[]) || []) {
+      for (const col of section.columns || []) {
+        for (const b of col.blocks || []) {
+          if ((b as { type?: string }).type !== 'faq') continue
+          for (const item of ((b as { items?: Record<string, unknown>[] }).items || [])) {
+            const name = byLocale(item, 'question')
+            const text = stripTags(byLocale(item, 'answer')).trim()
+            if (name && text) faqSchemaItems.push({ name, text })
+          }
+        }
+      }
+    }
     return (
       <div className="min-h-screen">
-        {locale === 'et' && (
+        {faqSchemaItems.length > 0 && (
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'FAQPage',
-                mainEntity: [
-                  {
-                    '@type': 'Question',
-                    name: 'Milliseid Grundfos pumapasi leiate Pumbapoest?',
-                    acceptedAnswer: {
-                      '@type': 'Answer',
-                      text: 'Meie valikust leiad kõik peamised Grundfos seeriad: veeautomaadid ja hüdrofoorid (SCALA1, SCALA2, JP), kütte- ja tsirkulatsioonipumbad (ALPHA GO, MAGNA3), drenaaži- ja tühjenduspumbad (Unilift), puurkaevupumbad (SQ, SQE) ja reoveepumbad.',
-                    },
-                  },
-                  {
-                    '@type': 'Question',
-                    name: 'Kas olete ametlik Grundfos edasimüüja Eestis?',
-                    acceptedAnswer: {
-                      '@type': 'Answer',
-                      text: 'Jah — Pumbapood.ee (Pump OÜ) on ametlik Grundfos partner. Kõik tooted on originaalsed, kehtib tootjagarantii ja pakume tehnilist tuge.',
-                    },
-                  },
-                  {
-                    '@type': 'Question',
-                    name: 'Kui kiire on tarne?',
-                    acceptedAnswer: {
-                      '@type': 'Answer',
-                      text: 'Laos olevad Grundfos pumbad jõuavad üle Eesti tavaliselt 1–3 tööpäevaga. Suurematele projektidele ja eritellimustele kokkuleppel.',
-                    },
-                  },
-                  {
-                    '@type': 'Question',
-                    name: 'Kas aitate pumba valikul ja paigaldusel?',
-                    acceptedAnswer: {
-                      '@type': 'Answer',
-                      text: 'Jah — tasuta nõustamine aitab valida õige pumba vastavalt veeallikale, kraanikohtadele ja rõhuvajadusele. Helista +372 527 4403, kirjuta info@pumbapood.ee või võta ühendust.',
-                    },
-                  },
-                ],
+                mainEntity: faqSchemaItems.map((f) => ({
+                  '@type': 'Question',
+                  name: f.name,
+                  acceptedAnswer: { '@type': 'Answer', text: f.text },
+                })),
               }),
             }}
           />

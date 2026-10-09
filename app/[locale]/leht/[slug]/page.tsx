@@ -8,6 +8,7 @@ import { getTranslations, getLocale } from 'next-intl/server'
 import type { Section } from '@/components/page-builder/types'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import JsonLd from '@/components/seo/JsonLd'
+import ShopNavSidebar from '@/components/ShopNavSidebar'
 
 export const dynamic = 'force-dynamic'
 import { SITE_URL, localizedUrl, languageAlternates } from '@/lib/config'
@@ -49,10 +50,12 @@ function extractFAQItems(content: string | null, blocks: unknown[] | null): FAQI
   // If no FAQ blocks found, try to parse from HTML content
   if (faqs.length === 0 && content) {
     // Match H3 followed by paragraph (#### Question\nAnswer)
-    const h3AnswerRegex = /<h3[^>]*>([^<]+)<\/h3>\s*<p>([^<]+)<\/p>/gi
+    // Answers may contain links — strip tags for the plain-text schema.
+    const stripTags = (html: string) => html.replace(/<[^>]+>/g, '')
+    const h3AnswerRegex = /<h3[^>]*>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/gi
     let match
     while ((match = h3AnswerRegex.exec(content)) !== null) {
-      faqs.push({ question: match[1].trim(), answer: match[2].trim() })
+      faqs.push({ question: stripTags(match[1]).trim(), answer: stripTags(match[2]).trim() })
     }
   }
 
@@ -242,66 +245,74 @@ export default async function PublicPage(
     <div className="bg-gray-50 min-h-screen">
       {/* FAQPage JSON-LD schema if FAQ content detected */}
       <FAQPageSchema page={page} locale={locale} slug={slug} />
-      
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        {page.image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={page.image_url}
-            alt={title}
-            className="w-full h-64 object-cover rounded-2xl mb-8 shadow-sm"
-          />
-        )}
 
-        {titleVisible && (
-          <>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">{title}</h2>
-            {shortDesc && (
-              <p className="text-[17px] text-gray-600 mb-10 leading-relaxed">{shortDesc}</p>
-            )}
-          </>
-        )}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex gap-6">
+          <ShopNavSidebar />
+          <div className="flex-1 min-w-0">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
+              {page.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={page.image_url}
+                  alt={title}
+                  className="w-full h-64 object-cover rounded-2xl mb-8 shadow-sm"
+                />
+              )}
 
-        {isContact ? (
-          <>
-            {columns.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-                {columns.map((col, i) => (
-                  <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                    {col.title && (
-                      <h3 className="font-semibold text-[#003366] text-[15px] mb-2">{col.title}</h3>
-                    )}
-                    {col.text && (
-                      <p className="text-[14px] text-gray-600 leading-relaxed whitespace-pre-line">{col.text}</p>
-                    )}
+              {titleVisible && (
+                <>
+                  <h2 className="text-3xl font-bold text-[#003366] mb-3">{title}</h2>
+                  {shortDesc && (
+                    <p className="text-[17px] text-gray-600 mb-10 leading-relaxed">{shortDesc}</p>
+                  )}
+                </>
+              )}
+
+              {isContact ? (
+                <>
+                  {columns.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                      {columns.map((col, i) => (
+                        <div key={i} className="bg-gray-50 rounded-2xl border border-gray-100 p-5">
+                          {col.title && (
+                            <h3 className="font-semibold text-[#003366] text-[15px] mb-2">{col.title}</h3>
+                          )}
+                          {col.text && (
+                            <p className="text-[14px] text-gray-600 leading-relaxed whitespace-pre-line">{col.text}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="bg-gray-50 rounded-2xl border border-gray-100 p-8">
+                    <h2 className="text-xl font-bold text-gray-900 mb-1">{tCommon('contactFormTitle')}</h2>
+                    <p className="text-[14px] text-gray-500 mb-6">{tCommon('contactFormSubtitle')}</p>
+                    <ContactForm pageId={page.id} />
                   </div>
-                ))}
-              </div>
-            )}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">{tCommon('contactFormTitle')}</h2>
-              <p className="text-[14px] text-gray-500 mb-6">{tCommon('contactFormSubtitle')}</p>
-              <ContactForm pageId={page.id} />
+                </>
+              ) : (
+                content && (
+                  <ShortcodeRenderer
+                    html={content}
+                    pageId={page.id}
+                    className="text-[15px] text-gray-700 leading-relaxed
+                      [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-gray-900 [&_h1]:mt-8 [&_h1]:mb-3
+                      [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h2]:mb-2
+                      [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-gray-900 [&_h3]:mt-4 [&_h3]:mb-2
+                      [&_p]:leading-relaxed [&_p]:mb-3
+                      [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:mb-3
+                      [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1 [&_ol]:mb-3
+                      [&_a]:text-[#003366] [&_a]:underline [&_a:hover]:text-[#01a0dc]
+                      [&_strong]:font-semibold [&_strong]:text-gray-900
+                      [&_img]:rounded-xl
+                      [&_hr]:border-gray-200 [&_hr]:my-6"
+                  />
+                )
+              )}
             </div>
-          </>
-        ) : (
-          content && (
-            <ShortcodeRenderer
-              html={content}
-              pageId={page.id}
-              className="text-[15px] text-gray-700 leading-relaxed
-                [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-gray-900 [&_h1]:mt-8 [&_h1]:mb-3
-                [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h2]:mb-2
-                [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-gray-900 [&_h3]:mt-4 [&_h3]:mb-2
-                [&_p]:leading-relaxed [&_p]:mb-3
-                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1 [&_ul]:mb-3
-                [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1 [&_ol]:mb-3
-                [&_a]:text-[#003366] [&_a]:underline [&_a:hover]:text-[#01a0dc]
-                [&_strong]:font-semibold [&_strong]:text-gray-900
-                [&_hr]:border-gray-200 [&_hr]:my-6"
-            />
-          )
-        )}
+          </div>
+        </div>
       </div>
     </div>
   )

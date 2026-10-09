@@ -180,7 +180,7 @@ async function main() {
         link_data: {
           image_hash: hashAlpha2,
           link: LINK_KUTTEPUMBAD,
-          message: 'Uus Grundfos ALPHA GO seeria on saabunud!\n\nALPHA1 GO ja ALPHA2 GO asendavad enamiku vanu UPS, ALPHA1, ALPHA2 ja ALPHA3 tsirkulatsioonipumapasid. Grundfos GO äpp juhendab asenduse ja seadistuse samm-sammult.\n\nLaos ja kohe saadaval. Vaata valikut.',
+          message: 'Uus Grundfos ALPHA GO seeria on saabunud!\n\nALPHA1 GO ja ALPHA2 GO asendavad enamiku vanu UPS, ALPHA1, ALPHA2 ja ALPHA3 tsirkulatsioonipumpasid. Grundfos GO äpp juhendab asenduse ja seadistuse samm-sammult.\n\nLaos ja kohe saadaval. Vaata valikut.',
           name: 'Grundfos ALPHA GO küttepumbad',
           description: 'Kaks pumpa saja asemel.',
           call_to_action: { type: 'LEARN_MORE', value: { link: LINK_KUTTEPUMBAD } },

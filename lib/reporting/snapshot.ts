@@ -33,7 +33,7 @@ export async function collectSnapshot(now: Date = new Date()): Promise<ReportSna
     attempt(errors, "GA4", () => pullGa4(period)),
     attempt(errors, "Ads", () => pullAds(period)),
     attempt(errors, "Meta", () => pullMeta(period)),
-    attempt(errors, "Tellimused", () => pullOrders(period)),
+    attempt(errors, "Tellimused", () => pullOrders(period, now)),
   ])
 
   return {

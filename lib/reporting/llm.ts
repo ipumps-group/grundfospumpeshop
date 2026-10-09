@@ -3,11 +3,9 @@
  * (insights.ts) produces the facts and concrete flags; this module asks an
  * LLM to prioritize and phrase the Estonian marketing narrative on top.
  *
- * Providers (first configured key wins):
- *   1. Anthropic Messages API — ANTHROPIC_API_KEY (model: ANTHROPIC_MODEL)
- *   2. DeepSeek (OpenAI-compatible) — DEEPSEEK_API_KEY (model: DEEPSEEK_MODEL)
- * Both are plain fetch calls, no SDKs. With neither key set the report ships
- * rules-only (returns null, never blocks the pipeline).
+ * Provider: Anthropic Messages API only — ANTHROPIC_API_KEY (Pumbapood's own
+ * key, model: ANTHROPIC_MODEL). Plain fetch call, no SDK. Without the key the
+ * report ships rules-only (returns null, never blocks the pipeline).
  */
 
 import type { Insight, ReportChange, ReportSnapshot } from "./types"
@@ -253,8 +251,7 @@ export async function generateNarrative(
   changes: ReportChange[],
 ): Promise<string | null> {
   const anthropicKey = process.env.ANTHROPIC_API_KEY
-  const deepseekKey = process.env.DEEPSEEK_API_KEY
-  if (!anthropicKey && !deepseekKey) return null
+  if (!anthropicKey) return null
 
   const digest = buildDigest(snapshot, insights, changes)
   const userContent =
@@ -262,8 +259,7 @@ export async function generateNarrative(
     `Koosta nende põhjal nädalaraporti analüütiline osa.\n\n` +
     JSON.stringify(digest, null, 1)
 
-  if (anthropicKey) return finalize(await callAnthropic(anthropicKey, userContent), digest, insights)
-  return finalize(await callDeepseek(deepseekKey!, userContent), digest, insights)
+  return finalize(await callAnthropic(anthropicKey, userContent), digest, insights)
 }
 
 /**
@@ -281,7 +277,18 @@ function finalize(text: string | null, digest: Digest, insights: Insight[]): str
   return text
 }
 
-async function callAnthropic(apiKey: string, userContent: string): Promise<string | null> {
+/**
+ * Generic one-shot LLM call for auxiliary summaries (e.g. the site-changes
+ * section): Anthropic only, null when ANTHROPIC_API_KEY is not set. The main
+ * narrative keeps its own provider branch in generateNarrative.
+ */
+export async function callLlm(userContent: string, systemPrompt: string, maxTokens: number): Promise<string | null> {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY
+  if (anthropicKey) return callAnthropic(anthropicKey, userContent, systemPrompt, maxTokens)
+  return null
+}
+
+async function callAnthropic(apiKey: string, userContent: string, system: string = SYSTEM_PROMPT, maxTokens: number = MAX_TOKENS): Promise<string | null> {
   const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5"
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
@@ -295,8 +302,8 @@ async function callAnthropic(apiKey: string, userContent: string): Promise<strin
       },
       body: JSON.stringify({
         model,
-        max_tokens: MAX_TOKENS,
-        system: SYSTEM_PROMPT,
+        max_tokens: maxTokens,
+        system,
         messages: [{ role: "user", content: userContent }],
       }),
       signal: controller.signal,
@@ -310,45 +317,6 @@ async function callAnthropic(apiKey: string, userContent: string): Promise<strin
     return text || null
   } catch (error) {
     console.error("Anthropic narrative failed:", error instanceof Error ? error.message : error)
-    return null
-  } finally {
-    clearTimeout(timer)
-  }
-}
-
-/** DeepSeek chat completions (OpenAI-compatible schema). */
-async function callDeepseek(apiKey: string, userContent: string): Promise<string | null> {
-  // NB: pin the V4 model id — the legacy "deepseek-chat" alias (V4-Flash
-  // non-thinking) is officially deprecated and may stop resolving.
-  const model = process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash"
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
-  try {
-    const res = await fetch("https://api.deepseek.com/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: MAX_TOKENS,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent },
-        ],
-      }),
-      signal: controller.signal,
-    })
-    if (!res.ok) {
-      console.error(`DeepSeek API ${res.status}: ${(await res.text()).slice(0, 300)}`)
-      return null
-    }
-    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
-    const text = data.choices?.[0]?.message?.content?.trim()
-    return text || null
-  } catch (error) {
-    console.error("DeepSeek narrative failed:", error instanceof Error ? error.message : error)
     return null
   } finally {
     clearTimeout(timer)
