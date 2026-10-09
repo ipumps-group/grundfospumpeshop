@@ -49,7 +49,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         ["Grundfos JP", "põrandal seisev hüdrofoor — suvila, aed, väiksem maja", "235–550 €"],
         ["Grundfos SCALA1", "kompaktne ja vaikne veeautomaat väiksemale koju", "450–570 €"],
         ["Grundfos SCALA2", "täiesti püsiv rõhk, väga vaikne — eramu 3–6 kraanikohta", "u 660 €"],
-        ["Grundfos SB", "põrandal seisev, imeb kaevust kuni 8 m", "520–600 €"],
+        ["Grundfos SB", "uputatav sukelpump kaevu sisse — vajab välist juhtseadet", "520–600 €"],
         ["Grundfos SBA", "uputatav veeautomaat kaevu sisse", "575–720 €"],
       ],
     },
@@ -65,7 +65,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Mis vahe on põrandal seisval ja uputataval veeautomaadil?",
-        a: "Põrandal seisev veeautomaat (SCALA1, SCALA2, JP, SB) paigaldatakse kuiva ruumi — tehnoruumi või saunakambrisse — ja imeb vett kaevust kuni 8 m sügavuselt. Uputatav veeautomaat (SBA) langetatakse kaevu sisse: see on täiesti vaikne, ei võta ruumi ja sobib ka sügavamatesse kaevudesse.",
+        a: "Põrandal seisev veeautomaat (SCALA1, SCALA2, JP) paigaldatakse kuiva ruumi — tehnoruumi või saunakambrisse — ja imeb vett kaevust kuni 8 m sügavuselt. Uputatavad pumbad (SB, SBA) langetatakse kaevu sisse: need on täiesti vaiksed, ei võta ruumi ja sobivad ka sügavamatesse kaevudesse.",
       },
       {
         q: "Mis vahe on veeautomaadil ja hüdrofooril?",
@@ -98,7 +98,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         ["Grundfos JP", "floor-standing hydrophore — cottage, garden, smaller house", "€235–550"],
         ["Grundfos SCALA1", "compact and quiet booster for a smaller home", "€450–570"],
         ["Grundfos SCALA2", "perfectly constant pressure, very quiet — house with 3–6 taps", "≈ €660"],
-        ["Grundfos SB", "floor-standing, draws from wells up to 8 m", "€520–600"],
+        ["Grundfos SB", "submersible pump inside the well — needs an external controller", "€520–600"],
         ["Grundfos SBA", "submersible booster installed inside the well", "€575–720"],
       ],
     },
@@ -114,7 +114,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "What is the difference between a floor-standing and a submersible booster?",
-        a: "A floor-standing booster (SCALA1, SCALA2, JP, SB) is installed in a dry room — a utility room or a sauna chamber — and draws water from wells up to 8 m deep. A submersible booster (SBA) is lowered into the well: completely silent, takes no indoor space and suits deeper wells.",
+        a: "A floor-standing booster (SCALA1, SCALA2, JP) is installed in a dry room — a utility room or a sauna chamber — and draws water from wells up to 8 m deep. Submersible pumps (SB, SBA) are lowered into the well: completely silent, they take no indoor space and suit deeper wells.",
       },
       {
         q: "What is the difference between a water booster and a hydrophore?",
@@ -147,7 +147,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         ["Grundfos JP", "напольный гидрофор — дача, сад, небольшой дом", "235–550 €"],
         ["Grundfos SCALA1", "компактная и тихая станция для небольшого дома", "450–570 €"],
         ["Grundfos SCALA2", "полностью постоянное давление, очень тихая — дом с 3–6 кранами", "≈ 660 €"],
-        ["Grundfos SB", "напольная, забор воды из скважины до 8 м", "520–600 €"],
+        ["Grundfos SB", "погружной насос внутрь скважины — нужен внешний блок управления", "520–600 €"],
         ["Grundfos SBA", "погружная станция внутрь скважины", "575–720 €"],
       ],
     },
@@ -163,7 +163,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "В чём разница между напольной и погружной станцией?",
-        a: "Напольная станция (SCALA1, SCALA2, JP, SB) устанавливается в сухом помещении и забирает воду из скважины глубиной до 8 м. Погружная станция (SBA) опускается в скважину: полностью бесшумна, не занимает места и подходит для более глубоких скважин.",
+        a: "Напольная станция (SCALA1, SCALA2, JP) устанавливается в сухом помещении и забирает воду из скважины глубиной до 8 м. Погружные насосы (SB, SBA) опускаются в скважину: полностью бесшумны, не занимают места и подходят для более глубоких скважин.",
       },
       {
         q: "Чем отличается насосная станция от гидрофора?",
@@ -196,7 +196,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         ["Grundfos JP", "uz grīdas stāvošs hidrofors — vasarnīca, dārzs, mazāka māja", "235–550 €"],
         ["Grundfos SCALA1", "kompakts un kluss automāts mazākai mājai", "450–570 €"],
         ["Grundfos SCALA2", "pilnīgi nemainīgs spiediens, ļoti kluss — māja ar 3–6 krāniem", "≈ 660 €"],
-        ["Grundfos SB", "uz grīdas stāvošs, sūc no akas līdz 8 m", "520–600 €"],
+        ["Grundfos SB", "iegremdējamais sūknis akā — vajadzīga ārēja vadības ierīce", "520–600 €"],
         ["Grundfos SBA", "iegremdējams automāts akas iekšpusē", "575–720 €"],
       ],
     },
@@ -212,7 +212,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Kāda ir atšķirība starp uz grīdas stāvošu un iegremdējamu automātu?",
-        a: "Uz grīdas stāvošs automāts (SCALA1, SCALA2, JP, SB) tiek uzstādīts sausā telpā un sūc ūdeni no akas līdz 8 m dziļumam. Iegremdējamais automāts (SBA) tiek nolaists akā: pilnīgi kluss, neaizņem vietas un der arī dziļākām akām.",
+        a: "Uz grīdas stāvošs automāts (SCALA1, SCALA2, JP) tiek uzstādīts sausā telpā un sūc ūdeni no akas līdz 8 m dziļumam. Iegremdējamie sūkņi (SB, SBA) tiek nolaisti akā: pilnīgi klusi, neaizņem vietas un der arī dziļākām akām.",
       },
       {
         q: "Kāda ir atšķirība starp ūdens automātu un hidroforu?",
@@ -245,7 +245,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         ["Grundfos JP", "ant grindų statomas hidroforas – vasarnamis, sodas, mažesnis namas", "235–550 €"],
         ["Grundfos SCALA1", "kompaktiškas ir tylus automatas mažesniam namui", "450–570 €"],
         ["Grundfos SCALA2", "visiškai pastovus slėgis, labai tylus – namas su 3–6 čiaupais", "≈ 660 €"],
-        ["Grundfos SB", "ant grindų statomas, siurbia iš šulinio iki 8 m", "520–600 €"],
+        ["Grundfos SB", "panardinamas siurblys į šulinį — reikalingas išorinis valdymo blokas", "520–600 €"],
         ["Grundfos SBA", "panardinamas automatas šulinio viduje", "575–720 €"],
       ],
     },
@@ -261,7 +261,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Kuo skiriasi ant grindų statomas ir panardinamas automatas?",
-        a: "Ant grindų statomas automatas (SCALA1, SCALA2, JP, SB) montuojamas sausoje patalpoje ir siurbia vandenį iš iki 8 m gylio šulinio. Panardinamas automatas (SBA) leidžiamas į šulinį: visiškai tylus, neužima vietos ir tinka gilesniems šuliniams.",
+        a: "Ant grindų statomas automatas (SCALA1, SCALA2, JP) montuojamas sausoje patalpoje ir siurbia vandenį iš iki 8 m gylio šulinio. Panardinami siurbliai (SB, SBA) leidžiami į šulinį: visiškai tylūs, neužima vietos ir tinka gilesniems šuliniams.",
       },
       {
         q: "Kuo skiriasi vandens automatas ir hidroforas?",
@@ -1020,7 +1020,7 @@ const REOVEEPUMBAD: Record<Locale, CategoryContentSection> = {
       "Reoveepump on vaja, kui kanalisatsioonitoru on kõrgemal kui madalaim veevõtu koht või kui reovesi tuleb septikust kaugemale pumpata. Õige valik sõltub sellest, kas pumpad ühe seadme (WC, dušš) vett või kogu maja reovett kaevikust.",
       "Sololift2 on kompaktne lahendus WC, duši või valamu lisamiseks kohtadesse, kus gravitatsiooniline kanalisatsioon puudub — näiteks keldri või garaazhi WC. Pump koos mahutiga paigaldatakse otse seadme taha.",
       "Unilift AP on reovee- ja drenaažipump kaevikusse ja septikusse — see läbib osakesi kuni 50 mm ja pumpab saastunud vee ülekanalisse või puhastusseadmesse.",
-      "Kui survejuhis on pikk või tõste suur, on õige valik lõikuriga Unilift APG, mis peenendab reovee ja suudab seda kaugemale ja kõrgemale pumpata.",
+      "Kui survetoru on pikk või tõste suur, on õige valik lõikuriga Unilift APG, mis peenestab reovee ja suudab seda kaugemale ja kõrgemale pumpata.",
     ],
     priceTitle: "Reoveepumba hind",
     priceIntro:
@@ -1030,7 +1030,7 @@ const REOVEEPUMBAD: Record<Locale, CategoryContentSection> = {
       rows: [
         ["Sololift2", "WC, duši ja valamu reovee pumpamiseks — kompaktne, seadme taha", "396–555 €"],
         ["Unilift AP", "reovee ja saastunud vee kaevikust — osakesed kuni 50 mm", "551–937 €"],
-        ["Unilift APG", "lõikuriga — pikk survejuhis ja suur tõste", "817–1007 €"],
+        ["Unilift APG", "lõikuriga — pikk survetoru ja suur tõste", "817–1007 €"],
       ],
     },
     faqTitle: "Korduma kippuvad küsimused",
@@ -1049,7 +1049,7 @@ const REOVEEPUMBAD: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Millal valida lõikuriga Unilift APG?",
-        a: "Lõikuriga APG on õige valik siis, kui survejuhis on pikk, tõste suur või toru väikese läbimõõduga — lõikur peenendab reovee ja pump suudab seda tõhusalt edasi liigutada. Lühikese juhtme ja tavalise kaeviku jaoks piisab Unilift AP-st.",
+        a: "Lõikuriga APG on õige valik siis, kui survetoru on pikk, tõste suur või toru väikese läbimõõduga — lõikur peenestab reovee ja pump suudab seda tõhusalt edasi liigutada. Lühikese toru ja tavalise kaeviku jaoks piisab Unilift AP-st.",
       },
       {
         q: "Kas reoveepump käib septiku ja kanalisatsiooni vahele?",
@@ -1257,8 +1257,8 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     guideParagraphs: [
       "Salvkaevupump toob vett avatud kaevust või salvkaevust majja, aita või kastmisseadmesse. Õige valik sõltub imusügavusest (põrandal seisev pump imeb kuni 8 m sügavuselt), sellest, kas vaja varustada ka maja, ja soovitud müratasemest.",
       "Grundfos JP on klassikaline ja soodne lahendus — pump koos rõhumahuti ja automaatikaga (hüdrofoor), mis sobib hästi suvilasse ja aeda.",
-      "Grundfos SB on põrandal seisev veeautomaat, mis imeb vett kuni 8 m sügavuselt — hea valik kastmiseks ja väiksema maja veevarustuseks.",
-      "Kui veetase on madalamal või soovid täiesti vaikset lahendust, on õige valik uputatav Grundfos SBA, mis langetatakse kaevu sisse ega vaja eraldi paigaldusruumi.",
+      "Grundfos SB on uputatav sukelpump, mis langetatakse kaevu või mahutisse — töötab täiesti vaikselt ja sobib kastmiseks ning väiksema maja veevarustuseks, kuid automaatseks tööks vajab välist juhtseadet.",
+      "Grundfos SBA on sama sukelpump koos sisseehitatud automaatika ja kuivakäigukaitsega — käivitub ja seiskub veevõtu järgi ning eraldi juhtseadet pole vaja lisada.",
     ],
     priceTitle: "Salvkaevupumba hind",
     priceIntro:
@@ -1267,7 +1267,7 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       head: ["Seeria", "Sobivus", "Hinnavahemik"],
       rows: [
         ["Grundfos JP", "klassikaline hüdrofoor — suvila ja aed, soodne", "235–553 €"],
-        ["Grundfos SB", "põrandal seisev veeautomaat — kastmine ja väiksem maja", "521–602 €"],
+        ["Grundfos SB", "uputatav sukelpump — vajab välist juhtseadet", "521–602 €"],
         ["Grundfos SBA", "uputatav pump kaevu sisse — täiesti vaikne", "575–716 €"],
       ],
     },
@@ -1275,23 +1275,23 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     faq: [
       {
         q: "Milline on parim pump salvkaevu jaoks?",
-        a: "Kui kaevu veetase on kuni 8 m sügavusel, on hea valik põrandal seisev Grundfos SB. Kui veetase on madalamal või soovid vaikset lahendust, vali uputatav SBA. Kõige soodsam variant on klassikaline JP hüdrofoor.",
+        a: "Kui kaevu veetase on kuni 8 m sügavusel ja soovid soodsat lahendust, on hea valik klassikaline JP hüdrofoor. Kui soovid täiesti vaikset lahendust või veetase on madalamal, vali uputatav Grundfos SB või automaatikaga SBA.",
       },
       {
         q: "Kui palju maksab salvkaevupump?",
-        a: "Klassikaline JP hüdrofoor maksab meie valikus 235–553 €, põrandal seisev SB veeautomaat 521–602 € ja uputatav SBA 575–716 €.",
+        a: "Klassikaline JP hüdrofoor maksab meie valikus 235–553 €, uputatav SB sukelpump 521–602 € ja automaatikaga SBA 575–716 €.",
       },
       {
         q: "Mis vahe on SB ja SBA seerial?",
-        a: "SB on põrandal seisev pump, mis paigaldatakse kuiva ruumi ja imeb vett kuni 8 m sügavuselt. SBA on uputatav — see langetatakse kaevu sisse, on täiesti vaikne ja sobib ka madalama veetasemega kaevudesse.",
+        a: "Mõlemad on uputatavad sukelpumbad, mis langetatakse kaevu või mahutisse ja töötavad täiesti vaikselt. Erinevus on juhtimises: SB vajab automaatseks tööks välist juhtseadet, SBA-l on automaatika ja kuivakäigukaitse juba sisseehitatud — see on mugavam valik.",
       },
       {
         q: "Kui sügavalt salvkaevupump vett imeb?",
-        a: "Põrandal seisev pump (JP, SB) suudab imeda vett kuni 8 m sügavuselt. Kui veetase on madalamal, tuleb valida uputatav pump (SBA) või puurkaevupump — aitame valikuga tasuta.",
+        a: "Põrandal seisev pump (JP) suudab imeda vett kuni 8 m sügavuselt. Uputatavad sukelpumbad (SB, SBA) langetatakse kaevu sisse ja toovad vett ka madalamalt. Väga sügava kaevu puhul on õige valik puurkaevupump — aitame valikuga tasuta.",
       },
       {
         q: "Kas salvkaevupump sobib ka maja veevarustuseks?",
-        a: "Jah — SB ja SBA toimivad täisväärtusliku veeautomaadina ja JP koos rõhumahutiga samuti. Kui maja veevarustus on põhikasutus, vaata ka meie veeautomaatide valikut (SCALA1, SCALA2).",
+        a: "Jah — SBA toimib täisväärtusliku veeautomaadina, SB koos välise juhtseadmega samuti ja JP koos rõhumahutiga. Kui maja veevarustus on põhikasutus, vaata ka meie veeautomaatide valikut (SCALA1, SCALA2).",
       },
       {
         q: "Kas salvkaevupumpa saab kasutada vihmavee pumpamiseks?",
@@ -1304,8 +1304,8 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     guideParagraphs: [
       "A well pump brings water from an open or shallow well to the house, garden or irrigation system. The right choice depends on the suction depth (a surface pump draws from up to 8 m), whether the house needs water too, and the desired noise level.",
       "Grundfos JP is the classic and affordable solution — a pump with a pressure tank and automatics (hydrofor) that fits summer houses and gardens well.",
-      "Grundfos SB is a surface-mounted water automatic that draws water from up to 8 m deep — a good choice for irrigation and supplying a smaller house.",
-      "If the water level is lower or you want a completely silent solution, the right choice is the submersible Grundfos SBA, which is lowered into the well and needs no separate installation space.",
+      "Grundfos SB is a submersible booster pump that is lowered into the well or tank — it works silently and suits irrigation and supplying a smaller house, but needs an external controller for automatic operation.",
+      "Grundfos SBA is the same submersible pump with a built-in controller and dry-running protection — it starts and stops with water draw and needs no separate control unit.",
     ],
     priceTitle: "Well pump prices",
     priceIntro:
@@ -1314,7 +1314,7 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       head: ["Series", "Best for", "Price range"],
       rows: [
         ["Grundfos JP", "classic hydrofor — summer house and garden, affordable", "235–553 €"],
-        ["Grundfos SB", "surface water automatic — irrigation and a smaller house", "521–602 €"],
+        ["Grundfos SB", "submersible booster pump — needs an external controller", "521–602 €"],
         ["Grundfos SBA", "submersible pump inside the well — completely silent", "575–716 €"],
       ],
     },
@@ -1322,23 +1322,23 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     faq: [
       {
         q: "Which pump is best for a well?",
-        a: "If the well's water level is up to 8 m deep, the surface-mounted Grundfos SB is a good choice. If the level is lower or you want a silent solution, choose the submersible SBA. The most affordable option is the classic JP hydrofor.",
+        a: "If the well's water level is up to 8 m deep and you want an affordable solution, the classic JP hydrofor is a good choice. If you want a completely silent solution or the level is lower, choose the submersible Grundfos SB or the automatic SBA.",
       },
       {
         q: "How much does a well pump cost?",
-        a: "The classic JP hydrofor costs 235–553 € in our range, the surface SB water automatic 521–602 € and the submersible SBA 575–716 €.",
+        a: "The classic JP hydrofor costs 235–553 € in our range, the submersible SB booster pump 521–602 € and the automatic SBA 575–716 €.",
       },
       {
         q: "What is the difference between SB and SBA?",
-        a: "SB is a surface pump installed in a dry room that draws water from up to 8 m deep. SBA is submersible — lowered into the well, completely silent and suitable for wells with a lower water level.",
+        a: "Both are submersible booster pumps that are lowered into the well or tank and work silently. The difference is in control: SB needs an external controller for automatic operation, while SBA has the controller and dry-running protection built in — the more convenient choice.",
       },
       {
         q: "From how deep does a well pump draw water?",
-        a: "A surface pump (JP, SB) can draw water from up to 8 m deep. If the water level is lower, you need a submersible pump (SBA) or a borehole pump — we help with the selection free of charge.",
+        a: "A surface pump (JP) can draw water from up to 8 m deep. Submersible pumps (SB, SBA) are lowered into the well and bring water from deeper as well. For a very deep well, a borehole pump is the right choice — we help with the selection free of charge.",
       },
       {
         q: "Does a well pump suit house water supply too?",
-        a: "Yes — SB and SBA work as a full water automatic, and JP with its pressure tank as well. If house supply is the main use, also see our water automatics selection (SCALA1, SCALA2).",
+        a: "Yes — SBA works as a full water automatic, SB with an external controller as well, and JP with its pressure tank. If house supply is the main use, also see our water automatics selection (SCALA1, SCALA2).",
       },
       {
         q: "Can a well pump be used for rain water?",
@@ -1351,8 +1351,8 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     guideParagraphs: [
       "Колодезный насос подаёт воду из открытого или неглубокого колодца в дом, сад или систему полива. Правильный выбор зависит от глубины всасывания (поверхностный насос качает с глубины до 8 м), от того, нужно ли снабжать и дом, и от желаемого уровня шума.",
       "Grundfos JP — классическое и доступное решение: насос с гидроаккумулятором и автоматикой (гидрофор), хорошо подходящий для дачи и сада.",
-      "Grundfos SB — поверхностный водяной автомат, качающий воду с глубины до 8 м — хороший выбор для полива и водоснабжения небольшого дома.",
-      "Если уровень воды ниже или нужно полностью бесшумное решение, правильный выбор — погружной Grundfos SBA, который опускается в колодец и не требует отдельного места для установки.",
+      "Grundfos SB — погружной насос, который опускается в колодец или ёмкость, — работает бесшумно и подходит для полива и водоснабжения небольшого дома, но для автоматической работы требует внешнего блока управления.",
+      "Grundfos SBA — тот же погружной насос со встроенной автоматикой и защитой от сухого хода — включается и выключается при разборе воды, отдельный блок управления не нужен.",
     ],
     priceTitle: "Цена колодезного насоса",
     priceIntro:
@@ -1361,7 +1361,7 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       head: ["Серия", "Применение", "Диапазон цен"],
       rows: [
         ["Grundfos JP", "классический гидрофор — дача и сад, доступный", "235–553 €"],
-        ["Grundfos SB", "поверхностный водяной автомат — полив и небольшой дом", "521–602 €"],
+        ["Grundfos SB", "погружной насос — нужен внешний блок управления", "521–602 €"],
         ["Grundfos SBA", "погружной насос в колодец — полностью бесшумный", "575–716 €"],
       ],
     },
@@ -1369,23 +1369,23 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     faq: [
       {
         q: "Какой насос лучший для колодца?",
-        a: "Если уровень воды в колодце до 8 м, хороший выбор — поверхностный Grundfos SB. Если уровень ниже или нужно бесшумное решение, выбирайте погружной SBA. Самый доступный вариант — классический гидрофор JP.",
+        a: "Если уровень воды в колодце до 8 м и нужно доступное решение, хороший выбор — классический гидрофор JP. Если нужно полностью бесшумное решение или уровень ниже, выбирайте погружной Grundfos SB или автоматический SBA.",
       },
       {
         q: "Сколько стоит колодезный насос?",
-        a: "Классический гидрофор JP в нашем ассортименте стоит 235–553 €, поверхностный автомат SB — 521–602 €, погружной SBA — 575–716 €.",
+        a: "Классический гидрофор JP в нашем ассортименте стоит 235–553 €, погружной насос SB — 521–602 €, автоматический SBA — 575–716 €.",
       },
       {
         q: "Чем отличаются SB и SBA?",
-        a: "SB — поверхностный насос, устанавливаемый в сухом помещении и качающий воду с глубины до 8 м. SBA — погружной: опускается в колодец, полностью бесшумен и подходит для колодцев с более низким уровнем воды.",
+        a: "Оба — погружные насосы, которые опускаются в колодец или ёмкость и работают бесшумно. Разница в управлении: SB для автоматической работы нужен внешний блок управления, а у SBA автоматика и защита от сухого хода уже встроены — более удобный выбор.",
       },
       {
         q: "С какой глубины всасывает колодезный насос?",
-        a: "Поверхностный насос (JP, SB) качает воду с глубины до 8 м. Если уровень ниже, нужен погружной насос (SBA) или скважинный насос — поможем с выбором бесплатно.",
+        a: "Поверхностный насос (JP) качает воду с глубины до 8 м. Погружные насосы (SB, SBA) опускаются в колодец и подают воду и с большей глубины. Для очень глубокого колодца нужен скважинный насос — поможем с выбором бесплатно.",
       },
       {
         q: "Подходит ли колодезный насос для водоснабжения дома?",
-        a: "Да — SB и SBA работают как полноценный водяной автомат, как и JP с гидроаккумулятором. Если водоснабжение дома — основная задача, посмотрите также наш выбор водяных автоматов (SCALA1, SCALA2).",
+        a: "Да — SBA работает как полноценный водяной автомат, SB с внешним блоком управления — тоже, как и JP с гидроаккумулятором. Если водоснабжение дома — основная задача, посмотрите также наш выбор водяных автоматов (SCALA1, SCALA2).",
       },
       {
         q: "Можно ли использовать колодезный насос для дождевой воды?",
@@ -1398,8 +1398,8 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     guideParagraphs: [
       "Akas sūknis piegādā ūdeni no atklātās vai seklas akas mājai, dārzam vai laistīšanas sistēmai. Pareizā izvēle ir atkarīga no iesūkšanas dziļuma (virszemes sūknis sūc līdz 8 m dziļumam), vai jāapgādā arī māja, un no vēlamā trokšņa līmeņa.",
       "Grundfos JP ir klasiskais un pieejamākais risinājums — sūknis ar spiedtvertni un automātiku (hidrofors), kas labi der vasarnīcai un dārzam.",
-      "Grundfos SB ir virszemes ūdens automāts, kas sūc ūdeni no līdz 8 m dziļuma — laba izvēle laistīšanai un mazākas mājas apgādei.",
-      "Ja ūdens līmenis ir zemāks vai vēlaties pilnīgi klusu risinājumu, pareizā izvēle ir iegremdējamais Grundfos SBA, ko nolaiž akā un kam nav vajadzīga atsevišķa uzstādīšanas vieta.",
+      "Grundfos SB ir iegremdējamais sūknis, ko nolaiž akā vai tvertnē — tas darbojas klusi un der laistīšanai un mazākas mājas apgādei, taču automātiskai darbībai nepieciešama ārēja vadības ierīce.",
+      "Grundfos SBA ir tas pats iegremdējamais sūknis ar iebūvētu automātiku un aizsardzību pret sauso gājienu — tas ieslēdzas un izslēdzas ūdens patēriņa brīdī, un atsevišķa vadības ierīce nav vajadzīga.",
     ],
     priceTitle: "Akas sūkņa cena",
     priceIntro:
@@ -1408,7 +1408,7 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       head: ["Sērija", "Pielietojums", "Cenu diapazons"],
       rows: [
         ["Grundfos JP", "klasiskais hidrofors — vasarnīca un dārzs, pieejams", "235–553 €"],
-        ["Grundfos SB", "virszemes ūdens automāts — laistīšana un mazāka māja", "521–602 €"],
+        ["Grundfos SB", "iegremdējamais sūknis — vajadzīga ārēja vadības ierīce", "521–602 €"],
         ["Grundfos SBA", "iegremdējamais sūknis akā — pilnīgi kluss", "575–716 €"],
       ],
     },
@@ -1416,23 +1416,23 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     faq: [
       {
         q: "Kurš sūknis ir labākais akai?",
-        a: "Ja akas ūdens līmenis ir līdz 8 m dziļumā, laba izvēle ir virszemes Grundfos SB. Ja līmenis ir zemāks vai vēlaties klusu risinājumu, izvēlieties iegremdējamo SBA. Pieejamākā izvēle ir klasiskais JP hidrofors.",
+        a: "Ja akas ūdens līmenis ir līdz 8 m dziļumā un vēlaties izdevīgu risinājumu, laba izvēle ir klasiskais JP hidrofors. Ja vēlaties pilnīgi klusu risinājumu vai līmenis ir zemāks, izvēlieties iegremdējamo Grundfos SB vai automātisko SBA.",
       },
       {
         q: "Cik maksā akas sūknis?",
-        a: "Klasiskais JP hidrofors mūsu klāstā maksā 235–553 €, virszemes SB ūdens automāts 521–602 € un iegremdējamais SBA 575–716 €.",
+        a: "Klasiskais JP hidrofors mūsu klāstā maksā 235–553 €, iegremdējamais SB sūknis 521–602 € un automātiskais SBA 575–716 €.",
       },
       {
         q: "Kāda ir atšķirība starp SB un SBA?",
-        a: "SB ir virszemes sūknis, ko uzstāda sausā telpā un kas sūc ūdeni no līdz 8 m dziļuma. SBA ir iegremdējamais — to nolaiž akā, tas ir pilnīgi kluss un der akām ar zemāku ūdens līmeni.",
+        a: "Abi ir iegremdējamie sūkņi, ko nolaiž akā vai tvertnē un kas darbojas klusi. Atšķirība ir vadībā: SB automātiskai darbībai nepieciešama ārēja vadības ierīce, bet SBA automātika un aizsardzība pret sauso gājienu jau ir iebūvēta — ērtākā izvēle.",
       },
       {
         q: "No cik liela dziļuma akas sūknis sūc ūdeni?",
-        a: "Virszemes sūknis (JP, SB) spēj sūkt ūdeni no līdz 8 m dziļuma. Ja ūdens līmenis ir zemāks, jāizvēlas iegremdējamais sūknis (SBA) vai urbuma sūknis — palīdzam izvēlēties bez maksas.",
+        a: "Virszemes sūknis (JP) spēj sūkt ūdeni no līdz 8 m dziļuma. Iegremdējamie sūkņi (SB, SBA) tiek nolaisti akā un piegādā ūdeni arī no lielāka dziļuma. Ļoti dziļai akai jāizvēlas urbuma sūknis — palīdzam izvēlēties bez maksas.",
       },
       {
         q: "Vai akas sūknis der arī mājas ūdens apgādei?",
-        a: "Jā — SB un SBA darbojas kā pilnvērtīgs ūdens automāts, tāpat JP ar spiedtvertni. Ja mājas apgāde ir galvenais uzdevums, skatiet arī mūsu ūdens automātu klāstu (SCALA1, SCALA2).",
+        a: "Jā — SBA darbojas kā pilnvērtīgs ūdens automāts, SB ar ārēju vadības ierīci tāpat, un JP ar spiedtvertni. Ja mājas apgāde ir galvenais uzdevums, skatiet arī mūsu ūdens automātu klāstu (SCALA1, SCALA2).",
       },
       {
         q: "Vai akas sūkni var izmantot lietus ūdenim?",
@@ -1445,8 +1445,8 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     guideParagraphs: [
       "Šulinio siurblys tiekia vandenį iš atviro ar negilaus šulinio namui, sodui ar laistymo sistemai. Tinkamas pasirinkimas priklauso nuo siurbimo gylio (paviršinis siurblys siurbia iki 8 m gylio), ar reikia aprūpinti ir namą, bei norimo triukšmo lygio.",
       "Grundfos JP yra klasikinis ir prieinamas sprendimas — siurblys su slėgine talpa ir automatika (hidroforas), gerai tinkantis sodybai ir sodui.",
-      "Grundfos SB yra paviršinis vandens automatas, siurbiantis vandenį iš iki 8 m gylio — geras pasirinkimas laistymui ir mažesnio namo vandens tiekimui.",
-      "Jei vandens lygis žemesnis arba norite visiškai tylaus sprendimo, tinkamas pasirinkimas yra panardinamas Grundfos SBA, kuris nuleidžiamas į šulinį ir nereikalauja atskiros montavimo vietos.",
+      "Grundfos SB yra panardinamas siurblys, kuris nuleidžiamas į šulinį arba talpą — veikia tyliai ir tinka laistymui bei mažesnio namo vandens tiekimui, tačiau automatiniam veikimui reikalingas išorinis valdymo blokas.",
+      "Grundfos SBA yra tas pats panardinamas siurblys su įmontuota automatika ir apsauga nuo sauso eigos — įsijungia ir išsijungia atidarius vandenį, atskiro valdymo bloko nereikia.",
     ],
     priceTitle: "Šulinio siurblio kaina",
     priceIntro:
@@ -1455,7 +1455,7 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       head: ["Serija", "Paskirtis", "Kainų diapazonas"],
       rows: [
         ["Grundfos JP", "klasikinis hidroforas — sodyba ir sodas, prieinamas", "235–553 €"],
-        ["Grundfos SB", "paviršinis vandens automatas — laistymas ir mažesnis namas", "521–602 €"],
+        ["Grundfos SB", "panardinamas siurblys — reikalingas išorinis valdymo blokas", "521–602 €"],
         ["Grundfos SBA", "panardinamas siurblys šulinyje — visiškai tylus", "575–716 €"],
       ],
     },
@@ -1463,23 +1463,23 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     faq: [
       {
         q: "Kuris siurblys geriausias šuliniui?",
-        a: "Jei šulinio vandens lygis iki 8 m gylyje, geras pasirinkimas yra paviršinis Grundfos SB. Jei lygis žemesnis arba norite tylaus sprendimo, rinkitės panardinamą SBA. Prieinamiausias variantas — klasikinis JP hidroforas.",
+        a: "Jei šulinio vandens lygis iki 8 m gylyje ir norite ekonomiško sprendimo, geras pasirinkimas yra klasikinis JP hidroforas. Jei norite visiškai tylaus sprendimo arba lygis žemesnis, rinkitės panardinamą Grundfos SB arba automatinį SBA.",
       },
       {
         q: "Kiek kainuoja šulinio siurblys?",
-        a: "Klasikinis JP hidroforas mūsų asortimente kainuoja 235–553 €, paviršinis SB vandens automatas 521–602 €, o panardinamas SBA — 575–716 €.",
+        a: "Klasikinis JP hidroforas mūsų asortimente kainuoja 235–553 €, panardinamas SB siurblys 521–602 €, o automatinis SBA — 575–716 €.",
       },
       {
         q: "Kuo skiriasi SB ir SBA?",
-        a: "SB yra paviršinis siurblys, montuojamas sausoje patalpoje ir siurbiantis vandenį iš iki 8 m gylio. SBA yra panardinamas — nuleidžiamas į šulinį, visiškai tylus ir tinka šuliniams su žemesniu vandens lygiu.",
+        a: "Abu yra panardinami siurbliai, kurie nuleidžiami į šulinį arba talpą ir veikia tyliai. Skirtumas — valdymas: SB automatiniam veikimui reikalingas išorinis valdymo blokas, o SBA automatika ir apsauga nuo sauso eigos jau įmontuota — patogesnis pasirinkimas.",
       },
       {
         q: "Iš kokio gylio siurbia šulinio siurblys?",
-        a: "Paviršinis siurblys (JP, SB) gali siurbti vandenį iš iki 8 m gylio. Jei vandens lygis žemesnis, reikia rinktis panardinamą siurblį (SBA) arba gręžinio siurblį — padėsime išsirinkti nemokamai.",
+        a: "Paviršinis siurblys (JP) gali siurbti vandenį iš iki 8 m gylio. Panardinami siurbliai (SB, SBA) nuleidžiami į šulinį ir tiekia vandenį iš didesnio gylio. Labai giliam šuliniui reikia gręžinio siurblio — padėsime išsirinkti nemokamai.",
       },
       {
         q: "Ar šulinio siurblys tinka ir namo vandens tiekimui?",
-        a: "Taip — SB ir SBA veikia kaip pilnavertis vandens automatas, kaip ir JP su slėgine talpa. Jei namo tiekimas yra pagrindinė užduotis, taip pat žiūrėkite mūsų vandens automatų asortimentą (SCALA1, SCALA2).",
+        a: "Taip — SBA veikia kaip pilnavertis vandens automatas, SB su išoriniu valdymo bloku taip pat, kaip ir JP su slėgine talpa. Jei namo tiekimas yra pagrindinė užduotis, taip pat žiūrėkite mūsų vandens automatų asortimentą (SCALA1, SCALA2).",
       },
       {
         q: "Ar šulinio siurblį galima naudoti lietaus vandeniui?",
@@ -1494,7 +1494,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
     guideTitle: "Kuidas valida rõhutõstepump?",
     guideParagraphs: [
       "Rõhutõstepump lahendab madala veerõhu probleemi — kui dušš on nõrk või boiler saab aeglaselt täis. Õige valik sõltub sellest, kas tõsta tuleb ühe tarbija (boiler, dušš) või kogu maja rõhku, vajalikust vooluhulgast ja müratasemest.",
-      "Grundfos UPA on väike ja kompaktne tõstepump, mis paigaldatakse torusse otse boileri või duši ette — kiire lahendus ühe tarbija rõhu parandamiseks.",
+      "Grundfos UPA on väike ja kompaktne tõstepump, mis paigaldatakse torude vahele otse boileri või duši ette — kiire lahendus ühe tarbija rõhu parandamiseks.",
       "Kogu maja veerõhu tõstmiseks on õige valik SCALA1 või SCALA2 kõik-ühes veeautomaat. SCALA2 hoiab rõhu täiesti püsivana ka mitme avatud kraani korral ja on praktiliselt vaikne.",
       "Suurematesse hoonetesse — kortermajad, ärihooned, suured vooluhulgad — on mitmepakkorjelised CMBE ja CMBE TWIN rõhutõstesüsteemid.",
     ],
@@ -1530,7 +1530,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Kas rõhutõstepump sobib ka korterisse?",
-        a: "Jah — kompaktne UPA paigaldatakse torusse boileri või duši ette ja SCALA1/SCALA2 leiavad koha köögi- või tehnoruumi kapis. Vaikne töö teeb need sobivaks ka korterisse.",
+        a: "Jah — kompaktne UPA paigaldatakse torude vahele boileri või duši ette ja SCALA1/SCALA2 leiavad koha köögi- või tehnoruumi kapis. Vaikne töö teeb need sobivaks ka korterisse.",
       },
       {
         q: "Kas rõhutõstepump käivitub automaatselt?",
@@ -1542,7 +1542,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
     guideTitle: "How to choose a pressure booster pump?",
     guideParagraphs: [
       "A pressure booster pump solves low water pressure — when the shower is weak or the tank fills slowly. The right choice depends on whether you need to boost one consumer (boiler, shower) or the whole house, the required flow and the noise level.",
-      "Grundfos UPA is a small, compact booster installed in the pipe right before a boiler or shower — a quick fix to improve the pressure of a single consumer.",
+      "Grundfos UPA is a small, compact booster installed between the pipes right before a boiler or shower — a quick fix to improve the pressure of a single consumer.",
       "To boost the whole house's water pressure, the right choice is the SCALA1 or SCALA2 all-in-one water automatic. SCALA2 keeps the pressure perfectly constant even with several taps open and is practically silent.",
       "For larger buildings — apartment blocks, commercial buildings, large flows — there are the multi-stage CMBE and CMBE TWIN booster systems.",
     ],
@@ -1578,7 +1578,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Does a booster pump suit an apartment?",
-        a: "Yes — the compact UPA is installed in the pipe before a boiler or shower, and SCALA1/SCALA2 fit into a kitchen or utility cupboard. Quiet operation makes them suitable for apartments too.",
+        a: "Yes — the compact UPA is installed between the pipes before a boiler or shower, and SCALA1/SCALA2 fit into a kitchen or utility cupboard. Quiet operation makes them suitable for apartments too.",
       },
       {
         q: "Does the pump start automatically?",
@@ -1590,7 +1590,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
     guideTitle: "Как выбрать насос повышения давления?",
     guideParagraphs: [
       "Насос повышения давления решает проблему низкого напора воды — когда душ слабый или бак наполняется медленно. Правильный выбор зависит от того, нужно ли поднять давление одному потребителю (бойлер, душ) или всему дому, от требуемого расхода и уровня шума.",
-      "Grundfos UPA — небольшой компактный насос, устанавливаемый в трубу прямо перед бойлером или душем — быстрое решение для улучшения напора одного потребителя.",
+      "Grundfos UPA — небольшой компактный насос, устанавливаемый в разрыв трубы прямо перед бойлером или душем — быстрое решение для улучшения напора одного потребителя.",
       "Для повышения давления во всём доме правильный выбор — водяной автомат «всё в одном» SCALA1 или SCALA2. SCALA2 держит давление абсолютно постоянным даже при нескольких открытых кранах и практически бесшумна.",
       "Для больших зданий — многоквартирных домов, коммерческих объектов, больших расходов — предназначены многоступенчатые системы CMBE и CMBE TWIN.",
     ],
@@ -1626,7 +1626,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Подходит ли насос повышения давления для квартиры?",
-        a: "Да — компактная UPA устанавливается в трубу перед бойлером или душем, а SCALA1/SCALA2 помещаются в кухонный или технический шкаф. Тихая работа делает их подходящими и для квартиры.",
+        a: "Да — компактная UPA устанавливается в разрыв трубы перед бойлером или душем, а SCALA1/SCALA2 помещаются в кухонный или технический шкаф. Тихая работа делает их подходящими и для квартиры.",
       },
       {
         q: "Включается ли насос автоматически?",
@@ -1638,7 +1638,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
     guideTitle: "Kā izvēlēties spiediena palielināšanas sūkni?",
     guideParagraphs: [
       "Spiediena palielināšanas sūknis risina zema ūdens spiediena problēmu — kad duša ir vāja vai tvertne piepildās lēni. Pareizā izvēle ir atkarīga no tā, vai jāpalielina spiediens vienam patērētājam (boilerim, dušai) vai visai mājai, vajadzīgās plūsmas un trokšņa līmeņa.",
-      "Grundfos UPA ir mazs, kompakts sūknis, ko uzstāda caurulē tieši pirms boilera vai dušas — ātrs risinājums viena patērētāja spiediena uzlabošanai.",
+      "Grundfos UPA ir mazs, kompakts sūknis, ko uzstāda starp caurulēm tieši pirms boilera vai dušas — ātrs risinājums viena patērētāja spiediena uzlabošanai.",
       "Lai palielinātu spiedienu visā mājā, pareizā izvēle ir „viss vienā” ūdens automāts SCALA1 vai SCALA2. SCALA2 uztur spiedienu pilnīgi nemainīgu arī ar vairākiem atvērtiem krāniem un ir praktiski klusa.",
       "Lielākām ēkām — dzīvojamām mājām, komercēkām, lielām plūsmām — paredzētas daudzpakāpju CMBE un CMBE TWIN sistēmas.",
     ],
@@ -1674,7 +1674,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Vai spiediena palielināšanas sūknis der dzīvoklim?",
-        a: "Jā — kompakto UPA uzstāda caurulē pirms boilera vai dušas, un SCALA1/SCALA2 atradīs vietu virtuves vai tehniskajā skapī. Klusā darbība padara tās piemērotas arī dzīvoklim.",
+        a: "Jā — kompakto UPA uzstāda starp caurulēm pirms boilera vai dušas, un SCALA1/SCALA2 atradīs vietu virtuves vai tehniskajā skapī. Klusā darbība padara tās piemērotas arī dzīvoklim.",
       },
       {
         q: "Vai sūknis ieslēdzas automātiski?",
@@ -1686,7 +1686,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
     guideTitle: "Kaip išsirinkti slėgio didinimo siurblį?",
     guideParagraphs: [
       "Slėgio didinimo siurblys sprendžia žemo vandens slėgio problemą — kai dušas silpnas arba bakas prisipildo lėtai. Tinkamas pasirinkimas priklauso nuo to, ar slėgį reikia kelti vienam vartotojui (boileriui, dušui), ar visam namui, reikiamo srauto ir triukšmo lygio.",
-      "Grundfos UPA yra mažas kompaktiškas siurblys, montuojamas vamzdyje tiesiai prieš boilerį ar dušą — greitas sprendimas vieno vartotojo slėgiui pagerinti.",
+      "Grundfos UPA yra mažas kompaktiškas siurblys, montuojamas tarp vamzdžių tiesiai prieš boilerį ar dušą — greitas sprendimas vieno vartotojo slėgiui pagerinti.",
       "Viso namo vandens slėgiui kelti tinkamas pasirinkimas yra „viskas viename“ vandens automatas SCALA1 arba SCALA2. SCALA2 palaiko visiškai pastovų slėgį net atidarius kelis čiaupus vienu metu ir yra praktiškai tylus.",
       "Didesniems pastatams — daugiabučiams, komerciniams objektams, dideliems srautams — skirtos daugiapakopės CMBE ir CMBE TWIN sistemos.",
     ],
@@ -1722,7 +1722,7 @@ const ROHUTOSTEPUMBAD: Record<Locale, CategoryContentSection> = {
       },
       {
         q: "Ar slėgio didinimo siurblys tinka butui?",
-        a: "Taip — kompaktiškas UPA montuojamas vamzdyje prieš boilerį ar dušą, o SCALA1/SCALA2 tilps į virtuvės ar techninę spintą. Tylus veikimas daro juos tinkamus ir butui.",
+        a: "Taip — kompaktiškas UPA montuojamas tarp vamzdžių prieš boilerį ar dušą, o SCALA1/SCALA2 tilps į virtuvės ar techninę spintą. Tylus veikimas daro juos tinkamus ir butui.",
       },
       {
         q: "Ar siurblys įsijungia automatiškai?",
