@@ -13,6 +13,14 @@ const legacyCategoryPaths = [
   ['reovesi', 'reoveepumbad'],
 ] as const
 
+// Eemaldatud (draft) toodete sluugid → asjakohane kategooria.
+// Nt vanad Meta-reklaamide lingid (SQE kit'id) ei tohi 404 anda.
+const retiredProductPaths = [
+  ['sqe-3-65-kit-20m-old', 'puurkaevupumbad'],
+  ['sqe-3-65-kit-40m-old', 'puurkaevupumbad'],
+  ['sqe-2-55-kit', 'puurkaevupumbad'],
+] as const
+
 const nextConfig: NextConfig = {
   // ─── REDIRECTS ───────────────────────────────────────────────────────────────
   async redirects() {
@@ -26,6 +34,18 @@ const nextConfig: NextConfig = {
         {
           source: `/:locale/tooted/${oldSlug}`,
           destination: `/:locale/tooted/${newSlug}`,
+          permanent: true,
+        },
+      ])),
+      ...retiredProductPaths.flatMap(([oldSlug, category]) => ([
+        {
+          source: `/toode/${oldSlug}`,
+          destination: `/tooted/${category}`,
+          permanent: true,
+        },
+        {
+          source: `/:locale/toode/${oldSlug}`,
+          destination: `/:locale/tooted/${category}`,
           permanent: true,
         },
       ])),

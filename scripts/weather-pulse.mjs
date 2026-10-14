@@ -102,10 +102,16 @@ async function main() {
   }
   console.log(`\nOtsus: ${maxRain48.toFixed(1)} mm / 48h (${driver}), tõenäosus ${maxProb}% → tase "${tier.label}" → ${tier.budget.toFixed(2)} €/päev`)
 
-  const rows = await gaql(`SELECT campaign.campaign_budget, campaign_budget.amount_micros FROM campaign WHERE campaign.id = ${CAMPAIGN_ID}`)
+  const rows = await gaql(`SELECT campaign.campaign_budget, campaign.status, campaign_budget.amount_micros FROM campaign WHERE campaign.id = ${CAMPAIGN_ID}`)
   const budgetRn = rows[0]?.campaignBudget?.resourceName || rows[0]?.campaign?.campaignBudget
   const currentEur = Number(rows[0]?.campaignBudget?.amountMicros || 0) / 1_000_000
-  console.log(`Praegune eelarve: ${currentEur.toFixed(2)} €/päev (${budgetRn})`)
+  const campaignStatus = rows[0]?.campaign?.status
+  console.log(`Praegune eelarve: ${currentEur.toFixed(2)} €/päev (${budgetRn}), staatus: ${campaignStatus}`)
+
+  if (campaignStatus !== 'ENABLED') {
+    console.log(`Kampaania on ${campaignStatus} — eelarvet ei muudeta.`)
+    return
+  }
 
   if (Math.abs(currentEur - tier.budget) < 0.01) {
     console.log('Eelarve juba õige — muudatust pole vaja.')

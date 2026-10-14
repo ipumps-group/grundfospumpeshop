@@ -7,6 +7,21 @@
 
 ---
 
+## Uuendus 14.10.2026 — UNILIFT REKLAAMID LÕPETATUD (Google + Meta)
+
+Kõik Unilifti reklaamid pausitud kliendi otsusel — kulutamine peatunud, kampaaniad säilivad (taasaktiveerimine võimalik):
+
+| Platvorm | Kampaania | Seis 14.10.2026 |
+|---|---|---|
+| Google Ads | `Unilift CC + Drenaaž - EE 2026 sügis` (id 24203046624, oli 5 €/päev) | **PAUSED** |
+| Meta | `Unilift CC - Tühjendus ja drenaaž B2B - EE sügis 2026` (id 120253843650360120, oli 10 €/päev) | **PAUSED** (ad set'ide effective_status = CAMPAIGN_PAUSED) |
+
+- Skript: `scripts/pause-unilift-campaigns.mjs` (idempotentne, `--dry-run` toega).
+- Weather-pulse ei puuduta enam pausitud kampaania eelarvet — staatusekontroll lisatud `app/api/cron/weather-pulse/route.ts` ja `scripts/weather-pulse.mjs` (route'i muudatus jõustub Vercel deploy'ga).
+- Töös jäävad: `Pumbapood + Grundfos Brand Search`, `ALPHA GO - Küte - EE 2026 sügis` (Google + Meta), `Pumbapood remarketing - EE 2026`.
+
+---
+
 ## 0. Uuendus 9.09.2026 — UNILIFT ilmapulss välja lülitatud, maandumisleht `/unilift`
 
 ### Uuendus 26.09.2026 — Ad Strength parandused: 15 pealkirja igale RSA-le + 8 sitelinki

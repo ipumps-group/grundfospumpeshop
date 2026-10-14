@@ -94,11 +94,17 @@ export async function GET(req: NextRequest) {
 
     const customerId = (process.env.GOOGLE_ADS_CUSTOMER_ID || '2639481819').replace(/-/g, '')
     const token = await googleAccessToken()
-    const rows = await gaql(token, customerId, `SELECT campaign.campaign_budget, campaign_budget.amount_micros FROM campaign WHERE campaign.id = ${CAMPAIGN_ID}`)
+    const rows = await gaql(token, customerId, `SELECT campaign.campaign_budget, campaign.status, campaign_budget.amount_micros FROM campaign WHERE campaign.id = ${CAMPAIGN_ID}`)
     const budgetRn = rows[0]?.campaignBudget?.resourceName || rows[0]?.campaign?.campaignBudget
     const currentEur = Number(rows[0]?.campaignBudget?.amountMicros || 0) / 1_000_000
+    const campaignStatus = rows[0]?.campaign?.status
 
     if (!budgetRn) throw new Error('Campaign budget not found')
+
+    // Campaign paused/removed (e.g. ads stopped) — don't touch its budget anymore
+    if (campaignStatus !== 'ENABLED') {
+      return NextResponse.json({ skipped: true, reason: `Campaign ${CAMPAIGN_ID} is ${campaignStatus}, not ENABLED`, today })
+    }
 
     if (Math.abs(currentEur - tier.budget) < 0.01) {
       return NextResponse.json({ changed: false, today, budget: currentEur, tier: tier.label, rain48h: maxRain48, driver, forecasts })

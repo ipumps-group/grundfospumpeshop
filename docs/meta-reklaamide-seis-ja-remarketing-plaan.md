@@ -25,6 +25,14 @@ Tehnilised märkused (API v25): `customaudiences` loomisel `subtype`-parameeter 
 
 ---
 
+## Uuendus 14.10.2026 — Unilift CC kampaania PAUSITUD + RMK Unilifti reklaamid eemaldatud
+
+Kampaania `Unilift CC - Tühjendus ja drenaaž B2B - EE sügis 2026` (id 120253843650360120) pausitud kliendi otsusel (koos Google Adsi Unilift-kampaaniaga). Kulutamine peatunud; ad set'ide effective_status = CAMPAIGN_PAUSED. Skript: `scripts/pause-unilift-campaigns.mjs`. Töös jäävad: ALPHA GO traffic ja remarketing-kampaania.
+
+Samal päeval pausitud ka remarketing-kampaania mõlemad `RMK reklaam - Unilift CC` reklaamid (mõlemas ad set'is) — remarketing jookseb kuni 31.10.2026 edasi ainult ALPHA GO reklaamidega. Skript: `scripts/pause-rmk-unilift-ads.mjs`. Märkus: 2.10 dokumendis on RMK kreatiivid kirjas kui "Unilift KP Avariipump", live-kontroll 14.10 näitas, et tegelikult kasutusel "RMK 2.0 - Unilift CC" kreatiivid.
+
+---
+
 ## 1. Praegune Meta seis (faktid, 24.–30.09.2026)
 
 | Kampaania | Eesmärk (objective) | Optimeerimine | Kulu/nädal | Klikid | LP-vaated | Tootevaated | Ostukorvid | Ostud |
