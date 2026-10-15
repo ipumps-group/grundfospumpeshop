@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Send, CheckCircle } from 'lucide-react'
 import { trackContactFormSubmit } from '@/lib/google-ads'
 import { trackMetaLead } from '@/lib/meta-pixel'
@@ -26,16 +25,29 @@ export default function ContactForm({ pageId }: { pageId?: string }) {
     setError('')
     setSending(true)
 
-    const { error: err } = await supabase.from('contact_submissions').insert({
-      page_id: pageId ?? null,
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim() || null,
-      address: address.trim() || null,
-      message: message.trim(),
-    })
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pageId: pageId ?? null,
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim() || null,
+          address: address.trim() || null,
+          message: message.trim(),
+        }),
+      })
 
-    if (err) {
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        console.error('[contact-form] submit failed:', res.status, data)
+        setError(t('error'))
+        setSending(false)
+        return
+      }
+    } catch (err) {
+      console.error('[contact-form] submit failed:', err)
       setError(t('error'))
       setSending(false)
       return
