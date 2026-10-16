@@ -39,6 +39,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Põrandal seisev veeautomaat (SCALA1, SCALA2, JP) paigaldatakse kuiva ruumi ja imeb vett kaevust kuni 8 m sügavuselt. Kui kaevupind on madalamal või soovid pumpa kaevu sisse, on õige valik uputatav veeautomaat SBA, mis töötab vaikselt ja ei vaja kuiva paigaldusruumi.",
       "Eramule 3–6 kraanikohaga on parim valik SCALA2, mis hoiab rõhu täiesti püsivana ka mitme tarbija korral. Soodsam alternatiiv on SCALA1 või klassikaline JP hüdrofoor, suvilasse ja aeda piisab enamasti JP-st.",
       "Kontorisse ja ärihoonesse vali vaikne veeautomaat, mis peab vastu üheaegsele kasutusele — 5–20 töötajaga kontorisse sobib hästi Grundfos SCALA2 nii köögi, tualettruumi kui ka muudeks veevõttudeks; väiksemasse kontorisse piisab SCALA1-st.",
+      "Kui tahad veeautomaate teiste Grundfos lahendustega võrrelda, vaata avalehe Grundfos veeautomaadid valikujuhendit, kus on hinnavahemikud ja nõuanded kõikidele seeriatele.",
     ],
     priceTitle: "Veeautomaadi hind",
     priceIntro:
@@ -88,6 +89,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "A floor-standing booster (SCALA1, SCALA2, JP) is installed in a dry room and draws water from wells up to 8 m deep. If the water level is deeper or you want the pump inside the well, the submersible SBA booster is the right choice — silent and needing no dry installation space.",
       "For a detached house with 3–6 taps, SCALA2 is the best choice, keeping the pressure perfectly constant even with several simultaneous users. A more affordable alternative is SCALA1 or the classic JP hydrophore; for a summer cottage or garden, JP is usually enough.",
       "For an office or commercial building choose a quiet booster that handles simultaneous use — Grundfos SCALA2 suits a 5–20 person office for the kitchen, restrooms and other taps; a smaller office is fine with SCALA1.",
+      "To compare water boosters with other Grundfos solutions, see the Grundfos water boosters selection guide on our homepage, with price ranges and advice for every series.",
     ],
     priceTitle: "Water booster prices",
     priceIntro:
@@ -137,6 +139,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Напольная станция (SCALA1, SCALA2, JP) устанавливается в сухом помещении и забирает воду из скважины глубиной до 8 м. Если зеркало воды глубже или насос нужен внутри скважины, правильный выбор — погружная станция SBA: бесшумная и не требующая сухого помещения.",
       "Для частного дома с 3–6 точками разбора лучший выбор — SCALA2: давление остаётся полностью постоянным даже при нескольких одновременно открытых кранах. Более доступная альтернатива — SCALA1 или классический гидрофор JP; для дачи и сада обычно достаточно JP.",
       "Для офиса и коммерческого здания выберите бесшумную станцию, выдерживающую одновременное потребление — Grundfos SCALA2 подходит для офиса на 5–20 сотрудников (кухня, санузлы и другие точки); в небольшой офис достаточно SCALA1.",
+      "Если хотите сравнить водяные автоматы с другими решениями Grundfos, смотрите на главной странице гид «водяные автоматы Grundfos» с ценовыми диапазонами и советами по всем сериям.",
     ],
     priceTitle: "Цена насосной станции",
     priceIntro:
@@ -186,6 +189,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Uz grīdas novietojams automāts (SCALA1, SCALA2, JP) tiek uzstādīts sausā telpā un sūc ūdeni no akas līdz 8 m dziļumam. Ja ūdens līmenis ir dziļāks vai sūknis jānovieto akā, pareizā izvēle ir iegremdējamais SBA automāts — kluss un bez sausas uzstādīšanas vietas.",
       "Privātmājai ar 3–6 krāniem labākā izvēle ir SCALA2, kas uztur spiedienu pilnīgi nemainīgu pat vairākiem vienlaicīgiem lietotājiem. Lētāka alternatīva ir SCALA1 vai klasiskais JP hidrofors; vasarnīcai vai dārzam parasti pietiek ar JP.",
       "Birojam un komerciālai ēkai izvēlieties klusu ūdens automātu, kas iztur vienlaicīgu ūdens ņemšanu — Grundfos SCALA2 ir piemērots 5–20 darbinieku birojam (virtuvei, tualetēm un citiem punktiem); mazākam birojam pietiek ar SCALA1.",
+      "Ja vēlaties salīdzināt ūdens automātus ar citiem Grundfos risinājumiem, skatiet sākumlapas Grundfos ūdens automāti izvēles ceļvedi ar cenu diapazoniem un padomiem visām sērijām.",
     ],
     priceTitle: "Ūdens automāta cena",
     priceIntro:
@@ -235,6 +239,7 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       "Ant grindų statomas automatas (SCALA1, SCALA2, JP) montuojamas sausoje patalpoje ir siurbia vandenį iš iki 8 m gylio šulinio. Jei vandens lygis gilesnis arba siurblio reikia pačiame šulinyje, tinkamas pasirinkimas – panardinamas automatas SBA: tylus ir jam nereikia sausos patalpos.",
       "Individualiam namui su 3–6 čiaupais geriausias pasirinkimas – SCALA2: slėgis išlieka visiškai pastovus net esant keliems vienu metu atidarytiems čiaupams. Pigesnė alternatyva – SCALA1 arba klasikinis JP hidroforas; vasarnamiui ar sodui dažniausiai pakanka JP.",
       "Biurui ir komerciniam pastui rinkitės tylų vandens automatą, atlaikantį vienalaikį naudojimą – Grundfos SCALA2 tinka 5–20 darbuotojų biurui (virtuvei, tualetams ir kitiems taškams); mažesniam biurui pakanka SCALA1.",
+      "Jei norite palyginti vandens automatus su kitais Grundfos sprendimais, žr. pagrindinio puslapio Grundfos vandens automatai pasirinkimo gidą su kainų diapazonais ir patarimais visoms serijoms.",
     ],
     priceTitle: "Vandens automato kaina",
     priceIntro:
@@ -287,6 +292,7 @@ const KUTTEPUMBAD: Record<Locale, CategoryContentSection> = {
       "Kui majas on vana kolme käiguga UPS pump, on otseste asendustena kaks valikut: soodne ALPHA1 L (lihtne käiguvahetus) või intelligentsed ALPHA1 GO ja ALPHA2 GO, mille AUTOADAPT-režiim seab pumba tööpunkti ise ja Grundfos GO äpp juhendab paigalduse samm-sammult.",
       "Radiaatorküttega eramusse piisab enamasti ALPHA1 GO-st; põrandaküttele ja suurematesse süsteemidesse sobib ALPHA2 GO. Kortermajade, ärihoonete ja tööstuse suuremate vooluhulkade ja tõstete jaoks on MAGNA1 ja MAGNA3 seeriad.",
       "Uus elektrooniline pump tarbib vana 60–90 W asemel tüüpiliselt 5–45 W — elektrisääst on kuni 80 % ja pump maksab end enamasti 1–3 aastaga tagasi.",
+      "Kui tahad küttepumpasid teiste Grundfos lahendustega võrrelda, vaata avalehe Grundfos küttepumbad valikujuhendit, kus on hinnavahemikud ja nõuanded kõikidele seeriatele.",
     ],
     priceTitle: "Küttepumba hind",
     priceIntro:
@@ -337,6 +343,7 @@ const KUTTEPUMBAD: Record<Locale, CategoryContentSection> = {
       "If the house has an old three-speed UPS, there are two direct replacements: the affordable ALPHA1 L (simple speed selection) or the intelligent ALPHA1 GO and ALPHA2 GO, whose AUTOADAPT mode sets the duty point automatically while the Grundfos GO app guides installation step by step.",
       "For a radiator-heated house, ALPHA1 GO is usually enough; ALPHA2 GO suits underfloor heating and larger systems. For apartment blocks, commercial buildings and industry with larger flows and heads, there are the MAGNA1 and MAGNA3 ranges.",
       "A new electronic pump typically uses 5–45 W instead of the old 60–90 W — electricity savings of up to 80%, so the pump usually pays for itself within 1–3 years.",
+      "To compare heating pumps with other Grundfos solutions, see the Grundfos heating pumps selection guide on our homepage, with price ranges and advice for every series.",
     ],
     priceTitle: "Heating pump prices",
     priceIntro:
@@ -387,6 +394,7 @@ const KUTTEPUMBAD: Record<Locale, CategoryContentSection> = {
       "Если в доме стоит старый трёхскоростной UPS, есть две прямые замены: доступная ALPHA1 L (простой выбор ступени) или интеллектуальные ALPHA1 GO и ALPHA2 GO с режимом AUTOADAPT, который сам настраивает рабочую точку, а приложение Grundfos GO ведёт установку шаг за шагом.",
       "Для дома с радиаторным отоплением обычно достаточно ALPHA1 GO; для тёплого пола и больших систем подходит ALPHA2 GO. Для многоквартирных и коммерческих зданий с большими расходами и напорами — серии MAGNA1 и MAGNA3.",
       "Новый электронный насос потребляет обычно 5–45 Вт вместо старых 60–90 Вт — экономия электричества до 80 %, поэтому насос обычно окупается за 1–3 года.",
+      "Если хотите сравнить насосы отопления с другими решениями Grundfos, смотрите на главной странице гид «насосы Grundfos для отопления» с ценовыми диапазонами и советами по всем сериям.",
     ],
     priceTitle: "Цена насоса отопления",
     priceIntro:
@@ -437,6 +445,7 @@ const KUTTEPUMBAD: Record<Locale, CategoryContentSection> = {
       "Ja mājā ir vecs trīs ātrumu UPS sūknis, ir divas tiešas aizstāšanas iespējas: pieejamais ALPHA1 L (vienkārša ātruma izvēle) vai viedie ALPHA1 GO un ALPHA2 GO, kuru AUTOADAPT režīms pats iestata darba punktu, bet Grundfos GO lietotne vada uzstādīšanu soli pa solim.",
       "Mājai ar radiatoru apkuri parasti pietiek ar ALPHA1 GO; grīdas apkurei un lielākām sistēmām der ALPHA2 GO. Dzīvojamām un komercēkām ar lielākām plūsmām un pacēlumiem paredzētas MAGNA1 un MAGNA3 sērijas.",
       "Jaunais elektroniskais sūknis patērē parasti 5–45 W vecā 60–90 W vietā — elektroenerģijas ietaupījums līdz 80 %, tāpēc sūknis parasti atmaksājas 1–3 gados.",
+      "Ja vēlaties salīdzināt apkures sūkņus ar citiem Grundfos risinājumiem, skatiet sākumlapas Grundfos apkures sūkņi izvēles ceļvedi ar cenu diapazoniem un padomiem visām sērijām.",
     ],
     priceTitle: "Apkures sūkņa cena",
     priceIntro:
@@ -487,6 +496,7 @@ const KUTTEPUMBAD: Record<Locale, CategoryContentSection> = {
       "Jei name yra senas trigreitis UPS, yra du tiesioginiai pakaitalai: prieinamas ALPHA1 L (paprastas pakopos pasirinkimas) arba išmanieji ALPHA1 GO ir ALPHA2 GO, kurių AUTOADAPT režimas pats nustato darbo tašką, o Grundfos GO programėlė veda montavimą žingsnis po žingsnio.",
       "Namui su radiatorių šildymu paprastai užtenka ALPHA1 GO; grindiniam šildymui ir didesnėms sistemoms tinka ALPHA2 GO. Daugiabučiams ir komerciniams pastatams su didesniais srautais ir slėgiais skirtos MAGNA1 ir MAGNA3 serijos.",
       "Naujas elektroninis siurblys paprastai naudoja 5–45 W vietoj senųjų 60–90 W — elektros santaupos siekia iki 80 %, todėl siurblys dažniausiai atsiperka per 1–3 metus.",
+      "Jei norite palyginti šildymo siurblius su kitais Grundfos sprendimais, žr. pagrindinio puslapio Grundfos šildymo siurbliai pasirinkimo gidą su kainų diapazonais ir patarimais visoms serijoms.",
     ],
     priceTitle: "Šildymo siurblio kaina",
     priceIntro:
@@ -778,6 +788,7 @@ const PUURKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       "Grundfos SQ on kõik-ühes lahendus eramu kaevule — pumbal on sisseehitatud kuivakäimise kaitse ja pehme käivitus, seega eraldi juhtkasti pole vaja.",
       "Grundfos SQE on SQ muutuva pööretega versioon: koos CU301 juhtkarbiga hoiab see veerõhu püsivana ka siis, kui tarbimine kõigub (üks kraan või mitu korraga).",
       "Suuremate vooluhulkade ja tõstete jaoks — talud, suured aiad, kastmine ja tööstus — on Grundfos SP seeria, mida on saadaval paljudes võimsustes.",
+      "Kui tahad kaevupumpasid teiste Grundfos lahendustega võrrelda, vaata avalehe Grundfos puurkaevupumbad valikujuhendit, kus on hinnavahemikud ja nõuanded kõikidele seeriatele.",
     ],
     priceTitle: "Puurkaevupumba hind",
     priceIntro:
@@ -826,6 +837,7 @@ const PUURKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       "Grundfos SQ is an all-in-one solution for a house well — the pump has built-in dry-running protection and soft start, so no separate control box is needed.",
       "Grundfos SQE is the variable-speed version of the SQ: together with the CU301 control unit it keeps water pressure constant even when consumption varies (one tap or several at once).",
       "For larger flows and heads — farms, big gardens, irrigation and industry — there is the Grundfos SP range, available in many capacities.",
+      "To compare borehole pumps with other Grundfos solutions, see the Grundfos borehole pumps selection guide on our homepage, with price ranges and advice for every series.",
     ],
     priceTitle: "Borehole pump prices",
     priceIntro:
@@ -874,6 +886,7 @@ const PUURKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       "Grundfos SQ — решение «всё в одном» для дома: у насоса встроены защита от сухого хода и плавный пуск, поэтому отдельный блок управления не нужен.",
       "Grundfos SQE — версия SQ с переменной частотой вращения: вместе с блоком CU301 он держит давление постоянным даже при изменяющемся расходе (один кран или несколько одновременно).",
       "Для больших расходов и напоров — фермы, большие сады, полив и промышленность — предназначена серия Grundfos SP, доступная во многих мощностях.",
+      "Если хотите сравнить скважинные насосы с другими решениями Grundfos, смотрите на главной странице гид «скважинные насосы Grundfos» с ценовыми диапазонами и советами по всем сериям.",
     ],
     priceTitle: "Цена скважинного насоса",
     priceIntro:
@@ -922,6 +935,7 @@ const PUURKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       "Grundfos SQ ir „viss vienā” risinājums mājas urbumam — sūknim ir iebūvēta aizsardzība pret sauso gājienu un maigā palaišana, tāpēc atsevišķa vadības kaste nav vajadzīga.",
       "Grundfos SQE ir SQ versija ar mainīgu apgriezienu skaitu: kopā ar CU301 vadības ierīci tā uztur nemainīgu spiedienu arī tad, kad patēriņš svārstās (viens krāns vai vairāki vienlaikus).",
       "Lielākām plūsmām un pacēlumiem — saimniecībām, lieliem dārziem, apūdeņošanai un rūpniecībai — paredzēta Grundfos SP sērija, kas pieejama daudzās jaudās.",
+      "Ja vēlaties salīdzināt urbumu sūkņus ar citiem Grundfos risinājumiem, skatiet sākumlapas Grundfos urbumu sūkņi izvēles ceļvedi ar cenu diapazoniem un padomiem visām sērijām.",
     ],
     priceTitle: "Urbuma sūkņa cena",
     priceIntro:
@@ -970,6 +984,7 @@ const PUURKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
       "Grundfos SQ yra sprendimas „viskas viename“ namo gręžiniui — siurblys turi integruotą apsaugą nuo sausojo eigos ir švelnų paleidimą, todėl atskiros valdymo dėžutės nereikia.",
       "Grundfos SQE yra SQ versija su kintamaisiais sūkiais: kartu su CU301 valdymo bloku jis palaiko pastovų slėgį net kintant vandens sunaudojimui (vienas čiaupas ar keli vienu metu).",
       "Didesniems srautams ir slėgiams — ūkiams, dideliems sodams, laistymui ir pramonei — skirta Grundfos SP serija, kurioje yra daug galingumo variantų.",
+      "Jei norite palyginti gręžinių siurblius su kitais Grundfos sprendimais, žr. pagrindinio puslapio Grundfos gręžinių siurbliai pasirinkimo gidą su kainų diapazonais ir patarimais visoms serijoms.",
     ],
     priceTitle: "Gręžinio siurblio kaina",
     priceIntro:
@@ -2016,6 +2031,12 @@ export function getCategoryContent(slug: string, locale: string): CategoryConten
  */
 const PRODUCT_LINKS: Record<string, Record<string, string>> = {
   veeautomaadid: {
+    /* Siselingid avalehe Grundfos-juhendile (SEO, 16.10) — 5 keeles */
+    'Grundfos veeautomaadid': '/',
+    'Grundfos water boosters': '/',
+    'водяные автоматы Grundfos': '/',
+    'Grundfos ūdens automāti': '/',
+    'Grundfos vandens automatai': '/',
     SCALA2: '/tooted/veeautomaadid/grundfos-scala2',
     SCALA1: '/tooted/veeautomaadid/grundfos-scala1',
     SBA: '/tooted/veeautomaadid/grundfos-sba',
@@ -2024,6 +2045,12 @@ const PRODUCT_LINKS: Record<string, Record<string, string>> = {
     CMB: '/tooted/rohutostepumbad',
   },
   kuttepumbad: {
+    /* Siselingid avalehe Grundfos-juhendile (SEO, 16.10) — 5 keeles */
+    'Grundfos küttepumbad': '/',
+    'Grundfos heating pumps': '/',
+    'насосы Grundfos для отопления': '/',
+    'Grundfos apkures sūkņi': '/',
+    'Grundfos šildymo siurbliai': '/',
     'ALPHA1 GO': '/tooted/kuttepumbad/alpha1-go',
     'ALPHA2 GO': '/tooted/kuttepumbad/alpha2-go',
     'ALPHA GO': '/alpha-go',
@@ -2042,6 +2069,12 @@ const PRODUCT_LINKS: Record<string, Record<string, string>> = {
     KP: '/tooted/drenaazipumbad/unilift-kp',
   },
   puurkaevupumbad: {
+    /* Siselingid avalehe Grundfos-juhendile (SEO, 16.10) — 5 keeles */
+    'Grundfos puurkaevupumbad': '/',
+    'Grundfos borehole pumps': '/',
+    'скважинные насосы Grundfos': '/',
+    'Grundfos urbumu sūkņi': '/',
+    'Grundfos gręžinių siurbliai': '/',
     SQE: '/tooted/puurkaevupumbad/sqe',
     SQ: '/tooted/puurkaevupumbad/grundfos-sq',
     SP: '/tooted/puurkaevupumbad/grundfos-sp',

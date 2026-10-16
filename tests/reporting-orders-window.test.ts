@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import { ordersWindow } from "@/lib/reporting/orders"
 import type { ReportPeriod } from "@/lib/reporting/types"
 
-/* Tavaline reedene periood (weeklyPeriod 09.10.2026 genereerimisel). */
+/* Näidis-7-päevane periood (ordersWindow töötab suvalise perioodiga). */
 const PERIOD: ReportPeriod = {
   start: "2026-10-01",
   end: "2026-10-07",
@@ -11,7 +11,7 @@ const PERIOD: ReportPeriod = {
 }
 
 describe("ordersWindow", () => {
-  it("aken ulatub genereerimispäevani (reede hommikune seis)", () => {
+  it("aken ulatub genereerimispäevani (koostamise hommiku seis)", () => {
     const w = ordersWindow(PERIOD, new Date("2026-10-09T06:00:00.000Z"))
     expect(w.start).toBe("2026-10-01")
     expect(w.end).toBe("2026-10-09")

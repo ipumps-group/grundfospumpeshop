@@ -386,9 +386,9 @@ function ordersInsights(orders: OrdersData, ads: AdsData | null, out: Insight[])
   const c = orders.current
   const p = orders.previous
 
-  /* Tellimuste aken ulatub raporti koostamiseni (reede hommik, ~9 päeva —
+  /* Tellimuste aken ulatub raporti koostamiseni (neljapäeva hommik, ~11 päeva —
    * vt orders.ts). Nädala eesmärk skaleeritakse akna pikkusega, et hinnang
-   * oleks õiglane (7-päevane aken → 5, 9-päevane aken → 6). */
+   * oleks õiglane (7-päevane aken → 5, 11-päevane aken → 8). */
   const windowDays = orders.window
     ? Math.round((new Date(`${orders.window.end}T00:00:00Z`).getTime() - new Date(`${orders.window.start}T00:00:00Z`).getTime()) / 86_400_000) + 1
     : 7

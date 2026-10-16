@@ -3,8 +3,10 @@ import { generateWeeklyReport } from '@/lib/reporting/generate'
 import { sendReportEmail } from '@/lib/reporting/notify'
 
 /**
- * Weekly marketing report — Vercel Cron every Friday 06:00 UTC (09:00 EEST,
- * see vercel.json). Generates the report, stores it and e-mails it to the
+ * Weekly marketing report — Vercel Cron every Thursday 06:00 UTC (09:00 EEST,
+ * see vercel.json). Raportinädal on esmaspäev → pühapäev (vt weeklyPeriod) —
+ * neljapäevaseks koostamiseks on Google'i andmed lõplikud.
+ * Generates the report, stores it and e-mails it to the
  * `report_email_recipients` setting (fallback info@pumbapood.ee).
  *
  * Protected by CRON_SECRET like /api/cron/weather-pulse. `?send=0` generates

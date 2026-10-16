@@ -17,7 +17,9 @@ import type { StoredReport } from "./types"
 export async function generateWeeklyReport(): Promise<StoredReport> {
   const snapshot = await collectSnapshot()
   const previous = await getPreviousReport(snapshot.period.start)
-  const changes = computeChanges(snapshot, previous)
+  /* WoW-võrdlus SAMA snapshoti sees — kaardid ja muutuste tabel ei saa
+   * lahkneda (vt changes.ts päis). `previous` on vaid site-changes aknale. */
+  const changes = computeChanges(snapshot)
 
   /* „Lehekülje arendus" (git-põhine täienduste kokkuvõte): aken = eelmise
    * NÄDALA raporti genereerimisest tänaseni. getPreviousReport filtreerib

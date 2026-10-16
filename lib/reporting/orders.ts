@@ -87,8 +87,8 @@ function inclusiveDays(start: string, end: string): number {
 
 /**
  * Tellimuste tegelik aken: tellimused salvestuvad reaalajas, seega peab raport
- * kajastama KÕIKI tellimusi kuni genereerimishetkeni (reede hommik) — Google'i
- * statistika ~2-päevane viivitus ei tohi päris tellimusi raportist välja jätta.
+ * kajastama KÕIKI tellimusi kuni genereerimishetkeni (koostamise hommik) — Google'i
+ * statistika ~4-päevane viivitus ei tohi päris tellimusi raportist välja jätta.
  * Eelmine aken on sama pikk ja lõpeb vahetult enne käesoleva algust, et
  * nädalavõrdlus oleks õiglane.
  */

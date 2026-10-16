@@ -121,22 +121,39 @@ export async function postJson<T>(url: string, token: string, body: unknown): Pr
   return (await res.json()) as T
 }
 
-/* ---------- shared date-range convention (GA4/GSC/Ads data lags ~2 days) ---------- */
+/* ---------- shared date-range convention: report week = esmaspäev → pühapäev ---------- */
 
 export function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10)
 }
 
-/** Last 7 days (ending 2 days ago) vs the 7 days before that. */
+/**
+ * Raportinädal = ESMASPÄEV → PÜHAPÄEV (kalendernädal), võrdlusperiood =
+ * eelmine kalendernädal.
+ *
+ * Miks neljapäevane raport: GSC andmed jõuavad API-sse ~3–4 päeva hiljem
+ * (mõõdetud korduvalt: genereerimishetkest 2 päeva tagune päev puudub
+ * päevaväljundis täiesti, 3 päeva tagune on osaline). Neljapäeva hommikul
+ * (cron N 06:00 UTC) on pühapäevane (X-4) nädalalõpp lõplik — ja eelmise
+ * nädala oma samuti, seega on MÕLEMAD võrreldavad nädalad alati täielikud
+ * ja WoW-võrdlused õiglased (sama alus kaartidel, muutuste tabelis ja
+ * leidudes; 2-päevase viivitusega jäi jooksev nädal süstemaatiliselt
+ * ~20 % alamõõdetuks).
+ *
+ * Ankur: lõpupäev = viimane PÜHAPÄEV, mis on vähemalt 4 päeva tagasi —
+ * ka suvalisel nädalapäeval käsitsi genereerides tuleb sama E→P nädal,
+ * mitte nihkuv aken. Alguspäev = lõpupäev − 6 = esmaspäev.
+ */
 export function weeklyPeriod(now: Date = new Date()): ReportPeriod {
   const end = new Date(now)
-  end.setDate(end.getDate() - 2)
+  end.setUTCDate(end.getUTCDate() - 4)
+  while (end.getUTCDay() !== 0) end.setUTCDate(end.getUTCDate() - 1) // pühapäev
   const start = new Date(end)
-  start.setDate(start.getDate() - 6)
+  start.setUTCDate(start.getUTCDate() - 6) // esmaspäev
   const prevEnd = new Date(start)
-  prevEnd.setDate(prevEnd.getDate() - 1)
+  prevEnd.setUTCDate(prevEnd.getUTCDate() - 1)
   const prevStart = new Date(prevEnd)
-  prevStart.setDate(prevStart.getDate() - 6)
+  prevStart.setUTCDate(prevStart.getUTCDate() - 6)
   return {
     start: isoDate(start),
     end: isoDate(end),

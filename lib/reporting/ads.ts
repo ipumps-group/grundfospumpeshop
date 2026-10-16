@@ -198,5 +198,18 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     conversions: campaigns.reduce((s, c) => s + c.allConversions, 0),
   }
 
-  return { available: true, campaigns, brand, nonBrand, topTerms, keywords, totals }
+  /* --- previous-period totals (WoW baseline — the changes table compares
+   *     within the SAME snapshot so it can never disagree with the cards) --- */
+  const prevRows = await run(
+    `SELECT metrics.cost_micros, metrics.clicks, metrics.all_conversions
+     FROM campaign
+     WHERE segments.date BETWEEN '${period.prevStart}' AND '${period.prevEnd}'`,
+  )
+  const prevTotals = {
+    cost: prevRows.reduce((s, r) => s + micros(field(r, "metrics", "cost_micros")), 0),
+    clicks: prevRows.reduce((s, r) => s + num(field(r, "metrics", "clicks")), 0),
+    conversions: prevRows.reduce((s, r) => s + num(field(r, "metrics", "all_conversions")), 0),
+  }
+
+  return { available: true, campaigns, brand, nonBrand, topTerms, keywords, totals, prevTotals }
 }

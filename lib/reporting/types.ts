@@ -155,6 +155,8 @@ export interface AdsData {
   topTerms: AdsTerm[]
   keywords: AdsKeyword[]
   totals: { cost: number; clicks: number; impressions: number; conversions: number }
+  /** Eelmise perioodi kogud (WoW-võrdluse alus). Valikuline — vanades salvestatud snapshotides puudub. */
+  prevTotals?: { cost: number; clicks: number; conversions: number }
 }
 
 /* ---------- Meta (Facebook/Instagram) Marketing API ---------- */
@@ -221,8 +223,9 @@ export interface OrdersData {
   orders: OrderRow[]
   /**
    * Tegelik andmeaken: tellimused salvestuvad reaalajas, seega ulatub aken
-   * raporti koostamiseni (reede hommik), mitte Google'i ~2-päevase viivitusega
-   * perioodi lõpuni. Eelmine aken on sama pikk, et nädalavõrdlus oleks õiglane.
+   * raporti koostamiseni (neljapäeva hommik), mitte Google'i ~4-päevase
+   * viivitusega perioodi lõpuni. Eelmine aken on sama pikk, et nädalavõrdlus
+   * oleks õiglane.
    */
   window?: { start: string; end: string; prevStart: string; prevEnd: string }
 }
@@ -288,13 +291,13 @@ export interface StoredReport {
   insights: Insight[]
   /** LLM-written Estonian narrative ("" when ANTHROPIC_API_KEY is unset). */
   narrative: string
-  /** Headline-metric changes vs the previous STORED report (see changes.ts). */
+  /** Headline-metric changes WoW, computed within this report's snapshot (see changes.ts). */
   changes: ReportChange[]
   emailSentAt: string | null
   emailError: string
 }
 
-/** One headline metric compared against the previous stored report. */
+/** One headline metric: current week vs previous week (same snapshot). */
 export interface ReportChange {
   id: string
   label: string

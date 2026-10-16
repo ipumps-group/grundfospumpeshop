@@ -176,7 +176,7 @@ export default function SeadedPage() {
           <div>
             <label className="block text-[15px] font-medium text-gray-700 mb-1.5">
               Nädalaraporti saajad
-              <span className="block text-[13px] font-normal text-gray-400">Iganädalane turundusraport (reede 09:00) — mitu aadressi komaga eraldatult</span>
+              <span className="block text-[13px] font-normal text-gray-400">Iganädalane turundusraport (neljapäev 09:00) — mitu aadressi komaga eraldatult</span>
             </label>
             <input
               type="text"

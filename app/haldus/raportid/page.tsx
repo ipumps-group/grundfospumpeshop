@@ -99,7 +99,7 @@ export default function ReportsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Raportid</h1>
           <p className="text-[15px] text-gray-500 mt-0.5">
-            Iganädalane turundusraport (GSC + GA4 + Ads + tellimused). Automaatselt igal reedel kell 09:00, saadetakse e-postiga.
+            Iganädalane turundusraport (GSC + GA4 + Ads + tellimused). Periood esmaspäev → pühapäev, automaatselt igal neljapäeval kell 09:00, saadetakse e-postiga.
           </p>
         </div>
         <button
@@ -123,7 +123,7 @@ export default function ReportsPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <BarChart3 className="mx-auto text-gray-300 mb-3" size={32} />
           <p className="text-[15px] text-gray-400">
-            Raporteid pole veel. Klõpsa „Genereeri raport kohe“ või oota esimest reedest automaatkäivitust.
+            Raporteid pole veel. Klõpsa „Genereeri raport kohe“ või oota esimest neljapäevast automaatkäivitust.
           </p>
         </div>
       ) : (

@@ -67,10 +67,14 @@ function posArrow(cur: number | null, prev: number | null): { symbol: string; cl
 function Delta({ cur, prev, invert = false, suffix = '%' }: { cur: number; prev: number; invert?: boolean; suffix?: string }) {
   if (prev === 0) return <span className="text-gray-400">eelmine: 0</span>
   const pct = Math.round(((cur - prev) / prev) * 100)
-  const good = invert ? pct < 0 : pct > 0
-  const cls = pct === 0 ? 'text-gray-400' : good ? 'text-green-600' : 'text-red-600'
-  const arrow = pct === 0 ? '■' : pct > 0 ? '▲' : '▼'
-  return <span className={cls}>{arrow} {pct > 0 ? '+' : ''}{pct} {suffix} vs eelmine nädal</span>
+  /* invert=true (nt keskmine positsioon): numbri langus on PARANEMINE.
+   * Kuvame alati kvaliteedi suunda, mitte toorarvu märki — nii on kaart
+   * kooskõlas muutuste tabeli ▲ Paranes / ▼ Halvenes loogikaga:
+   * roheline ▲ = paranemine, punane ▼ = halvenemine. */
+  const shown = invert ? -pct : pct
+  const cls = shown === 0 ? 'text-gray-400' : shown > 0 ? 'text-green-600' : 'text-red-600'
+  const arrow = shown === 0 ? '■' : shown > 0 ? '▲' : '▼'
+  return <span className={cls}>{arrow} {shown > 0 ? '+' : ''}{shown} {suffix} vs eelmine nädal</span>
 }
 
 function Card({ label, value, children }: { label: string; value: string; children?: React.ReactNode }) {
@@ -272,18 +276,18 @@ export default function ReportDetailPage() {
 
       {/* Changes vs the previous stored report */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-[18px] font-bold text-gray-900 mb-1">Muutused eelmise raportiga</h2>
+        <h2 className="text-[18px] font-bold text-gray-900 mb-1">Muutused eelmise nädalaga</h2>
         {changes.length === 0 ? (
-          <p className="text-[14px] text-gray-500">Esimene raport — võrdluspunkti pole. Järgmisest raportist näidatakse siin paranemisi ja halvenemisi.</p>
+          <p className="text-[14px] text-gray-500">Võrdlusandmed puuduvad — järgmisest raportist näidatakse siin paranemisi ja halvenemisi.</p>
         ) : (
           <>
-            <p className="text-[13px] text-gray-500 mb-3">▲ paranes · ▼ halvenes · ■ stabiilne (&lt;5 % muutus) · võrdlus eelmise salvestatud raportiga</p>
+            <p className="text-[13px] text-gray-500 mb-3">▲ paranes · ▼ halvenes · ■ stabiilne (&lt;5 % muutus) · võrdlus eelmise nädalaga (sama alus kui ülal kaartidel)</p>
             <div className="overflow-x-auto">
               <table className="w-full text-[14px] min-w-[520px]">
                 <thead>
                   <tr className="text-left text-gray-500 border-b border-gray-100">
                     <th className="py-2 pr-3 font-medium">Näitaja</th>
-                    <th className="py-2 pr-3 font-medium text-right">Eelmine raport</th>
+                    <th className="py-2 pr-3 font-medium text-right">Eelmine nädal</th>
                     <th className="py-2 pr-3 font-medium text-right">See raport</th>
                     <th className="py-2 pr-3 font-medium text-right">Muutus</th>
                     <th className="py-2 font-medium text-right">Hinnang</th>

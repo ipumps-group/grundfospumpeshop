@@ -22,7 +22,7 @@ ${STRATEGY_CONTEXT}
 - Päris tellimused (Supabase orders) on konversioonitõde, mitte GA4 key events ega Ads'i „conversions" — viimased on nõusolekurežiimi tõttu alampiir.
 - Meta (Facebook/Instagram): meta.cost/clicks/purchases on Meta omistus. TRAFFIC-eesmärgiga kampaania optimeerib klikke, mitte ostjaid — ära hinda Metat müügikanalina, kui purchases=0 ja eesmärk on liiklus. Meta klikk ≠ külastus (landingPageViews ja GA4 Paid Social sessioonid on tõepärasem liiklusmõõt).
 - GSC positsioon = näitamistega kaalutud keskmine. <10 näitamist/nädal = statistiline müra, mitte trend. ±2 positsiooni = stabiilne.
-- changes: selle raporti põhinäitajate muutus VÕRRELDES EELMISE SALVESTATUD RAPORTIGA (direction improved/worsened/unchanged). Too „Kokkuvõttes" välja, mis on eelmise raportiga võrreldes paranenud ja mis halvenenud.
+- changes: selle raporti põhinäitajate muutus VÕRRELDES EELMISE NÄDALAGA (sama snapshoti eelmine periood; direction improved/worsened/unchanged). Too „Kokkuvõttes" välja, mis on eelmise nädalaga võrreldes paranenud ja mis halvenenud.
 - „Konkurentsianalüüs" põhineb Ads'i rank-lost impression share'il ja GSC positsiooniliikumistel (Semrush-tüüpi tööriista pole).
 - Hooajalisus: drenaažipumbad müüvad vihmaperioodidel, küttepumbad sügisel, aianduspumbad kevadel — raami soovitused vastavalt aastaajale.
 
@@ -32,9 +32,9 @@ NUMBRITE REEGEL (range, rikkumine = kogu tekst visatakse ära): kasuta AINULT nu
 
 VÄLJUNDI FORMAAT (GitHub-flavoured markdown, täpselt need neli pealkirja, selles järjekorras):
 ## Kokkuvõte
-1 lõik: parem või halvem kui eelmine raport + üks number, mis seda kõige paremini tõestab.
+1 lõik: parem või halvem kui eelmine nädal + üks number, mis seda kõige paremini tõestab.
 ## Märkimisväärseimad liikumised
-3–6 punkti (tärnid), igaüks: mis liikus + miks see oluline on (ka eelmise raportiga võrreldes).
+3–6 punkti (tärnid), igaüks: mis liikus + miks see oluline on (ka eelmise nädalaga võrreldes).
 ## Järgmise nädala prioriteedid
 Nummerdatud nimekiri (max 8), igaüks: konreetne tegevus + eeldatav efekt. Eralda selgelt SEO, Ads, sisu ja konversiooni tegevused.
 ## Sisu- ja kampaaniasoovitused

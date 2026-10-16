@@ -126,9 +126,9 @@ function changesSection(changes: ReportChange[]): { html: string; text: string[]
   const summary = summarizeChanges(changes)
   if (changes.length === 0) {
     return {
-      html: `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Muutused eelmise raportiga</h2>` +
+      html: `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Muutused eelmise nädalaga</h2>` +
         `<p style="font-size:14px;color:${MUTED};margin:4px 0 8px">${escapeHtml(summary)}.</p>`,
-      text: ["MUUTUSED EELMISE RAPORTIGA", summary, ""],
+      text: ["MUUTUSED EELMISE NÄDALAGA", summary, ""],
     }
   }
   const rows = changes
@@ -147,11 +147,11 @@ function changesSection(changes: ReportChange[]): { html: string; text: string[]
     })
     .join("\n")
   const html =
-    `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Muutused eelmise raportiga</h2>` +
+    `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Muutused eelmise nädalaga</h2>` +
     `<p style="font-size:14px;color:${MUTED};margin:4px 0 8px">${escapeHtml(summary)}.</p>` +
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${BORDER};border-radius:12px;overflow:hidden">${rows}</table>`
   const text = [
-    "MUUTUSED EELMISE RAPORTIGA",
+    "MUUTUSED EELMISE NÄDALAGA",
     summary,
     ...changes.map((c) => {
       const m = CHANGE_META[c.direction]
@@ -246,10 +246,10 @@ function ordersSection(orders: OrderRow[], window?: { start: string; end: string
       )
     })
     .join("\n")
-  /* Tellimused on arvestatud kuni raporti koostamiseni (reede hommik) — Google'i
-   * ~2-päevane viivitus ei tohi päris tellimusi raportist välja jätta. */
+  /* Tellimused on arvestatud kuni raporti koostamiseni (neljapäeva hommik) —
+   * Google'i ~4-päevane viivitus ei tohi päris tellimusi raportist välja jätta. */
   const windowNote = window
-    ? `Tellimuste aken: ${window.start} – ${window.end} (kõik tellimused kuni raporti koostamiseni; Google'i statistika lõppeb ~2 päeva varem).`
+    ? `Tellimuste aken: ${window.start} – ${window.end} (kõik tellimused kuni raporti koostamiseni; Google'i statistika lõppeb ~4 päeva varem).`
     : null
   const html =
     `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Nädala tellimused</h2>` +
@@ -401,7 +401,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
     Täisraport tabelite ja trendidega: <a href="${escapeHtml(adminUrl)}" style="color:#1d4ed8">${escapeHtml(adminUrl)}</a>
   </p>
   <p style="font-size:12px;color:#9aa5b1;margin-top:16px;border-top:1px solid #edf0f4;padding-top:10px">
-    Automaatne nädalaraport (reede 09:00) · Andmed: GSC, GA4, Google Ads API, Meta Marketing API, tellimuste andmebaas · GSC/GA4/Ads/Meta andmed lõppevad ~2 päeva tagasi (Google'i viive); tellimused ja poe täiendused on arvestatud kuni raporti koostamiseni.
+    Automaatne nädalaraport (neljapäev 09:00) · Raportinädal: esmaspäev → pühapäev · Andmed: GSC, GA4, Google Ads API, Meta Marketing API, tellimuste andmebaas · Google'i andmed jõuavad ~3–4 päeva hiljem — neljapäevaseks koostamiseks on mõlemad võrreldavad nädalad lõplikud; tellimused ja poe täiendused on arvestatud kuni raporti koostamiseni.
   </p>
 </div>
 </body></html>`

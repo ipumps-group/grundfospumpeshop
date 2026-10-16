@@ -10,6 +10,7 @@ import {
 import { groupBySection } from '@/lib/spec-sections'
 import { withVat, fmt } from '@/lib/price'
 import { trackMetaViewContent } from '@/lib/meta-pixel'
+import { trackViewItem } from '@/lib/google-ads'
 
 // ─── TÜÜBID ────────────────────────────────────────────────────────────────
 
@@ -679,6 +680,15 @@ export default function ProductDetailClient({ product, attributes, attrNameMap, 
       content_category: product.primary_activity_area_slug || undefined,
       value: displayPrice,
       currency: 'EUR',
+    })
+    /* GA4 view_item — funktsioon oli olemas (lib/google-ads.ts), aga seda ei
+     * kutsutud kuskilt: GA4 nägi 0 tootevaadet, mistõttu LP→toote lehtrit
+     * polnud võimalik kanaliti mõõta. */
+    trackViewItem({
+      id: String(product.id),
+      name: product.name,
+      price: displayPrice,
+      category: product.primary_activity_area_slug || undefined,
     })
   }, [product])
 
