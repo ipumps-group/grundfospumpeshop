@@ -88,12 +88,22 @@ async function main() {
   const changes = []
 
   /* --- 1) Juhendi-sektsioon --- */
+  // NB: settings on KOHUSTUSLIK — RenderSection loeb settings.width jm (ilma selleta kukub lehe renderdus!)
   const guideSection = {
     id: 'gv-guide-' + rid(),
     type: 'section',
     order: 0,
+    settings: {
+      width: 'boxed',
+      padding_top: 'small',
+      padding_bottom: 'medium',
+      background_type: 'color',
+      background_color: '#ffffff',
+      background_overlay: 0.4,
+      background_image_url: null,
+    },
     columns: [{
-      id: rid(), width: 100,
+      id: rid(), width: 100, vertical_align: 'top',
       blocks: [
         { id: rid(), type: 'heading', color: '#003366', level: 'h2', alignment: 'left',
           text: GUIDE.heading.et, text_en: GUIDE.heading.en, text_ru: GUIDE.heading.ru, text_lv: GUIDE.heading.lv, text_lt: GUIDE.heading.lt },
