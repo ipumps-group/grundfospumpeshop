@@ -13,3 +13,8 @@ CREATE TABLE IF NOT EXISTS public.email_logs (
 
 CREATE INDEX IF NOT EXISTS idx_email_logs_order_id ON public.email_logs(order_id);
 CREATE INDEX IF NOT EXISTS idx_email_logs_created_at ON public.email_logs(created_at);
+
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. email_logs is written/read only server-side (service role).
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.email_logs TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.email_logs_id_seq TO service_role;

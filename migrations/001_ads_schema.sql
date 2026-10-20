@@ -416,6 +416,55 @@ create table if not exists public.sync_state (
 );
 
 -- ============================================================================
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. Without these, PostgREST returns 42501
+-- "permission denied for table <name>".
+-- ============================================================================
+
+-- service_role: full access (server-side API routes / sync jobs)
+grant select, insert, update, delete on public.companies to service_role;
+grant select, insert, update, delete on public.ad_platforms to service_role;
+grant select, insert, update, delete on public.ad_accounts to service_role;
+grant select, insert, update, delete on public.campaigns to service_role;
+grant select, insert, update, delete on public.ad_groups to service_role;
+grant select, insert, update, delete on public.ad_sets to service_role;
+grant select, insert, update, delete on public.ads to service_role;
+grant select, insert, update, delete on public.creatives to service_role;
+grant select, insert, update, delete on public.daily_insights to service_role;
+grant select, insert, update, delete on public.conversion_events to service_role;
+grant select, insert, update, delete on public.recommendations to service_role;
+grant select, insert, update, delete on public.change_requests to service_role;
+grant select, insert, update, delete on public.change_logs to service_role;
+grant select, insert, update, delete on public.report_templates to service_role;
+grant select, insert, update, delete on public.generated_reports to service_role;
+grant select, insert, update, delete on public.report_sections to service_role;
+grant select, insert, update, delete on public.scheduled_reports to service_role;
+grant select, insert, update, delete on public.sync_logs to service_role;
+grant select, insert, update, delete on public.api_error_logs to service_role;
+grant select, insert, update, delete on public.sync_state to service_role;
+
+-- authenticated: read-only from the dashboard browser client
+-- (RLS policies below restrict which rows are visible)
+grant select on public.ad_accounts to authenticated;
+grant select on public.campaigns to authenticated;
+grant select on public.ad_groups to authenticated;
+grant select on public.ad_sets to authenticated;
+grant select on public.ads to authenticated;
+grant select on public.creatives to authenticated;
+grant select on public.daily_insights to authenticated;
+grant select on public.conversion_events to authenticated;
+grant select on public.recommendations to authenticated;
+grant select on public.change_requests to authenticated;
+grant select on public.change_logs to authenticated;
+grant select on public.report_templates to authenticated;
+grant select on public.generated_reports to authenticated;
+grant select on public.report_sections to authenticated;
+grant select on public.scheduled_reports to authenticated;
+grant select on public.sync_logs to authenticated;
+grant select on public.api_error_logs to authenticated;
+grant select on public.sync_state to authenticated;
+
+-- ============================================================================
 -- ROW LEVEL SECURITY
 -- ============================================================================
 
@@ -728,3 +777,9 @@ begin
     case when coalesce(prev.purchases,0) > 0 then ((coalesce(cur.purchases,0) - coalesce(prev.purchases,0))::numeric / coalesce(prev.purchases,0) * 100) else null end;
 end;
 $$;
+
+-- RPC functions are called via supabase-js .rpc() from the browser client
+-- (authenticated) and API routes (service_role) — EXECUTE needs an explicit
+-- grant once default function privileges are gone (2026-10-30).
+grant execute on function public.get_aggregated_insights(uuid, date, date, text, uuid, uuid) to authenticated, service_role;
+grant execute on function public.get_period_comparison(uuid, date, date, date, date, text) to authenticated, service_role;

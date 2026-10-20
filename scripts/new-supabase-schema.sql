@@ -36,6 +36,61 @@ CREATE TABLE IF NOT EXISTS public.attribute_name_translations (name_et text, nam
 
 CREATE TABLE IF NOT EXISTS public.ui_translations (locale text, messages jsonb NOT NULL DEFAULT '{}'::jsonb, updated_at timestamp with time zone DEFAULT now());
 
+-- ============================================================================
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. Grant the minimum each role needs (RLS still applies).
+-- ============================================================================
+
+-- Public storefront reads (anon + authenticated)
+GRANT SELECT ON public.categories TO anon, authenticated;
+GRANT SELECT ON public.settings TO anon, authenticated;
+GRANT SELECT ON public.pages TO anon, authenticated;
+GRANT SELECT ON public.products TO anon, authenticated;
+GRANT SELECT ON public.product_attributes TO anon, authenticated;
+GRANT SELECT ON public.product_categories TO anon, authenticated;
+GRANT SELECT ON public.bulk_pricing TO anon, authenticated;
+GRANT SELECT ON public.product_documents TO anon, authenticated;
+GRANT SELECT ON public.coupons TO anon, authenticated;
+GRANT SELECT ON public.attribute_name_translations TO anon, authenticated;
+GRANT SELECT ON public.ui_translations TO anon, authenticated;
+
+-- Contact form accepts public submissions
+GRANT INSERT ON public.contact_submissions TO anon, authenticated;
+
+-- Signed-in customers
+GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.addresses TO authenticated;
+GRANT SELECT ON public.orders TO authenticated;
+GRANT SELECT ON public.order_items TO authenticated;
+GRANT SELECT ON public.order_status_history TO authenticated;
+GRANT SELECT, DELETE ON public.coupon_usage TO authenticated;
+
+-- service_role: full access (server-side API routes / admin)
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.categories TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.settings TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.pages TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.products TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_attributes TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_categories TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.bulk_pricing TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_documents TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.addresses TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.coupons TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.orders TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_items TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_status_history TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.coupon_usage TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.contact_submissions TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.attribute_name_translations TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ui_translations TO service_role;
+
+-- Serial/bigserial sequences: service_role needs USAGE for INSERTs with default ids
+GRANT USAGE, SELECT ON SEQUENCE public.categories_id_seq TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.products_id_seq TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.product_attributes_id_seq TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.product_documents_id_seq TO service_role;
+
 -- Table RLS policies
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN

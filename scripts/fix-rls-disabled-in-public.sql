@@ -635,3 +635,66 @@ DO $$ BEGIN
   CREATE POLICY "Authenticated delete" ON storage.objects
     FOR DELETE TO service_role USING (bucket_id = 'product-documents');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- ============================================================
+-- 6. GRANTS — required since 2026-10-30: new tables in public get
+-- NO default Data API privileges. Grant the minimum each role needs
+-- (RLS policies above still restrict rows). Idempotent.
+-- ============================================================
+
+-- Public storefront reads (anon + authenticated)
+GRANT SELECT ON public.categories TO anon, authenticated;
+GRANT SELECT ON public.settings TO anon, authenticated;  -- (also granted above)
+GRANT SELECT ON public.pages TO anon, authenticated;
+GRANT SELECT ON public.products TO anon, authenticated;
+GRANT SELECT ON public.product_attributes TO anon, authenticated;
+GRANT SELECT ON public.product_categories TO anon, authenticated;
+GRANT SELECT ON public.bulk_pricing TO anon, authenticated;
+GRANT SELECT ON public.product_documents TO anon, authenticated;
+GRANT SELECT ON public.coupons TO anon, authenticated;
+GRANT SELECT ON public.attribute_name_translations TO anon, authenticated;
+GRANT SELECT ON public.ui_translations TO anon, authenticated;
+
+-- series_activity_areas is created by add-category-series-columns.sql and may
+-- not exist yet — keep grants conditional so this script stays re-runnable.
+DO $$ BEGIN
+  GRANT SELECT ON public.series_activity_areas TO anon, authenticated;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON public.series_activity_areas TO service_role;
+EXCEPTION WHEN undefined_table THEN NULL; END $$;
+
+-- Contact form accepts public submissions
+GRANT INSERT ON public.contact_submissions TO anon, authenticated;
+
+-- Signed-in customers
+GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.addresses TO authenticated;
+GRANT SELECT ON public.orders TO authenticated;
+GRANT SELECT ON public.order_items TO authenticated;
+GRANT SELECT ON public.order_status_history TO authenticated;
+GRANT SELECT, DELETE ON public.coupon_usage TO authenticated;
+
+-- service_role: full access (server-side API routes / admin)
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.categories TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.settings TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.pages TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.products TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_attributes TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_categories TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.bulk_pricing TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_documents TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.addresses TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.coupons TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.orders TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_items TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_status_history TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.coupon_usage TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.contact_submissions TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.attribute_name_translations TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ui_translations TO service_role;
+
+-- Serial/bigserial sequences: service_role needs USAGE for INSERTs with default ids
+GRANT USAGE, SELECT ON SEQUENCE public.categories_id_seq TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.products_id_seq TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.product_attributes_id_seq TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.product_documents_id_seq TO service_role;

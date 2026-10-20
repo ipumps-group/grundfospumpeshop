@@ -31,6 +31,13 @@ create table if not exists ui_translations (
 alter table attribute_name_translations enable row level security;
 alter table ui_translations enable row level security;
 
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. Public read, service_role writes (admin translate APIs).
+grant select on public.attribute_name_translations to anon, authenticated;
+grant select on public.ui_translations to anon, authenticated;
+grant select, insert, update, delete on public.attribute_name_translations to service_role;
+grant select, insert, update, delete on public.ui_translations to service_role;
+
 create policy if not exists "public read attribute_name_translations"
   on attribute_name_translations for select using (true);
 

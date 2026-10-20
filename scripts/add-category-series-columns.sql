@@ -99,3 +99,9 @@ CREATE TABLE IF NOT EXISTS series_activity_areas (
   activity_area_id INTEGER REFERENCES activity_areas(id) ON DELETE CASCADE,
   PRIMARY KEY (series_id, activity_area_id)
 );
+
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. Public read (RLS policy in fix-rls-disabled-in-public.sql),
+-- service_role writes.
+GRANT SELECT ON public.series_activity_areas TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.series_activity_areas TO service_role;

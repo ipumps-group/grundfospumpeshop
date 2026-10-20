@@ -33,6 +33,11 @@ alter table public.recommendations
 -- RLS for the new table
 alter table public.gsc_search_analytics enable row level security;
 
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. service_role = full (API routes), authenticated = read.
+grant select, insert, update, delete on public.gsc_search_analytics to service_role;
+grant select on public.gsc_search_analytics to authenticated;
+
 create policy "Service role has full access"
   on public.gsc_search_analytics for all to service_role using (true) with check (true);
 
@@ -60,6 +65,9 @@ create table if not exists public.gsc_sync_logs (
 
 alter table public.gsc_sync_logs enable row level security;
 
+grant select, insert, update, delete on public.gsc_sync_logs to service_role;
+grant select on public.gsc_sync_logs to authenticated;
+
 create policy "Service role has full access"
   on public.gsc_sync_logs for all to service_role using (true) with check (true);
 
@@ -78,6 +86,9 @@ create table if not exists public.gsc_sync_state (
 );
 
 alter table public.gsc_sync_state enable row level security;
+
+grant select, insert, update, delete on public.gsc_sync_state to service_role;
+grant select on public.gsc_sync_state to authenticated;
 
 create policy "Service role has full access"
   on public.gsc_sync_state for all to service_role using (true) with check (true);

@@ -21,5 +21,11 @@ create table if not exists public.weekly_reports (
 create unique index if not exists weekly_reports_week_idx
   on public.weekly_reports (week_start, week_end);
 
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. weekly_reports is written/read only by server-side
+-- report generation (lib/reporting/store.ts uses the service role).
+-- No RLS on this table, so no grants to anon/authenticated.
+grant select, insert, update, delete on public.weekly_reports to service_role;
+
 -- Report e-mail recipients are stored in the existing settings table:
 --   key = 'report_email_recipients' (comma-separated), fallback info@pumbapood.ee

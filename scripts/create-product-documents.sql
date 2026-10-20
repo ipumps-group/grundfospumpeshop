@@ -17,6 +17,12 @@ create table if not exists product_documents (
 create index if not exists idx_product_documents_sku        on product_documents(sku);
 create index if not exists idx_product_documents_product_id on product_documents(product_id);
 
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. Public read (RLS policy below), service_role writes.
+grant select on public.product_documents to anon, authenticated;
+grant select, insert, update, delete on public.product_documents to service_role;
+grant usage, select on sequence public.product_documents_id_seq to service_role;
+
 -- 2. Row Level Security — anyone can read, only service role can write
 alter table product_documents enable row level security;
 

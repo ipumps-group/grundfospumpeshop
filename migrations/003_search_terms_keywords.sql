@@ -104,6 +104,18 @@ alter table public.campaigns add column if not exists monthly_budget numeric(12,
 alter table public.campaigns add column if not exists pacing_percent numeric(5,2);
 alter table public.campaigns add column if not exists budget_exhaustion_date date;
 
+-- GRANTS — required since 2026-10-30: new tables in public get NO default
+-- Data API privileges. service_role = full (API routes), authenticated = read.
+grant select, insert, update, delete on public.search_terms to service_role;
+grant select, insert, update, delete on public.keywords to service_role;
+grant select, insert, update, delete on public.auction_insights to service_role;
+grant select, insert, update, delete on public.budget_alerts to service_role;
+
+grant select on public.search_terms to authenticated;
+grant select on public.keywords to authenticated;
+grant select on public.auction_insights to authenticated;
+grant select on public.budget_alerts to authenticated;
+
 -- RLS policies for new tables
 alter table public.search_terms enable row level security;
 alter table public.keywords enable row level security;
