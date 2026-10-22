@@ -390,7 +390,7 @@ export default function ReportDetailPage() {
       {families.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-x-auto">
           <h2 className="text-[18px] font-bold text-gray-900 mb-1">Märksõnade peatabel</h2>
-          <p className="text-[13px] text-gray-500 mb-3">▲ tõus ≥2 kohta · ■ stabiilne · ▼ langus · positsioon = näitamistega kaalutud keskmine · &lt;10 näitamist = müra</p>
+          <p className="text-[13px] text-gray-500 mb-3">▲ tõus ≥2 kohta · ■ stabiilne · ▼ langus · positsioon = näitamistega kaalutud keskmine · &lt;10 näitamist = väike liiklus</p>
           <table className="w-full text-[14px] min-w-[560px]">
             <thead>
               <tr className="text-left text-gray-500 border-b border-gray-100">
@@ -408,7 +408,7 @@ export default function ReportDetailPage() {
                 const noise = f.current.impressions < 10 && f.previous.impressions < 10
                 return (
                   <tr key={f.id} className="border-b border-gray-50 last:border-0">
-                    <td className="py-2 pr-3 font-medium text-gray-900">{f.label}{noise && <span className="text-gray-400 font-normal"> (müra)</span>}</td>
+                    <td className="py-2 pr-3 font-medium text-gray-900">{f.label}{noise && <span className="text-gray-400 font-normal"> (väike liiklus)</span>}</td>
                     <td className="py-2 pr-3 text-right">{fmtPos(f.current.position)}</td>
                     <td className="py-2 pr-3 text-right text-gray-500">{fmtPos(f.previous.position)}</td>
                     <td className={`py-2 pr-3 text-center ${arrow.classes}`}>{arrow.symbol}</td>

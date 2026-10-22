@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import {
   Flame, Thermometer, Drill, Waves,
-  ArrowUpCircle, Filter, CircleDot,
+  ArrowUpCircle, Filter, CircleDot, Droplet,
   Search, ShoppingCart, User, ChevronDown,
   Phone, Mail, Menu, X, ChevronRight,
   LayoutDashboard, ShoppingBag, LogOut, Settings,
@@ -51,6 +51,7 @@ const categories = [
   { nameKey: 'borewell', icon: Drill,          count: 43,  slug: 'puurkaevupumbad' },
   { nameKey: 'drainage', icon: Waves,          count: 31,  slug: 'drenaazipumbad' },
   { nameKey: 'wells',    icon: CircleDot,      count: 22,  slug: 'salvkaevupumbad' },
+  { nameKey: 'jpWaterAutomatics', icon: Droplet, count: 23, slug: 'veeautomaadid' },
   { nameKey: 'pressure', icon: ArrowUpCircle,  count: 23,  slug: 'rohutostepumbad' },
   { nameKey: 'sewage',   icon: Filter,         count: 9,   slug: 'reoveepumbad' },
 ]

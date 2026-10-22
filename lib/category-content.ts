@@ -19,6 +19,15 @@ export interface CategoryFaq {
   a: string
 }
 
+export interface CategoryPick {
+  /** Tootenimi (linkifyProducts teeb sellest lingi, kui nimi on PRODUCT_LINKS-is). */
+  name: string
+  /** Miks see valik — üks lause, ostja olukorraga. */
+  why: string
+  /** Hind kujul "657,41 €". */
+  price: string
+}
+
 export interface CategoryContentSection {
   guideTitle: string
   guideParagraphs: string[]
@@ -27,6 +36,10 @@ export interface CategoryContentSection {
   priceTable: { head: [string, string, string]; rows: [string, string, string][] }
   faqTitle: string
   faq: CategoryFaq[]
+  /** „Parim X — meie valik" plokk (valikuline): 3 konkreetset valikut hindadega. */
+  picks?: { title: string; intro: string; items: CategoryPick[] }
+  /** Seotud kategooriate siselingid (valikuline) — tõusvad lehed saavad siselinki. */
+  related?: { title: string; links: { label: string; href: string }[] }
 }
 
 type Locale = "et" | "en" | "ru" | "lv" | "lt"
@@ -81,6 +94,19 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         a: "Kontorisse sobib vaikne ja automaatne veeautomaat, mis hoiab ühtlase veerõhu ka siis, kui mitu kraani on korraga avatud. 5–20 töötajaga kontorisse soovitame Grundfos SCALA2 — vaikne, püsiva rõhuga ja integreeritud automaatikaga. Väiksemasse kontorisse või äripinnale piisab SCALA1-st, suurematesse hoonetesse sobib ka CMB rõhutõstepump.",
       },
     ],
+    picks: {
+      title: "Parim veeautomaat 2026 — meie kolm valikut",
+      intro: "Vastus küsimusele „parim veeautomaat“ sõltub olukorrast — siin on meie kolm konkreetset valikut: parim üldine, parim hind ja parim uputatav.",
+      items: [
+        { name: "Grundfos SCALA2 3-45", why: "parim valik eramule — hoiab veerõhu püsivana ka siis, kui korraga on avatud mitu kraani, ja on praktiliselt vaikne.", price: "657,41 €" },
+        { name: "Grundfos JP 3-42", why: "parima hinnaga põrandal seisev hüdrofoor — lihtne ja vastupidav klassika suvilasse, aeda või väiksemasse majja.", price: "234,52 €" },
+        { name: "Grundfos SBA 3-45 M", why: "parim uputatav veeautomaat — langetatakse kaevu sisse, ei võta ruumi ega tee müra ja sobib ka sügavamale kaevupinnale.", price: "574,57 €" },
+      ],
+    },
+    related: { title: "Vaata ka:", links: [
+      { label: "Salvkaevu- ja kastmispumbad", href: "/tooted/salvkaevupumbad" },
+      { label: "Puurkaevupumbad", href: "/tooted/puurkaevupumbad" },
+    ] },
   },
   en: {
     guideTitle: "How to choose a water booster (hydrophore) for your home?",
@@ -131,6 +157,19 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         a: "An office needs a quiet, automatic booster that keeps pressure steady when several taps run at once. For a 5–20 person office we recommend Grundfos SCALA2 — quiet, constant pressure, integrated automation. A smaller office or retail space is fine with SCALA1; larger buildings can use a CMB booster set.",
       },
     ],
+    picks: {
+      title: "Best water booster 2026 — our three picks",
+      intro: "The answer to “the best water booster” depends on the situation — here are our three concrete picks: best overall, best price and best submersible.",
+      items: [
+        { name: "Grundfos SCALA2 3-45", why: "the best choice for a detached house — keeps the pressure constant even with several taps open and is practically silent.", price: "€657.41" },
+        { name: "Grundfos JP 3-42", why: "the best-priced floor-standing hydrophore — a simple, durable classic for a cottage, garden or smaller house.", price: "€234.52" },
+        { name: "Grundfos SBA 3-45 M", why: "the best submersible booster — lowered into the well, takes no indoor space, makes no noise and suits deeper water levels.", price: "€574.57" },
+      ],
+    },
+    related: { title: "See also:", links: [
+      { label: "Shallow-well and irrigation pumps", href: "/tooted/salvkaevupumbad" },
+      { label: "Borehole pumps", href: "/tooted/puurkaevupumbad" },
+    ] },
   },
   ru: {
     guideTitle: "Как выбрать насосную станцию для водоснабжения дома?",
@@ -181,6 +220,19 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         a: "В офис нужна тихая автоматическая станция, поддерживающая постоянное давление при одновременно открытых кранах. Для офиса на 5–20 сотрудников рекомендуем Grundfos SCALA2 — тихая, с постоянным давлением и встроенной автоматикой. В небольшой офис или магазин достаточно SCALA1; для крупных зданий подойдёт повысительный насос CMB.",
       },
     ],
+    picks: {
+      title: "Лучшая насосная станция 2026 — наши три рекомендации",
+      intro: "Ответ на вопрос «какая насосная станция лучшая» зависит от ситуации — вот наши три конкретные рекомендации: лучшая в целом, лучшая по цене и лучшая погружная.",
+      items: [
+        { name: "Grundfos SCALA2 3-45", why: "лучший выбор для частного дома — держит давление постоянным даже при нескольких открытых кранах и практически бесшумна.", price: "657,41 €" },
+        { name: "Grundfos JP 3-42", why: "лучший по цене напольный гидрофор — простая и надёжная классика для дачи, сада или небольшого дома.", price: "234,52 €" },
+        { name: "Grundfos SBA 3-45 M", why: "лучшая погружная станция — опускается в скважину, не занимает места, не шумит и подходит при более глубоком зеркале воды.", price: "574,57 €" },
+      ],
+    },
+    related: { title: "Смотрите также:", links: [
+      { label: "Колодезные и поливочные насосы", href: "/tooted/salvkaevupumbad" },
+      { label: "Скважинные насосы", href: "/tooted/puurkaevupumbad" },
+    ] },
   },
   lv: {
     guideTitle: "Kā izvēlēties ūdens automātu (hidroforu) mājas ūdensapgādei?",
@@ -231,6 +283,19 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         a: "Birojam vajag klusu, automātisku ūdens automātu, kas uztur stabilu spiedienu arī tad, ja vienlaikus ir atvērti vairāki krāni. 5–20 darbinieku birojam iesakām Grundfos SCALA2 — kluss, ar stabilu spiedienu un integrētu automātiku. Mazākam birojam vai telpai pietiek ar SCALA1; lielākām ēkām der CMB spiediena paaugstināšanas sūknis.",
       },
     ],
+    picks: {
+      title: "Labākais ūdens automāts 2026 — mūsu trīs izvēles",
+      intro: "Atbilde uz jautājumu „kurš ir labākais ūdens automāts“ ir atkarīga no situācijas — šeit ir mūsu trīs konkrētās izvēles: labākā kopumā, labākā cena un labākais iegremdējamais.",
+      items: [
+        { name: "Grundfos SCALA2 3-45", why: "labākā izvēle privātmājai — uztur spiedienu nemainīgu pat ar vairākiem vienlaikus atvērtiem krāniem un ir praktiski klusa.", price: "657,41 €" },
+        { name: "Grundfos JP 3-42", why: "izdevīgākais uz grīdas stāvošais hidrofors — vienkārša un izturīga klasika vasarnīcai, dārzam vai mazākai mājai.", price: "234,52 €" },
+        { name: "Grundfos SBA 3-45 M", why: "labākais iegremdējamais automāts — tiek nolaists akā, neaizņem vietu, ir kluss un der arī dziļākam ūdens līmenim.", price: "574,57 €" },
+      ],
+    },
+    related: { title: "Skatīt arī:", links: [
+      { label: "Akas un laistīšanas sūkņi", href: "/tooted/salvkaevupumbad" },
+      { label: "Urbumu sūkņi", href: "/tooted/puurkaevupumbad" },
+    ] },
   },
   lt: {
     guideTitle: "Kaip išsirinkti vandens automatą (hidroforą) namo vandentiekiui?",
@@ -281,6 +346,19 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         a: "Biurui reikia tylaus, automatinio vandens automato, išlaikančio stabilų slėgį net atidarius kelis čiaupus. 5–20 darbuotojų biurui rekomenduojame Grundfos SCALA2 – tylų, su stabiliu slėgiu ir integruota automatika. Mažesniam biurui ar patalpai pakanka SCALA1; didesniems pastatams tinka CMB slėgio didinimo siurblys.",
       },
     ],
+    picks: {
+      title: "Geriausias vandens automatas 2026 — mūsų trys pasirinkimai",
+      intro: "Atsakymas į klausimą „kuris vandens automatas geriausias“ priklauso nuo situacijos — štai mūsų trys konkretūs pasirinkimai: geriausias apskritai, geriausia kaina ir geriausias panardinamas.",
+      items: [
+        { name: "Grundfos SCALA2 3-45", why: "geriausias pasirinkimas individualiam namui — slėgis išlieka pastovus net esant keliems vienu metu atidarytiems čiaupams, praktiškai tylus.", price: "657,41 €" },
+        { name: "Grundfos JP 3-42", why: "geriausios kainos ant grindų statomas hidroforas — paprasta ir patvari klasika vasarnamiui, sodui ar mažesniam namui.", price: "234,52 €" },
+        { name: "Grundfos SBA 3-45 M", why: "geriausias panardinamas automatas — leidžiamas į šulinį, neužima vietos, netriukšmauja ir tinka gilesniam vandens lygiui.", price: "574,57 €" },
+      ],
+    },
+    related: { title: "Taip pat žr.:", links: [
+      { label: "Šulininiai ir laistymo siurbliai", href: "/tooted/salvkaevupumbad" },
+      { label: "Gręžinių siurbliai", href: "/tooted/puurkaevupumbad" },
+    ] },
   },
 }
 
@@ -1798,6 +1876,9 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
         a: "Kui majas on juba olemas tagasivooluliin ja soovid lihtsat ning töökindlat lahendust, on UPS(N) hea valik. ALPHA1 N ja ALPHA2 N reguleerivad võimsust automaatselt ja säästavad elektrit. MAGNA1 ja MAGNA3 on mõeldud kortermajadele, hotellidele ja muudesse suurtesse hoonetesse pikkade ringlusliinidega.",
       },
     ],
+    related: { title: "Vaata ka:", links: [
+      { label: "Kütte- ja tsirkulatsioonipumbad", href: "/tooted/kuttepumbad" },
+    ] },
   },
   en: {
     guideTitle: "How to choose a domestic hot water circulation pump?",
@@ -1849,6 +1930,9 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
         a: "If the house already has a return line and you want a simple, reliable solution, UPS(N) is a good choice. ALPHA1 N and ALPHA2 N adjust their output automatically and save electricity. MAGNA1 and MAGNA3 are meant for apartment blocks, hotels and other large buildings with long circulation lines.",
       },
     ],
+    related: { title: "See also:", links: [
+      { label: "Heating and circulator pumps", href: "/tooted/kuttepumbad" },
+    ] },
   },
   ru: {
     guideTitle: "Как выбрать циркуляционный насос горячего водоснабжения?",
@@ -1900,6 +1984,9 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
         a: "Если в доме уже есть обратная линия и нужно простое надёжное решение, хороший выбор — UPS(N). ALPHA1 N и ALPHA2 N автоматически регулируют мощность и экономят электричество. MAGNA1 и MAGNA3 предназначены для многоквартирных домов, отелей и других больших зданий с длинными циркуляционными линиями.",
       },
     ],
+    related: { title: "Смотрите также:", links: [
+      { label: "Отопительные и циркуляционные насосы", href: "/tooted/kuttepumbad" },
+    ] },
   },
   lv: {
     guideTitle: "Kā izvēlēties karstā ūdens cirkulācijas sūkni?",
@@ -1951,6 +2038,9 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
         a: "Ja mājā jau ir atgriezes līnija un vēlaties vienkāršu un uzticamu risinājumu, UPS(N) ir laba izvēle. ALPHA1 N un ALPHA2 N automātiski regulē jaudu un taupa elektroenerģiju. MAGNA1 un MAGNA3 ir paredzēti daudzdzīvokļu mājām, viesnīcām un citām lielām ēkām ar garām cirkulācijas līnijām.",
       },
     ],
+    related: { title: "Skatīt arī:", links: [
+      { label: "Apkures un cirkulācijas sūkņi", href: "/tooted/kuttepumbad" },
+    ] },
   },
   lt: {
     guideTitle: "Kaip išsirinkti karšto vandens cirkuliacinį siurblį?",
@@ -2002,6 +2092,9 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
         a: "Jei name jau yra grįžtamoji linija ir norite paprasto bei patikimo sprendimo, UPS(N) yra geras pasirinkimas. ALPHA1 N ir ALPHA2 N automatiškai reguliuoja galią ir taupo elektrą. MAGNA1 ir MAGNA3 skirti daugiabučiams, viešbučiams ir kitiems dideliems pastatams su ilgomis cirkuliacinėmis linijomis.",
       },
     ],
+    related: { title: "Taip pat žr.:", links: [
+      { label: "Šildymo ir cirkuliaciniai siurbliai", href: "/tooted/kuttepumbad" },
+    ] },
   },
 }
 

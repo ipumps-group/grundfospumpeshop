@@ -5,7 +5,7 @@
  * narrative (when present), grouped insights, link to the full admin report.
  */
 
-import type { Insight, OrderRow, ReportChange, SiteChanges, StoredReport } from "./types"
+import type { Insight, KeywordFamilyStat, OrderRow, ReportChange, SiteChanges, StoredReport } from "./types"
 import { summarizeChanges } from "./changes"
 
 const BRAND = "#003366"
@@ -268,6 +268,63 @@ function ordersSection(orders: OrderRow[], window?: { start: string; end: string
   return { html, text }
 }
 
+/* ---------- keyword families (GSC) — same table as the admin report ---------- */
+
+/** Positsiooni nool: tõus = positsiooni numbri LANGUS (madalam koht = parem). */
+function posArrowEmail(cur: number | null, prev: number | null): { symbol: string; color: string } {
+  if (cur === null || prev === null) return { symbol: "", color: MUTED }
+  const diff = prev - cur
+  if (diff >= 2) return { symbol: "▲", color: "#166534" }
+  if (diff <= -2) return { symbol: "▼", color: "#b91c1c" }
+  return { symbol: "■", color: MUTED }
+}
+
+function familiesSection(report: StoredReport): { html: string; text: string[] } | null {
+  const fams = report.snapshot.gsc?.families
+  if (!fams || fams.length === 0) return null
+  const fmtP = (p: number | null) => (p === null ? "–" : p.toFixed(1).replace(".", ","))
+  const sorted = [...fams].sort(
+    (a: KeywordFamilyStat, b: KeywordFamilyStat) =>
+      b.current.impressions - a.current.impressions || b.previous.impressions - a.previous.impressions,
+  )
+
+  const rows: string[] = []
+  const textRows: string[] = []
+  for (const f of sorted) {
+    const a = posArrowEmail(f.current.position, f.previous.position)
+    const noise = f.current.impressions < 10 && f.previous.impressions < 10
+    const label = escapeHtml(f.label) + (noise ? `<span style="color:#9aa5b1"> (väike liiklus)</span>` : "")
+    const arrow = a.symbol ? `<span style="color:${a.color}">${a.symbol}</span>` : ""
+    rows.push(
+      `<tr>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK}">${label}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};text-align:right">${fmtP(f.current.position)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${MUTED};text-align:right">${fmtP(f.previous.position)}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;text-align:center">${arrow}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};text-align:right">${f.current.impressions}</td>` +
+      `<td style="padding:6px 8px;border-top:1px solid #edf0f4;font-size:14px;color:${INK};text-align:right">${f.current.clicks}</td>` +
+      `</tr>`,
+    )
+    textRows.push(
+      `- ${f.label}${noise ? " (väike liiklus)" : ""}: pos ${fmtP(f.current.position)} (eelmine ${fmtP(f.previous.position)}) ${a.symbol} · ${f.current.impressions} näitamist, ${f.current.clicks} klikki`,
+    )
+  }
+
+  const html =
+    `<h2 style="font-size:18px;color:${BRAND};margin:24px 0 4px">Märksõnaperekonnad (GSC)</h2>` +
+    `<p style="font-size:13px;color:${MUTED};margin:4px 0 8px">▲ tõus ≥2 kohta · ■ stabiilne · ▼ langus · positsioon = näitamistega kaalutud keskmine · &lt;10 näitamist = väike liiklus</p>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${BORDER};border-radius:12px;overflow:hidden">` +
+    `<tr style="background:#f8fafc">` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED}">Märksõnapere</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Pos</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Eelmine</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED}"></td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Näitamised</td>` +
+    `<td style="padding:6px 8px;font-size:13px;color:${MUTED};text-align:right">Klikid</td>` +
+    `</tr>${rows.join("")}</table>`
+  return { html, text: ["", "MÄRKSÕNAPEREKONNAD (GSC)", ...textRows] }
+}
+
 /* ---------- channel comparison (Meta vs Google) ---------- */
 
 function channelsSection(report: StoredReport): { html: string; text: string[] } {
@@ -376,6 +433,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   const changes = changesSection(report.changes ?? [])
   const ordersHtml = ordersSection(s.orders?.orders ?? [], s.orders?.window)
   const channels = channelsSection(report)
+  const families = familiesSection(report)
   const siteChanges = s.siteChanges ? siteChangesSection(s.siteChanges) : null
   const errorsNote = s.errors.length
     ? `<p style="font-size:13px;color:#92400e;background:#fef3c7;border-radius:8px;padding:8px 12px">Osaliselt puuduvad andmed: ${escapeHtml(s.errors.join(" · "))}</p>`
@@ -392,6 +450,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cards.join("")}</tr></table>
   ${changes.html}
   ${siteChanges ? siteChanges.html : ""}
+  ${families ? families.html : ""}
   ${channels.html}
   ${ordersHtml.html}
   ${narrativeHtml}
@@ -412,6 +471,7 @@ export function buildReportEmail(report: StoredReport, adminUrl: string): { subj
   ]
   textLines.push(...changes.text)
   if (siteChanges) textLines.push(...siteChanges.text)
+  if (families) textLines.push(...families.text)
   textLines.push(...channels.text)
   textLines.push(...ordersHtml.text)
   if (report.narrative) {

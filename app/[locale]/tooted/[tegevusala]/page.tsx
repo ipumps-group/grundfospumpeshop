@@ -272,6 +272,37 @@ export default async function CategoryPage({
                     )}
                   </div>
 
+                  {cc.related && cc.related.links.length > 0 && (
+                    <div className="mt-5 flex flex-wrap items-center gap-2">
+                      <span className="text-[13px] font-medium text-gray-400">{cc.related.title}</span>
+                      {cc.related.links.map((l) => (
+                        <Link
+                          key={l.href}
+                          href={l.href}
+                          className="text-[13px] font-medium text-[#003366] bg-[#003366]/5 hover:bg-[#003366]/10 px-3 py-1.5 rounded-full transition-colors"
+                        >
+                          {l.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {cc.picks && (
+                    <div className="mt-8">
+                      <h3 className="text-xl font-bold text-[#003366]">{cc.picks.title}</h3>
+                      <p className="mt-3 text-[15px] text-gray-600 leading-relaxed">{cc.picks.intro}</p>
+                      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {cc.picks.items.map((item) => (
+                          <div key={item.name} className="rounded-xl border border-gray-200 bg-gray-50/50 p-5 flex flex-col">
+                            <div className="font-semibold text-gray-900">{linkifyProducts(item.name, productLinks)}</div>
+                            <p className="mt-2 text-[14px] text-gray-600 leading-relaxed flex-1">{linkifyProducts(item.why, productLinks)}</p>
+                            <div className="mt-3 text-lg font-bold text-[#003366]">{item.price}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <h3 className="mt-8 text-xl font-bold text-[#003366]">{cc.priceTitle}</h3>
                   <p className="mt-3 text-[15px] text-gray-600 leading-relaxed">{cc.priceIntro}</p>
                   <div className="mt-4 overflow-x-auto rounded-xl border border-gray-200">

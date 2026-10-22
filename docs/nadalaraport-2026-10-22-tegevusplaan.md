@@ -41,7 +41,9 @@ Skriptid: `scripts/add-salvkaevu-negatives.mjs` (idempotentne), `scripts/set-bud
 
 ## 1. SEO- ja sisuplaan (raporti leidude põhjal, täpsustatud olemasoleva sisu suhtes)
 
-### 1.1 Avalehe Grundfos-täiendus — „käeulatuses" (prioriteet 1)
+> **SEIS 22.10: punktid 1.1–1.3 TEOSTATUD** — vt allpool „Tehtud" märkused. Punkt 1.4 jääb seisma (pausitud kampaania).
+
+### 1.1 Avalehe Grundfos-täiendus — „käeulatuses" (prioriteet 1) ✅ TEHTUD
 
 **Seis:** perekond „Grundfos" pos **9,8** (oli 11,5), **141 näitamist/nädal** (oli 67 — kahekordistus), kandev leht on avaleht `/`. Esimesele lehele jääb puudu vähe.
 **Olemas juba:** meta description parandatud + „Grundfos pumpade valik" siselingide sektsioon (21.09).
@@ -54,7 +56,12 @@ Skriptid: `scripts/add-salvkaevu-negatives.mjs` (idempotentne), `scripts/set-bud
 **Teostus:** DB `pages` tabel (slug `esilehtx`), muster nagu `scripts/update-homepage-grundfos-links.mjs` ja `scripts/update-homepage-grundfos-faq.mjs`. Nõuab ISR-i (~1 h) / deploy'd.
 **Kriteerium:** „Grundfos" perekond pos ≤ 8 järgmiseks raportiks.
 
-### 1.2 Veeautomaadid — CTR ja „parim"-sisu (MITTE uus juhendileht)
+**Tehtud 22.10 (lõplik kujul pärast kliendi tagasisidet):** avalehe kaks sisuliselt korduvat sektsiooni („Grundfos tootesarjad ja hinnad" + „Milline Grundfos pump valida?" juhend) **ühendatud üheks 4-veeruliseks sektsiooniks koos tunnuspiltidega** — iga veerg: tootepilt (link), teema h3 ja lühitekst täpsete „alates X €" hindadega (5 keeles): Küte/tsirkulatsioon (ALPHA GO 170,05 € / MAGNA1 432,31 €) · Veeautomaat (SCALA2 657,41 € / SCALA1 452,05 € / JP 234,52 €) · Puurkaev (SQ 740,87 € / SQE) · Drenaaž (Unilift CC 172,75 € / KP / AP). „kasutatud vs uus" juhendi link jääb lingi-sektsiooni („Grundfos pumpade valik"). Skript: `scripts/merge-homepage-grundfos-guide.mjs` (idempotentne). Jõuab live'i ISR-iga (~1 h).
+**Lisaks parandatud:** megamenüüst („Elamud ja ärihooned") puudus **Veeautomaat** kategooria — `Header.tsx` hardkooditud nimekirjas polnud `veeautomaadid` rida (DB-s on aktiivne). Lisatud (Droplet ikoon, 23 toodet); nõuab deploy'd.
+
+**Viimistlus 22.10 (kliendi sõnastus):** veergude „→ valik" tekstilingid asendatud **nuppudega** (filled, #003366) ja veergude tekstid viidud kliendi sõnastusse (ALPHA GO / SCALA2-JP / SQ / Unilift CC); „kasutatud vs uus" link on lingi-sektsioonis. Skript: `scripts/update-homepage-grundfos-columns.mjs` (idempotentne). Raporti adminnis on „(müra)" sild nüüd **„(väike liiklus)"** (`app/haldus/raportid/[id]/page.tsx`).
+
+### 1.2 Veeautomaadid — CTR ja „parim"-sisu (MITTE uus juhendileht) ✅ TEHTUD
 
 **Seis ja täpsustus:** kategoorialehel `/tooted/veeautomaadid` on juba 21.09 lisatud valikujuhend + hinnatabel + FAQ (`lib/category-content.ts`). LLM-i soovitus „kirjuta juhend" on seega osaliselt dubleeriv — tegelik lünk on mujal:
 
@@ -72,19 +79,32 @@ Skriptid: `scripts/add-salvkaevu-negatives.mjs` (idempotentne), `scripts/set-bud
 **Teostus:** `lib/category-content.ts` (5 keelt) + kategoorialehe metadata. Kontrollida, et tõlkevõtmed ja JSON-LD säiliksid.
 **Kriteerium:** „põrandal seisev veeautomaat" CTR > 0 (esimene klikk); „parim veeautomaat" pos ≤ 10.
 
-### 1.3 Orgaanilise tõusu kinnitamine (GSC klikid +16 %)
+**Tehtud 22.10:**
+1. **Meta ümber** (live DB-s, leht on `force-dynamic` → jõustub kohe): title „Veeautomaat: põrandal seisev ja uputatav — laos | Pumbapood.ee" (parandab ka vana „| iPumps" brändijäänuki), description laoseisu + tarne 1–3 tööpäeva + hinnad alates 234,52 € / 574,57 €. Skript: `scripts/update-veeautomaadid-meta.mjs`.
+2. **„Parim veeautomaat 2026 — meie kolm valikut" plokk** kategoorialehel (5 keeles): SCALA2 3-45 (657,41 € — parim eramule), JP 3-42 (234,52 € — parim hind), SBA 3-45 M (574,57 € — parim uputatav) — `lib/category-content.ts` (`picks`) + renderdus `app/[locale]/tooted/[tegevusala]/page.tsx`. Jõuab live'i deploy'ga.
+3. **Seotud-kategooriate lingid** („Vaata ka: Salvkaevu- ja kastmispumbad · Puurkaevupumbad", 5 keeles) — annab siselingi tõusvale salvkaevupumpade lehele (`related`). Test: `tests/category-picks.test.ts` (6 testi).
+
+### 1.3 Orgaanilise tõusu kinnitamine (GSC klikid +16 %) ✅ TEHTUD
 
 **Tõusu kandjad (topPages, see nädal):** avaleht (106 näit.), `/tooted/veeautomaadid` (113 näit., pos 9,4), `/tooted/salvkaevupumbad` (29 näit., pos 7,4), ALPHA1 GO tootelehed (pos ~6,6, CTR 17 %).
 
-**Teha:**
-1. Siselinkide audit: avalehelt ja kategooriahub'idelt lisada 1–2 märksõna-ankru linki tõusvatele lehtedele (veeautomaadid, salvkaevupumbad, alpha1-go tooted).
-2. Tootedelehtede väike täiendus: ALPHA1 GO 25-80 leht (müüja nädalal) — tarneinfo ja laoseis esilehe osa lähemale (toetab ka konversiooni).
-
-**Teostus:** DB sisuplokid + kategooriate mallid. Väike töö (~1 h).
+**Tehtud 22.10:** siselingid lisatud kahest suunast — (a) avalehe uus „Grundfos tootesarjad ja hinnad" sektsioon lingib märksõna-ankrutega veeautomaadid (×3), salvkaevupumbad, puurkaevupumbad, kuttepumbad ja drenaažipumbad sarjadesse; (b) veeautomaatide lehe „Vaata ka" lingid salvkaevu- ja puurkaevupumpadele. ALPHA1 GO toodete tarneinfo teema jääb eraldi — vajab tootelehe malli muudatust (punk lisada, kui järgmine raport kinnitab tõusu jätkumist).
 
 ### 1.4 „tühjenduspump" QS 3/10 — SEISUB (seotud pausitud kampaaniaga)
 
 Leid puudutab **pausitud Unilifti kampaaniat** (pausitud 14.10). QS- ja maandumislehe parandustöid (`/unilift`) praegu ei tehta — tulemus ei avalduks ilma liikluseta. Kui Unilift taasaktiveeritakse, siis: kontrollida `/unilift` LCP < 2,5 s ja lehe asjakohasus enne uuesti käivitamist. Raporti poolel on kaunistusena planeeritud: pausitud kampaaniate QS-leiud tulevikus filtreerida (müra vähendamine).
+
+### 1.5 Küttepumpade nähtavuse audit (kliendi prioriteet — külm hooaeg) ✅ TEHTUD
+
+**Audit (22.10, live GSC + lehe lähtekood):** kategoorialehel on kõik põhiline olemas — H1 „Küttepumbad — Grundfos tsirkulatsioonipumbad küttesüsteemile", valikujuhend mõlema täpse märksõnavormiga, hinnatabel live-hindadega, FAQ + FAQPage JSON-LD, tootelehtedel Product JSON-LD, sitemap ja hreflang korras, siselinkid avalehelt (4-veeru sektsioon), menüüst, jalusest ja ALPHA GO lehelt. Orgaaniline nähtavus üldpäringutel on siiski ~0 (28p: 1 näitamist; eelmine 28p: 13, pos 34–81) — põhjus on domeeni noorus/autoriteet vs Bauhof/Depo/Akvedukt, mitte lehe sisu.
+
+**Parandatud 22.10:**
+1. **„| iPumps" brändijäänuk → „| Pumbapood.ee"** kõigis 7 kategooria meta_title'is (SERP-is paistsis vana brändi nimi — CTR ja usaldus). Skript: `scripts/fix-category-meta-brand.mjs`.
+2. **kuttepumbad meta_description** CTR-paremaks: „Küttepump ja tsirkulatsioonipump laos — Grundfos ALPHA GO asendab vanu UPS/ALPHA pumbad. Alates 170,05 €, tarne 1–3 tööpäeva, tasuta nõustamine."
+3. **Kanibalisatsiooni leevendus:** „tsirkulatsioonipump" päringule osutus korra /en/ sooja-tarbevee leht — sooja-tarbevee kategoorialehele lisatud „Vaata ka: Kütte- ja tsirkulatsioonipumbad" link (5 keeles, `related` väli), mis suunab signaali õigele lehele.
+4. Raporti **e-kirjas on nüüd märksõnaperekondade tabel** (küttepumbad rida oli varem nähtav ainult adminnis; e-kirjas puudus).
+
+**Mida on-page'i raames enam teha ei saa:** täiendav tõus vajab domeeniautoriteeti (linke, aega) — realistlik tee: ALPHA GO Ads katab vahepeal nõudluse (tsirkulatsioonipump: 192 näit. + 54 kl/nädal) + mudelipõhiste pika-saba päringute orgaanika (pos ~6,6 juba toimib).
 
 ---
 
