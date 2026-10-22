@@ -65,8 +65,21 @@ async function gaql(token: string, customerId: string, developerToken: string, q
 
 const field = (row: Row, resource: string, name: string): unknown => row[resource]?.[name]
 
-/** Pumbapood brand terms (brand clicks would mostly come organically anyway). */
-export const isBrandTerm = (t: string) => /pumba\s?pood|pumbapood|\bpump\s?oü\b/i.test(t)
+/**
+ * Pumbapood brand terms (brand clicks would mostly come organically anyway).
+ * Sisaldab ka Grundfos-termeid: Grundfos on poe põhibränd ja kliendi otsuse
+ * järgi on „grundfos pump" PÕHIMÄRKSÕNA — bränditermineid EI TOHI kunagi
+ * negatiivseteks märksõnadeks pakkuda (vt insights.ts „wasted" reegel).
+ */
+export const isBrandTerm = (t: string) => /pumba\s?pood|pumbapood|pump\s?oü|grundfos/i.test(t)
+
+/**
+ * Kitsas OMA-bränd (ainult pumbapood/pump oü, ilma tootjabrändita).
+ * Eelarve-kärpimise leiu eeldus „brändiklikid oleks tulnud ka orgaaniliselt
+ * (pos 1)" kehtib ainult oma brändile — „grundfos" orgaaniline positsioon on
+ * ~10, seega Grundfos-terminite ostmine on teadlik katvus, mitte raiskamine.
+ */
+export const isOwnBrandTerm = (t: string) => /pumba\s?pood|pumbapood|pump\s?oü/i.test(t)
 
 export async function pullAds(period: ReportPeriod): Promise<AdsData> {
   const developerToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN
@@ -133,12 +146,18 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     }
   })
   const brand = { cost: 0, clicks: 0, conversions: 0 }
+  const ownBrand = { cost: 0, clicks: 0, conversions: 0 }
   const nonBrand = { cost: 0, clicks: 0, conversions: 0 }
   for (const t of topTerms) {
     const bucket = isBrandTerm(t.term) ? brand : nonBrand
     bucket.cost += t.cost
     bucket.clicks += t.clicks
     bucket.conversions += t.conversions
+    if (isOwnBrandTerm(t.term)) {
+      ownBrand.cost += t.cost
+      ownBrand.clicks += t.clicks
+      ownBrand.conversions += t.conversions
+    }
   }
 
   /* --- keywords + quality score (koos QS-komponentidega) --- */
@@ -211,5 +230,5 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     conversions: prevRows.reduce((s, r) => s + num(field(r, "metrics", "all_conversions")), 0),
   }
 
-  return { available: true, campaigns, brand, nonBrand, topTerms, keywords, totals, prevTotals }
+  return { available: true, campaigns, brand, ownBrand, nonBrand, topTerms, keywords, totals, prevTotals }
 }

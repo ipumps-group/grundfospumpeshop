@@ -12,8 +12,8 @@ import type { Insight, ReportChange, ReportSnapshot } from "./types"
 import { auditNarrativeNumbers } from "./number-audit"
 import { STRATEGY_CONTEXT } from "./strategy"
 
-const TIMEOUT_MS = 90_000
-const MAX_TOKENS = 2500
+const TIMEOUT_MS = 120_000
+const MAX_TOKENS = 4000
 
 const SYSTEM_PROMPT = `Oled Pumbapoe (pumbapood.ee, Pump OÜ) peamine turundusstrateeg ja SEO/Ads-analüütik. Pumbapood on Eesti e-pood: veepumbad, drenaažipumbad, puurkaevupumbad, kütte- ja tsirkulatsioonipumbad, veeautomaadid/hüdrofoorid, reoveepumbad ja varustus (põhibränd nt Grundfos, sh Unilift). Müük toimub e-poes (pakiautomaat/kuller Eestisse, ka Lätti ja Leetu).
 
@@ -29,6 +29,8 @@ ${STRATEGY_CONTEXT}
 KIRJUTA eesti keeles, otse ja numbritega. Sihtrühm: poe omanik. Ära kasuta ingliskeelseid turundusklõpse.
 
 NUMBRITE REEGEL (range, rikkumine = kogu tekst visatakse ära): kasuta AINULT numbreid, mis esinevad sisend-JSON-is või leidude tekstis. Ära arvuta ise protsente, summasid, keskmisi ega muutusi; ära liida ega lahuta numbreid; ära ümarda neid omal äranägemisel. Kui soovitud number sisendis puudub, kirjelda suunda sõnadega (tõusis/langes) ilma numbrita. Kui midagi pole öelda, jäta välja. ads.searchTermsCoveragePct näitab, kui suure osa Ads-kulust otsingupäringute andmed katavad — jaotamata osa EI OLE brändi- ega konkurentide kulu ja seda ei tohi nii nimetada. TÕLGENDUSE REEGEL: ära nimeta pelkalt kulu konversiooni tõendiks — konversioonidest räägi ainult siis, kui vastava päringu/kampaania conversions > 0. Sisu- ja kampaaniasoovitused peavad põhinema sisend-JSON-is esinevatel päringutel ja märksõnaperekondadel — ära too välja päringuid ega tooteid, mida andmetes pole.
+
+BRÄNDITERMINTE RANGE REEGEL (kliendi direktiiv, erandita): kõik päringud, mis sisaldavad „pumbapood", „pump oü" või „grundfos" (sh mudelivariandid nt „grundfos sqe 2-55", „grundfos pump"), on poe kaitstud brändi- ja põhimärksõnad. ÄRA KUNAGI: esita neid „kulutab raha ilma konversioonideta" kontekstis, soovita neid negatiivseteks märksõnadeks ega ühenda neid „mitte-brändi päringute" leidu listiga. Bränditerminite kulu on teadlik brändikaitse — orgaaniline positsioon „grundfos" päringutele on nõrk (pos ~10), seega need klikid EI tuleks orgaaniliselt. Negatiivseid märksõnu võib soovitada ainult sellistele modifikaatoritele nagu „kasutatud", „remont", „rent" (ilma bränditerminit välistamata).
 
 VÄLJUNDI FORMAAT (GitHub-flavoured markdown, täpselt need neli pealkirja, selles järjekorras):
 ## Kokkuvõte
@@ -259,7 +261,35 @@ export async function generateNarrative(
     `Koosta nende põhjal nädalaraporti analüütiline osa.\n\n` +
     JSON.stringify(digest, null, 1)
 
-  return finalize(await callAnthropic(anthropicKey, userContent), digest, insights)
+  const first = await callAnthropic(anthropicKey, userContent)
+  const ok = finalize(first, digest, insights)
+  if (ok) return ok
+
+  /* Parandusring: kui number-audit lükkab teksti tagasi (mudel tuletas
+   * numbreid), palu SAMAL mudelil oma tekst parandada — keelatud numbrite
+   * nimekiri käib kaasa. Üks parandusring piisab; kui ka see ebaõnnestub,
+   * läheb raport välja rules-only kujul nagu seni. */
+  if (first) {
+    const violations = auditNarrativeNumbers(first, [JSON.stringify(digest), JSON.stringify(insights), SYSTEM_PROMPT])
+    /* Kontekst kaasa: näita mudelile täpsed laused/punktid, kus keelatud
+     * number esineb — palj "eemalda number" jätab mudel arvama, kus viga on,
+     * ja temp 0 korral kordab ta sama viga uuesti. */
+    const badLines = first
+      .split("\n")
+      .filter((line) => violations.some((v) => line.includes(v)))
+      .slice(0, 10)
+    const repairPrompt =
+      `Sinu eelmises raportitekstis esines numbreid, mida sisendandmetes EI OLE (ise tuletatud/arvutatud): ${violations.join(", ")}.\n\n` +
+      `Need read sisaldavad keelatud numbreid:\n${badLines.map((l) => `- ${l}`).join("\n")}\n\n` +
+      `Kirjuta allolev tekst ümber nii, et KÕIK numbrid pärinevad sõna-sõnalt sisendandmetest. Iga keelatud number tuleb EEMALDADA või asendada sõnalise suunaga (nt „langes märgatavalt") — ÄRA asenda neid teiste arvutatud numbritega. Eri tähelepanu: ära arvuta protsentuaalseid muutusi (sh „langes nulli" = -100 % on KEELATUD) ega liida eri väljade väärtusi. Säilita täpselt sama nelja-pealkirja markdown-struktuur ja asjakohasus.\n\n` +
+      `RIPAKKUNUD TEKST:\n${first}\n\n` +
+      `SISENDANDMED (viide):\n` +
+      JSON.stringify(digest, null, 1)
+    const repaired = await callAnthropic(anthropicKey, repairPrompt)
+    const ok2 = finalize(repaired, digest, insights)
+    if (ok2) return ok2
+  }
+  return null
 }
 
 /**
@@ -303,6 +333,10 @@ async function callAnthropic(apiKey: string, userContent: string, system: string
       body: JSON.stringify({
         model,
         max_tokens: maxTokens,
+        /* temperature 0: narrative on rangete numbrireeglitega sõnastuskiht —
+         * juhuslikkus (default 1.0) tõi kaasa tuletatud numbreid ja number-
+         * auditi korduvaid läbikukkumisi (raport jäi rules-only kujule). */
+        temperature: 0,
         system,
         messages: [{ role: "user", content: userContent }],
       }),

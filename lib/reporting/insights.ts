@@ -255,18 +255,26 @@ function adsInsights(ads: AdsData, out: Insight[]): void {
   // terms ("Other search terms"). Compare brand only against ATTRIBUTED spend
   // and require a meaningful absolute amount, otherwise the remainder bucket
   // would be misreported as brand spend.
+  //
+  // Eelarve-kärpimise leid põhineb AINULT oma brändil (pumbapood): eeldus
+  // „brändiklikid oleks tulnud ka orgaaniliselt (pos 1)" ei kehti Grundfos-
+  // terminitele (orgaaniline pos ~10) — need on teadlik katvus, mitte kärpe.
+  const own = ads.ownBrand
   const attributedCost = ads.brand.cost + ads.nonBrand.cost
-  const brandShare = attributedCost > 0 ? ads.brand.cost / attributedCost : 0
-  if (ads.brand.cost >= 10 && brandShare >= 0.3) {
+  const ownBrandShare = own && attributedCost > 0 ? own.cost / attributedCost : 0
+  if (own && own.cost >= 10 && ownBrandShare >= 0.3) {
     out.push({
       area: "ads",
       severity: "opportunity",
-      title: `${Math.round(brandShare * 100)} % päringutega seostatud Ads-kulust läheb brändipäringutele`,
-      detail: `Brändi-klikid oleks enamasti tulnud ka orgaaniliselt (pos 1). Brändikulu ${ads.brand.cost.toFixed(2).replace(".", ",")} € vs mitte-brändi ${ads.nonBrand.cost.toFixed(2).replace(".", ",")} €. Otsingupäringute andmed katavad ${t.cost > 0 ? Math.round((attributedCost / t.cost) * 100) : 0} % kogukulust (${t.cost.toFixed(2).replace(".", ",")} €) — ülejäänu on Google'i privaatsuskünnise tõttu jaotamata, mitte brändikulu.`,
+      title: `${Math.round(ownBrandShare * 100)} % päringutega seostatud Ads-kulust läheb oma brändipäringutele`,
+      detail: `Oma brändi (pumbapood) klikid oleks enamasti tulnud ka orgaaniliselt (pos 1). Oma brändi kulu ${own.cost.toFixed(2).replace(".", ",")} € vs muu ${(attributedCost - own.cost).toFixed(2).replace(".", ",")} €. Otsingupäringute andmed katavad ${t.cost > 0 ? Math.round((attributedCost / t.cost) * 100) : 0} % kogukulust (${t.cost.toFixed(2).replace(".", ",")} €) — ülejäänu on Google'i privaatsuskünnise tõttu jaotamata, mitte brändikulu.`,
       action: "Kaalu brändikampaania eelarve kärpimist miinimumini ja raha suunamist mitte-brändi tootepäringutesse, kus orgaaniline positsioon on nõrk (vt peatabel pos 10+).",
     })
   }
 
+  // Kaitstud bränditermineid (pumbapood + grundfos — kliendi direktiiv:
+  // „grundfos pump" on põhimärksõna) EI TOHI siia kunagi sattuda — isBrandTerm
+  // on lai definitsioon, mis hõlmab mõlemad.
   const wasted = ads.topTerms.filter((x) => !isBrandTerm(x.term) && x.cost >= 10 && x.conversions === 0).slice(0, 5)
   if (wasted.length > 0) {
     const list = wasted.map((x) => `„${x.term}" (${x.cost.toFixed(2).replace(".", ",")} €)`).join(", ")

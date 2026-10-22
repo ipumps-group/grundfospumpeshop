@@ -150,7 +150,10 @@ export interface AdsKeyword {
 export interface AdsData {
   available: boolean
   campaigns: AdsCampaign[]
+  /** Bränditerminid laias tähenduses: pumbapood + Grundfos (poe põhibränd). */
   brand: { cost: number; clicks: number; conversions: number }
+  /** Ainult oma bränd (pumbapood/pump oü) — brändieelarve leiu alus. Vanades snapshotides puudub. */
+  ownBrand?: { cost: number; clicks: number; conversions: number }
   nonBrand: { cost: number; clicks: number; conversions: number }
   topTerms: AdsTerm[]
   keywords: AdsKeyword[]
