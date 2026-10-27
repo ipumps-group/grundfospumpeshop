@@ -143,6 +143,12 @@ eraldi punkt ja pildid tõstavad CTR-i.
 | `add-image-assets.mjs` | Pildiassetid (2 formaati) + linkimine | `--dry-run` |
 | `raise-brand-cpc.mjs` | Brändi märksõnade maxCPC | `--dry-run` |
 | `pause-duplicate-brand-rsa.mjs` | Pausitab rühma üleliigse RSA (reegel: 1 RSA/rühm) | `--dry-run` |
+| `set-budget.mjs` | Kampaania päevaeelarve seadmine | `--dry-run` |
+| `set-weekday-schedule.mjs` | E–R 00:00–24:00 ajakavad ENABLED kampaaniatele (nädalavahetused väljas) | `--dry-run` |
+
+Meta poolel haldab nädalavahetuse-pausi Verceli cron `/api/cron/meta-weekday-schedule`
+(la 00:00 pausib, esm 00:00 jätkab 4 aktiivset ad set'i; Tallinna aeg, seis Supabase
+`settings` tabelis). Meta API ei toeta dayparting'ut ilma lifetime-eelarveteta.
 
 Kõik skriptid on idempotsentsed (juba tehtud sammud jäetakse vahele) ja loevad
 `.env.local` Google Ads volitusi.
