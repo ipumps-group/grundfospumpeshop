@@ -93,6 +93,18 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Milline veeautomaat sobib kontorisse?",
         a: "Kontorisse sobib vaikne ja automaatne veeautomaat, mis hoiab ühtlase veerõhu ka siis, kui mitu kraani on korraga avatud. 5–20 töötajaga kontorisse soovitame Grundfos SCALA2 — vaikne, püsiva rõhuga ja integreeritud automaatikaga. Väiksemasse kontorisse või äripinnale piisab SCALA1-st, suurematesse hoonetesse sobib ka CMB rõhutõstepump.",
       },
+      {
+        q: "Miks veeautomaat ei käivitu?",
+        a: "Kõige sagedasemad põhjused: voolu pole või pistik on lahti, kaitse on välja lülitanud (nt kuivakäik — kaev on tühi), rõhulüliti on rikki või kondensaator on lõppenud. Kontrolli esmalt voolu ja kaevu veetaset. Kui pump ikka ei käivitu, võta ühendust — aitame vea diagnoosida ja leiame vajadusel asenduspumba.",
+      },
+      {
+        q: "Miks veeautomaat ei seisku või lülitub pidevalt sisse-välja?",
+        a: "Pidev sisse-välja lülitumine viitab tavaliselt lekkele süsteemis (tilkuv kraan või wc-pott) või valele õhurõhule rõhumahutis. Kui pump töötab ilma veevõtuta edasi, võib rõhulüliti olla rikki või tagasilöögiklapp lekkida. Lekked tasub kõrvaldada kohe — pidev töö kulutab pumpa ja raiskab elektrit.",
+      },
+      {
+        q: "Miks veerõhk majas kõigub?",
+        a: "Kui rõhk langeb teise kraani avamisel, on pump liiga nõrk või on tegu klassikalise hüdrofooriga, mis hoiab rõhku vahemikus, mitte püsivana — SCALA2 hoiab rõhu püsivana ka mitme tarbija korral. Kõikumist võib põhjustada ka ummistunud filter või kaevu madal veetase.",
+      },
     ],
     picks: {
       title: "Parim veeautomaat 2026 — meie kolm valikut",
@@ -155,6 +167,18 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       {
         q: "Which water booster suits an office?",
         a: "An office needs a quiet, automatic booster that keeps pressure steady when several taps run at once. For a 5–20 person office we recommend Grundfos SCALA2 — quiet, constant pressure, integrated automation. A smaller office or retail space is fine with SCALA1; larger buildings can use a CMB booster set.",
+      },
+      {
+        q: "Why won't the water booster start?",
+        a: "The most common causes: no power or an unplugged cord, the protection has tripped (e.g. dry-running — the well is empty), a faulty pressure switch or a worn capacitor. First check the power and the well's water level. If the pump still does not start, contact us — we help diagnose the fault and find a replacement if needed.",
+      },
+      {
+        q: "Why does the water booster not stop, or switch on and off constantly?",
+        a: "Constant cycling usually points to a leak in the system (a dripping tap or toilet cistern) or incorrect air pressure in the pressure vessel. If the pump keeps running with no water draw, the pressure switch may be faulty or the non-return valve may leak. Fix leaks promptly — continuous running wears the pump and wastes electricity.",
+      },
+      {
+        q: "Why does the water pressure fluctuate in the house?",
+        a: "If pressure drops when a second tap is opened, the pump is undersized or you have a classic hydrophore that holds pressure within a range, not constant — SCALA2 keeps pressure perfectly constant even with several users. Fluctuation can also be caused by a clogged filter or a low well water level.",
       },
     ],
     picks: {
@@ -219,6 +243,18 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Какая насосная станция подходит для офиса?",
         a: "В офис нужна тихая автоматическая станция, поддерживающая постоянное давление при одновременно открытых кранах. Для офиса на 5–20 сотрудников рекомендуем Grundfos SCALA2 — тихая, с постоянным давлением и встроенной автоматикой. В небольшой офис или магазин достаточно SCALA1; для крупных зданий подойдёт повысительный насос CMB.",
       },
+      {
+        q: "Почему насосная станция не запускается?",
+        a: "Самые частые причины: нет питания или вилка вынута из розетки, сработала защита (например, сухой ход — скважина пуста), неисправно реле давления или изношен конденсатор. Сначала проверьте питание и уровень воды в скважине. Если насос всё равно не запускается, свяжитесь с нами — поможем диагностировать неисправность и при необходимости подберём замену.",
+      },
+      {
+        q: "Почему насосная станция не останавливается или постоянно включается и выключается?",
+        a: "Постоянные пуски-остановки обычно указывают на утечку в системе (капающий кран или бачок унитаза) или неверное давление воздуха в гидроаккумуляторе. Если насос работает без разбора воды, возможно, неисправно реле давления или подтекает обратный клапан. Утечки стоит устранять сразу — постоянная работа изнашивает насос и расходует электричество.",
+      },
+      {
+        q: "Почему давление воды в доме скачет?",
+        a: "Если давление падает при открытии второго крана, насос слишком слабый или у вас классический гидрофор, который держит давление в диапазоне, а не постоянным — SCALA2 держит давление полностью постоянным даже при нескольких потребителях. Скачки может вызывать также засорённый фильтр или низкий уровень воды в скважине.",
+      },
     ],
     picks: {
       title: "Лучшая насосная станция 2026 — наши три рекомендации",
@@ -282,6 +318,18 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
         q: "Kurš ūdens automāts ir piemērots birojam?",
         a: "Birojam vajag klusu, automātisku ūdens automātu, kas uztur stabilu spiedienu arī tad, ja vienlaikus ir atvērti vairāki krāni. 5–20 darbinieku birojam iesakām Grundfos SCALA2 — kluss, ar stabilu spiedienu un integrētu automātiku. Mazākam birojam vai telpai pietiek ar SCALA1; lielākām ēkām der CMB spiediena paaugstināšanas sūknis.",
       },
+      {
+        q: "Kāpēc ūdens automāts neiedarbinās?",
+        a: "Visbiežākie iemesli: nav strāvas vai kontaktdakša ir izvilkta, ir nostrādājusi aizsardzība (piemēram, sausgāje — akā nav ūdens), bojāts spiediena relejs vai nolietots kondensators. Vispirms pārbaudiet strāvu un ūdens līmeni akā. Ja sūknis joprojām neiedarbinās, sazinieties ar mums — palīdzēsim diagnosticēt bojājumu un vajadzības gadījumā atradīsim aizstājēju.",
+      },
+      {
+        q: "Kāpēc ūdens automāts neapstājas vai pastāvīgi ieslēdzas un izslēdzas?",
+        a: "Pastāvīga ieslēgšanās-izslēgšanās parasti norāda uz noplūdi sistēmā (pilošs krāns vai tualetes tvertne) vai nepareizu gaisa spiedienu spiedkatlā. Ja sūknis darbojas bez ūdens ņemšanas, iespējams, bojāts spiediena relejs vai noplūst pretvārsts. Noplūdes jānovērš nekavējoties — nepārtraukta darbība nolieto sūkni un tērē elektrību.",
+      },
+      {
+        q: "Kāpēc mājās svārstās ūdens spiediens?",
+        a: "Ja spiediens krītas, atverot otro krānu, sūknis ir par vāju vai arī jums ir klasiskais hidrofors, kas uztur spiedienu diapazonā, nevis nemainīgu — SCALA2 uztur spiedienu pilnīgi nemainīgu pat vairākiem lietotājiem vienlaikus. Svārstības var izraisīt arī aizsērējis filtrs vai zems ūdens līmenis akā.",
+      },
     ],
     picks: {
       title: "Labākais ūdens automāts 2026 — mūsu trīs izvēles",
@@ -344,6 +392,18 @@ const VEEAUTOMAADID: Record<Locale, CategoryContentSection> = {
       {
         q: "Kuris vandens automatas tinka biurui?",
         a: "Biurui reikia tylaus, automatinio vandens automato, išlaikančio stabilų slėgį net atidarius kelis čiaupus. 5–20 darbuotojų biurui rekomenduojame Grundfos SCALA2 – tylų, su stabiliu slėgiu ir integruota automatika. Mažesniam biurui ar patalpai pakanka SCALA1; didesniems pastatams tinka CMB slėgio didinimo siurblys.",
+      },
+      {
+        q: "Kodėl vandens automatas neįsijungia?",
+        a: "Dažniausios priežastys: nėra maitinimo arba kištukas ištrauktas iš lizdo, įsijungė apsauga (pvz., sausasis darbas – šulinys tuščias), sugedo slėgio relė arba susidėvėjo kondensatorius. Pirmiausia patikrinkite maitinimą ir vandens lygį šulinyje. Jei siurblys vis tiek neįsijungia, susisiekite su mumis – padėsime diagnozuoti gedimą ir prireikus parinksime pakaitalą.",
+      },
+      {
+        q: "Kodėl vandens automatas nesustoja arba nuolat įsijungia ir išsijungia?",
+        a: "Nuolatinis įsijungimas-išsijungimas paprastai rodo nuotėkį sistemoje (varvantis čiaupas arba tualeto bakelis) arba neteisingą oro slėgį slėginėje inde. Jei siurblys dirba be vandens išsiėmimo, gali būti sugedusi slėgio relė arba praleidžia atbulinis vožtuvas. Nuotėkius reikėtų šalinti nedelsiant – nuolatinis darbas dėvi siurblį ir eikvoja elektrą.",
+      },
+      {
+        q: "Kodėl name svyruoja vandens slėgis?",
+        a: "Jei slėgis krenta atidarius antrą čiaupą, siurblys per silpnas arba turite klasikinį hidroforą, kuris laiko slėgį diapazone, o ne pastovų – SCALA2 laiko slėgį visiškai pastovų net ir keliems vartotojams vienu metu. Svyravimus gali sukelti ir užsikimšęs filtras arba žemas vandens lygis šulinyje.",
       },
     ],
     picks: {

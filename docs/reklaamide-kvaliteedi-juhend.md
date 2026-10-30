@@ -145,6 +145,7 @@ eraldi punkt ja pildid tõstavad CTR-i.
 | `pause-duplicate-brand-rsa.mjs` | Pausitab rühma üleliigse RSA (reegel: 1 RSA/rühm) | `--dry-run` |
 | `set-budget.mjs` | Kampaania päevaeelarve seadmine | `--dry-run` |
 | `set-weekday-schedule.mjs` | E–R 00:00–24:00 ajakavad ENABLED kampaaniatele (nädalavahetused väljas) | `--dry-run` |
+| `set-network-settings.mjs` | Display-võrk (CONTENT) välja Search-kampaaniatelt | `--dry-run` |
 
 Meta poolel haldab nädalavahetuse-pausi Verceli cron `/api/cron/meta-weekday-schedule`
 (la 00:00 pausib, esm 00:00 jätkab 4 aktiivset ad set'i; Tallinna aeg, seis Supabase

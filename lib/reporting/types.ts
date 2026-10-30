@@ -147,6 +147,21 @@ export interface AdsKeyword {
   conversions: number
 }
 
+/**
+ * Kampaania metrika võrgu lõikes (segments.ad_network_type: SEARCH,
+ * SEARCH_PARTNERS, CONTENT, ...). Search-kampaania, kust suur osa klikkidest
+ * tuleb CONTENT-võrgust, on raha leke — juhuslikud mobiiliäppi bänneriklikid
+ * ei muutu sessioonideks ega tellimusteks (nädalaraport 19.-25.10.2026).
+ */
+export interface AdsNetworkSplit {
+  campaign: string
+  network: string
+  cost: number
+  clicks: number
+  impressions: number
+  conversions: number
+}
+
 export interface AdsData {
   available: boolean
   campaigns: AdsCampaign[]
@@ -157,6 +172,8 @@ export interface AdsData {
   nonBrand: { cost: number; clicks: number; conversions: number }
   topTerms: AdsTerm[]
   keywords: AdsKeyword[]
+  /** Võrgu lõikes kulu/klikid (Search vs Display leke). Valikuline — vanades snapshotides puudub. */
+  networks?: AdsNetworkSplit[]
   totals: { cost: number; clicks: number; impressions: number; conversions: number }
   /** Eelmise perioodi kogud (WoW-võrdluse alus). Valikuline — vanades salvestatud snapshotides puudub. */
   prevTotals?: { cost: number; clicks: number; conversions: number }

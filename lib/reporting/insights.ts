@@ -251,6 +251,33 @@ function adsInsights(ads: AdsData, out: Insight[]): void {
     }
   }
 
+  /* Võrgu lõikes kontroll: Search-kampaania CONTENT (Display) klikkide osakaal.
+   * Display-klikk on tavaliselt juhuslik mobiiliäpi bännerikoputus, mis ei
+   * muutu GA4-sessiooniks ega tellimuseks — raha leke, mitte liiklus.
+   * (19.-25.10.2026: ALPHA GO 71 % eelarvest CONTENTi — 1950 klikki, 0 conv.) */
+  const byNet = new Map<string, { contentClicks: number; contentCost: number; totalClicks: number }>()
+  for (const n of ads.networks ?? []) {
+    const e = byNet.get(n.campaign) ?? { contentClicks: 0, contentCost: 0, totalClicks: 0 }
+    e.totalClicks += n.clicks
+    if (n.network === "CONTENT") {
+      e.contentClicks += n.clicks
+      e.contentCost += n.cost
+    }
+    byNet.set(n.campaign, e)
+  }
+  for (const [campaign, e] of byNet) {
+    const share = e.totalClicks > 0 ? e.contentClicks / e.totalClicks : 0
+    if (e.contentCost >= 10 && share >= 0.2) {
+      out.push({
+        area: "ads",
+        severity: "warning",
+        title: `„${campaign}" — ${Math.round(share * 100)} % klikkidest tuleb Display-võrgust (raha leke)`,
+        detail: `CONTENT-võrk: ${e.contentClicks} klikki, ${e.contentCost.toFixed(2).replace(".", ",")} € — need ei ole otsinguklikid ega muutu sessioonideks. Kampaania klikkimäär on tänu Display'le liiga hea, et olla tõsi.`,
+        action: "Lülita Display-võrk välja: node scripts/set-network-settings.mjs (Google Search jääb tööle). Ära hinda kampaaniat klikkide arvu, vaid GA4 sessioonide ja DB tellimuste järgi.",
+      })
+    }
+  }
+
   // NB: search_term_view never covers 100% of spend — Google hides low-volume
   // terms ("Other search terms"). Compare brand only against ATTRIBUTED spend
   // and require a meaningful absolute amount, otherwise the remainder bucket
@@ -368,6 +395,20 @@ function metaInsights(meta: NonNullable<ReportSnapshot["meta"]>, ga4: Ga4Data | 
       title: `Meta tõi ${t.purchases} ostu (${t.purchaseValue.toFixed(2).replace(".", ",")} €)`,
       detail: `Kulu ${t.cost.toFixed(2).replace(".", ",")} € → ostu hind ${(t.cost / t.purchases).toFixed(2).replace(".", ",")} € (Meta omistus; DB tellimused on tõde).`,
       action: "Võrdle ostu hinda Google Ads'i omaga ja jälgi, kas DB tellimuste arv kajastab Meta panust.",
+    })
+  }
+
+  /* Klikk → LP-vaade konversioon: kui alla 40 % klikkidest jõuab lehe
+   * laadimiseni, on tegu paigutuste kvaliteediprobleemiga (nt Audience
+   * Networki juhuslikud mobiiliklikid), mitte maandumislehe veaga.
+   * (19.-25.10.2026: RMK 293 klikki → 34 LP-vaadet = 12 %.) */
+  if (t.clicks >= 100 && lpRate < 0.4) {
+    out.push({
+      area: "ads",
+      severity: "warning",
+      title: `Meta: vaid ${Math.round(lpRate * 100)} % klikkidest jõuab maandumisleheni`,
+      detail: `${t.clicks} klikki → ${t.landingPageViews} LP-vaadet. Nii suur kadumine viitab Advantage+ paigutuste (Audience Network) juhuslikele klikkidele, mitte lehe kiirusele.`,
+      action: "Piira paigutused FB/IG feed+stream peale: node scripts/fix-rmk-placements.mjs — ja kontrolli nädala pärast, kas suhe tõuseb üle 50 %.",
     })
   }
 

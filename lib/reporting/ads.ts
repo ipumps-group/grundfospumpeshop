@@ -9,7 +9,7 @@
  */
 
 import { getGoogleOAuthToken, type ReportPeriod } from "./google-auth"
-import type { AdsCampaign, AdsData, AdsKeyword, AdsTerm } from "./types"
+import type { AdsCampaign, AdsData, AdsKeyword, AdsNetworkSplit, AdsTerm } from "./types"
 
 /** Bump when Google sunsets this version (a 404 HTML error means: bump). */
 const ADS_API_VERSION = "v24"
@@ -210,6 +210,30 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     }
   })
 
+  /* --- network split (SEARCH / SEARCH_PARTNERS / CONTENT) — paljastab
+   *     Display-võrgu lekke: Search-kampaania, kus enamik klikke tuleb
+   *     CONTENT-võrgust, maksab juhuslike bänneriklikkide eest (nt 19.-25.10
+   *     2026: ALPHA GO 71 % eelarvest CONTENTi, 1950 klikki, 0 conv) --- */
+  const networkRows = await run(
+    `SELECT campaign.name, segments.ad_network_type,
+            metrics.cost_micros, metrics.clicks, metrics.impressions, metrics.all_conversions
+     FROM campaign
+     WHERE ${between}`,
+  )
+  const networks: AdsNetworkSplit[] = networkRows
+    .map((r) => {
+      const m = r.metrics ?? {}
+      return {
+        campaign: String(field(r, "campaign", "name") ?? "?"),
+        network: String(field(r, "segments", "ad_network_type") ?? "?"),
+        cost: micros(m.cost_micros),
+        clicks: num(m.clicks),
+        impressions: num(m.impressions),
+        conversions: num(m.all_conversions),
+      }
+    })
+    .filter((n) => n.impressions > 0 || n.cost > 0)
+
   const totals = {
     cost: campaigns.reduce((s, c) => s + c.cost, 0),
     clicks: campaigns.reduce((s, c) => s + c.clicks, 0),
@@ -230,5 +254,5 @@ export async function pullAds(period: ReportPeriod): Promise<AdsData> {
     conversions: prevRows.reduce((s, r) => s + num(field(r, "metrics", "all_conversions")), 0),
   }
 
-  return { available: true, campaigns, brand, ownBrand, nonBrand, topTerms, keywords, totals, prevTotals }
+  return { available: true, campaigns, brand, ownBrand, nonBrand, topTerms, keywords, networks, totals, prevTotals }
 }
