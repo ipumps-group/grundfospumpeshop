@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { ImageIcon, X, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { uploadFile } from '@/lib/upload'
 
 interface ProductImageUploadProps {
   currentUrl: string | null
@@ -28,21 +28,12 @@ export default function ProductImageUpload({ currentUrl, onUpload, onRemove }: P
     setUploading(true)
     setError('')
 
-    const ext  = file.name.split('.').pop() ?? 'jpg'
-    const path = `images/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('products')
-      .upload(path, file, { upsert: false })
-
-    if (uploadError) {
-      setError('Üleslaadimise viga: ' + uploadError.message)
-      setUploading(false)
-      return
+    try {
+      const url = await uploadFile(file, 'images', 'products')
+      onUpload(url)
+    } catch (e) {
+      setError('Üleslaadimise viga: ' + (e instanceof Error ? e.message : 'Üleslaadimine ebaõnnestus'))
     }
-
-    const { data } = supabase.storage.from('products').getPublicUrl(path)
-    onUpload(data.publicUrl)
     setUploading(false)
   }
 

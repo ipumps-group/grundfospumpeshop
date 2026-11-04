@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { FileText, X, Loader2, ExternalLink } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { uploadFile } from '@/lib/upload'
 
 interface ProductFileUploadProps {
   currentUrl: string | null
@@ -30,21 +30,12 @@ export default function ProductFileUpload({
     setUploading(true)
     setError('')
 
-    const ext  = file.name.split('.').pop() ?? 'pdf'
-    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('products')
-      .upload(path, file, { upsert: false })
-
-    if (uploadError) {
-      setError('Üleslaadimise viga: ' + uploadError.message)
-      setUploading(false)
-      return
+    try {
+      const url = await uploadFile(file, folder, 'products')
+      onUpload(url)
+    } catch (e) {
+      setError('Üleslaadimise viga: ' + (e instanceof Error ? e.message : 'Üleslaadimine ebaõnnestus'))
     }
-
-    const { data } = supabase.storage.from('products').getPublicUrl(path)
-    onUpload(data.publicUrl)
     setUploading(false)
   }
 

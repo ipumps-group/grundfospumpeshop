@@ -65,37 +65,40 @@ export default function UusToode() {
 
     setSaving(true); setError('')
 
-    const { data: product, error: err } = await supabase.from('products').insert({
-      name:                 name.trim(),
-      sku:                  sku.trim() || null,
-      slug:                 slug || toSlug(name),
-      short_description_et: shortDesc.trim() || null,
-      description_et:       desc.trim() || null,
-      price:                parseFloat(price),
-      sale_price:           salePrice ? parseFloat(salePrice) : null,
-      in_stock:             inStock,
-      image_url:            imageUrl,
-      published,
-      weight_kg:            weight ? parseFloat(weight) : null,
-      length_cm:            length ? parseFloat(length) : null,
-      width_cm:             width  ? parseFloat(width)  : null,
-      height_cm:            height ? parseFloat(height) : null,
-    }).select('id').single()
+    const res = await fetch('/api/haldus/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:                 name.trim(),
+        sku:                  sku.trim() || null,
+        slug:                 slug || toSlug(name),
+        short_description_et: shortDesc.trim() || null,
+        description_et:       desc.trim() || null,
+        price,
+        sale_price:           salePrice || null,
+        in_stock:             inStock,
+        image_url:            imageUrl,
+        published,
+        weight_kg:            weight || null,
+        length_cm:            length || null,
+        width_cm:             width  || null,
+        height_cm:            height || null,
+        category_slugs:       catSlug ? [catSlug] : [],
+      }),
+    })
+    const data = await res.json().catch(() => ({})) as { product?: { id: number }; error?: string }
 
-    if (err) {
-      setError(err.message.includes('slug') ? 'See slug on juba kasutusel' : err.message)
+    if (!res.ok || !data.product) {
+      setError(data.error ?? 'Toote salvestamine ebaõnnestus')
       setSaving(false); return
     }
-
-    if (catSlug && product) {
-      await supabase.from('product_categories').insert({ product_id: product.id, category_slug: catSlug })
-    }
+    const product = data.product
 
     // Fire-and-forget auto-translation (non-blocking)
     const fieldsToTranslate: Record<string, string> = {}
     if (desc.trim()) fieldsToTranslate.description = desc.trim()
     if (shortDesc.trim()) fieldsToTranslate.short_description = shortDesc.trim()
-    if (product && Object.keys(fieldsToTranslate).length > 0) {
+    if (Object.keys(fieldsToTranslate).length > 0) {
       fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,7 +106,7 @@ export default function UusToode() {
       }).catch(console.error)
     }
 
-    router.push(`/haldus/tooted/${product!.id}`)
+    router.push(`/haldus/tooted/${product.id}`)
   }
 
   if (!canManageProducts(profile?.role ?? '')) return null

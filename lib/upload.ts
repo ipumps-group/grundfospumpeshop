@@ -1,9 +1,10 @@
 import { fetchWithTimeout } from './fetch-utils'
 
-export async function uploadFile(file: File, folder = 'uploads'): Promise<string> {
+export async function uploadFile(file: File, folder = 'uploads', bucket?: string): Promise<string> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('folder', folder)
+  if (bucket) formData.append('bucket', bucket)
 
   try {
     const res = await fetchWithTimeout('/api/upload', { method: 'POST', body: formData }, 60_000)
