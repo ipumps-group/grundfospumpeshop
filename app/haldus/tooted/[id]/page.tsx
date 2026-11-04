@@ -229,13 +229,12 @@ export default function MuudaToode() {
 
   async function handleSaveBulk() {
     setBulkSaving(true); setBulkSaved(false)
-    await supabase.from('bulk_pricing').delete().eq('product_id', id)
     const rows = bulkPrices.filter(r => r.min_quantity > 0 && r.price > 0)
-    if (rows.length > 0) {
-      await supabase.from('bulk_pricing').insert(
-        rows.map(r => ({ product_id: Number(id), min_quantity: r.min_quantity, price: r.price }))
-      )
-    }
+    await fetch(`/api/haldus/products/${id}/bulk-pricing`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows }),
+    })
     setBulkSaving(false); setBulkSaved(true)
     setTimeout(() => setBulkSaved(false), 3000)
   }
@@ -243,12 +242,14 @@ export default function MuudaToode() {
   async function handleSaveAttrs() {
     setAttrsSaving(true); setAttrsSaved(false); setAttrsError('')
     const valid = attrs.filter(a => a.attribute_name.trim() && a.attribute_value.trim())
-    await supabase.from('product_attributes').delete().eq('product_id', id)
-    if (valid.length > 0) {
-      const { error: err } = await supabase.from('product_attributes').insert(
-        valid.map(a => ({ product_id: Number(id), attribute_name: a.attribute_name.trim(), attribute_value: a.attribute_value.trim() }))
-      )
-      if (err) { setAttrsError(err.message); setAttrsSaving(false); return }
+    const res = await fetch(`/api/haldus/products/${id}/attributes`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attributes: valid }),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      setAttrsError(json.error ?? 'Salvestamine ebaõnnestus'); setAttrsSaving(false); return
     }
     setAttrsSaving(false); setAttrsSaved(true)
     setTimeout(() => setAttrsSaved(false), 3000)
@@ -269,26 +270,16 @@ export default function MuudaToode() {
     if (file.size > 55 * 1024 * 1024) { setDocsError('Fail on liiga suur (max 55 MB)'); return }
     setDocsUploading(true); setDocsError('')
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-    const storagePath = `${product?.sku}/${Date.now()}-${safeName}`
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('label', newDocLabel.trim())
 
-    const { error: uploadErr } = await supabase.storage
-      .from('product-documents')
-      .upload(storagePath, file, { contentType: 'application/pdf', upsert: false })
+    const res = await fetch(`/api/haldus/products/${id}/documents`, { method: 'POST', body: formData })
+    const json = await res.json().catch(() => ({})) as { doc?: DocRow; error?: string }
 
-    if (uploadErr) { setDocsError('Üleslaadimise viga: ' + uploadErr.message); setDocsUploading(false); return }
+    if (!res.ok || !json.doc) { setDocsError(json.error ?? 'Üleslaadimine ebaõnnestus'); setDocsUploading(false); return }
 
-    const { data: { publicUrl } } = supabase.storage.from('product-documents').getPublicUrl(storagePath)
-
-    const { data: inserted, error: dbErr } = await supabase
-      .from('product_documents')
-      .insert({ sku: product?.sku, product_id: Number(id), label: newDocLabel.trim(), storage_path: storagePath, public_url: publicUrl })
-      .select('id, label, public_url, storage_path')
-      .single()
-
-    if (dbErr) { setDocsError('Andmebaasi viga: ' + dbErr.message); setDocsUploading(false); return }
-
-    setDocs(prev => [...prev, inserted as DocRow].sort((a, b) => a.label.localeCompare(b.label)))
+    setDocs(prev => [...prev, json.doc!].sort((a, b) => a.label.localeCompare(b.label)))
     setNewDocLabel('')
     setDocsUploading(false)
     setDocSaved(true)
@@ -300,15 +291,16 @@ export default function MuudaToode() {
     if (!newDocUrl.trim() || !newDocUrl.startsWith('http')) { setDocsError('Sisesta kehtiv URL'); return }
     setDocsUploading(true); setDocsError('')
 
-    const { data: inserted, error: dbErr } = await supabase
-      .from('product_documents')
-      .insert({ sku: product?.sku, product_id: Number(id), label: newDocLabel.trim(), storage_path: null, public_url: newDocUrl.trim() })
-      .select('id, label, public_url, storage_path')
-      .single()
+    const res = await fetch(`/api/haldus/products/${id}/documents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ label: newDocLabel.trim(), public_url: newDocUrl.trim() }),
+    })
+    const json = await res.json().catch(() => ({})) as { doc?: DocRow; error?: string }
 
-    if (dbErr) { setDocsError('Andmebaasi viga: ' + dbErr.message); setDocsUploading(false); return }
+    if (!res.ok || !json.doc) { setDocsError(json.error ?? 'Andmebaasi viga'); setDocsUploading(false); return }
 
-    setDocs(prev => [...prev, inserted as DocRow].sort((a, b) => a.label.localeCompare(b.label)))
+    setDocs(prev => [...prev, json.doc!].sort((a, b) => a.label.localeCompare(b.label)))
     setNewDocLabel('')
     setNewDocUrl('')
     setDocsUploading(false)
@@ -316,34 +308,32 @@ export default function MuudaToode() {
     setTimeout(() => setDocSaved(false), 3000)
   }
 
-  async function handleReplaceDocUrl(docId: number, oldStoragePath: string | null) {
+  async function handleReplaceDocUrl(docId: number) {
     if (!replaceDocUrl.trim() || !replaceDocUrl.startsWith('http')) return
     setReplaceSaving(true)
 
-    // Delete old file from storage if it was uploaded
-    if (oldStoragePath) {
-      await supabase.storage.from('product-documents').remove([oldStoragePath])
-    }
+    const res = await fetch(`/api/haldus/products/${id}/documents`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ docId, public_url: replaceDocUrl.trim() }),
+    })
+    const json = await res.json().catch(() => ({})) as { doc?: DocRow }
 
-    const { data: updated, error: dbErr } = await supabase
-      .from('product_documents')
-      .update({ public_url: replaceDocUrl.trim(), storage_path: null })
-      .eq('id', docId)
-      .select('id, label, public_url, storage_path')
-      .single()
-
-    if (!dbErr && updated) {
-      setDocs(prev => prev.map(d => d.id === docId ? (updated as DocRow) : d))
+    if (res.ok && json.doc) {
+      setDocs(prev => prev.map(d => d.id === docId ? json.doc! : d))
     }
     setReplaceDocId(null)
     setReplaceDocUrl('')
     setReplaceSaving(false)
   }
 
-  async function handleDeleteDoc(docId: number, storagePath: string | null) {
-    if (storagePath) await supabase.storage.from('product-documents').remove([storagePath])
-    await supabase.from('product_documents').delete().eq('id', docId)
-    setDocs(prev => prev.filter(d => d.id !== docId))
+  async function handleDeleteDoc(docId: number) {
+    const res = await fetch(`/api/haldus/products/${id}/documents`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ docId }),
+    })
+    if (res.ok) setDocs(prev => prev.filter(d => d.id !== docId))
   }
 
   function addAttrRow() {
@@ -540,7 +530,7 @@ export default function MuudaToode() {
                           URL
                         </button>
                       )}
-                      <button type="button" onClick={() => handleDeleteDoc(doc.id, doc.storage_path)}
+                      <button type="button" onClick={() => handleDeleteDoc(doc.id)}
                         className="p-1.5 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0">
                         <X size={14} />
                       </button>
@@ -554,7 +544,7 @@ export default function MuudaToode() {
                           className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-[13px] text-gray-900 outline-none focus:border-orange-400"
                         />
                         <button type="button"
-                          onClick={() => handleReplaceDocUrl(doc.id, doc.storage_path)}
+                          onClick={() => handleReplaceDocUrl(doc.id)}
                           disabled={replaceSaving || !replaceDocUrl.startsWith('http')}
                           className="px-3 py-2 text-[13px] font-medium bg-orange-500 text-white rounded-xl hover:bg-orange-600 disabled:opacity-50 transition-colors whitespace-nowrap">
                           {replaceSaving ? 'Salvestan...' : 'Asenda + kustuta fail'}

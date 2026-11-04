@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
-import { supabase } from '@/lib/supabase'
 import StatusToggle from '@/components/haldus/StatusToggle'
 
 const canManageProducts = (role: string) => role === 'superadmin'
@@ -39,19 +38,24 @@ export default function UusKupong() {
     if (type === 'percent' && Number(value) > 100) { setError('Protsent ei saa olla üle 100'); return }
     setSaving(true); setError('')
 
-    const { error: err } = await supabase.from('coupons').insert({
-      code:              code.trim().toUpperCase(),
-      type,
-      value:             Number(value),
-      min_order_amount:  minOrder   ? Number(minOrder)   : 0,
-      usage_limit:       usageLimit ? Number(usageLimit) : null,
-      valid_from:        validFrom  || null,
-      valid_until:       validUntil || null,
-      active,
+    const res = await fetch('/api/haldus/coupons', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code:              code.trim().toUpperCase(),
+        type,
+        value:             Number(value),
+        min_order_amount:  minOrder   ? Number(minOrder)   : 0,
+        usage_limit:       usageLimit ? Number(usageLimit) : null,
+        valid_from:        validFrom  || null,
+        valid_until:       validUntil || null,
+        active,
+      }),
     })
 
-    if (err) {
-      setError(err.code === '23505' ? 'See kood on juba olemas' : err.message)
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      setError(json.error ?? 'Salvestamine ebaõnnestus')
       setSaving(false)
       return
     }

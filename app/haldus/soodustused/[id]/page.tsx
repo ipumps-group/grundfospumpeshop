@@ -83,19 +83,24 @@ export default function MuudaKupong() {
     if (type === 'percent' && Number(value) > 100) { setError('Protsent ei saa olla üle 100'); return }
     setSaving(true); setError(''); setSaved(false)
 
-    const { error: err } = await supabase.from('coupons').update({
-      code:             code.trim().toUpperCase(),
-      type,
-      value:            Number(value),
-      min_order_amount: minOrder   ? Number(minOrder)   : 0,
-      usage_limit:      usageLimit ? Number(usageLimit) : null,
-      valid_from:       validFrom  || null,
-      valid_until:      validUntil || null,
-      active,
-    }).eq('id', id)
+    const res = await fetch(`/api/haldus/coupons/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code:             code.trim().toUpperCase(),
+        type,
+        value:            Number(value),
+        min_order_amount: minOrder   ? Number(minOrder)   : 0,
+        usage_limit:      usageLimit ? Number(usageLimit) : null,
+        valid_from:       validFrom  || null,
+        valid_until:      validUntil || null,
+        active,
+      }),
+    })
 
-    if (err) {
-      setError(err.code === '23505' ? 'See kood on juba olemas' : err.message)
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      setError(json.error ?? 'Salvestamine ebaõnnestus')
       setSaving(false)
       return
     }
@@ -105,8 +110,7 @@ export default function MuudaKupong() {
 
   async function handleDelete() {
     setDeleting(true)
-    await supabase.from('coupon_usage').delete().eq('coupon_id', id)
-    await supabase.from('coupons').delete().eq('id', id)
+    await fetch(`/api/haldus/coupons/${id}`, { method: 'DELETE' })
     router.push('/haldus/soodustused')
   }
 

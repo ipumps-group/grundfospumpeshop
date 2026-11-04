@@ -83,15 +83,11 @@ export default function HaldusLehedPage() {
 
   async function handleSave() {
     setSaving(true)
-    const keys = Object.keys(settings) as (keyof Settings)[]
-    
-    for (const key of keys) {
-      await supabase
-        .from('settings')
-        .update({ value: settings[key] })
-        .eq('key', key)
-    }
-    
+    await fetch('/api/haldus/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ settings }),
+    })
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)

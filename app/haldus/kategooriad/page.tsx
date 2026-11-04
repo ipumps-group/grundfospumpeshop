@@ -76,21 +76,20 @@ export default function KategooriadPage() {
     if (!form.name_et.trim()) { setError('Nimi on kohustuslik'); return }
     setSaving(true); setError('')
 
-    if (editId) {
-      const { error: err } = await supabase.from('categories').update({
-        name_et: form.name_et.trim(),
-        name_en: form.name_en.trim() || null,
-        parent_slug: form.parent_slug || null,
-      }).eq('id', editId)
-      if (err) { setError(err.message); setSaving(false); return }
-    } else {
-      const { error: err } = await supabase.from('categories').insert({
-        slug:       form.slug || toSlug(form.name_et),
-        name_et:    form.name_et.trim(),
-        name_en:    form.name_en.trim() || null,
-        parent_slug: form.parent_slug || null,
-      })
-      if (err) { setError(err.message.includes('slug') ? 'See slug on juba kasutusel' : err.message); setSaving(false); return }
+    const payload = {
+      slug:        form.slug || toSlug(form.name_et),
+      name_et:     form.name_et.trim(),
+      name_en:     form.name_en.trim() || null,
+      parent_slug: form.parent_slug || null,
+    }
+    const res = await fetch(editId ? `/api/haldus/categories/${editId}` : '/api/haldus/categories', {
+      method: editId ? 'PATCH' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      setError(json.error ?? 'Salvestamine ebaõnnestus'); setSaving(false); return
     }
 
     setSaving(false); cancelForm(); load()
@@ -98,14 +97,8 @@ export default function KategooriadPage() {
 
   async function handleDelete() {
     if (!deleteId) return
-    const cat = categories.find(c => c.id === deleteId)
-    if (!cat) return
 
-    // Eemalda kategooria toodetelt
-    await supabase.from('product_categories').delete().eq('category_slug', cat.slug)
-    // Eemalda laste parent_slug
-    await supabase.from('categories').update({ parent_slug: null }).eq('parent_slug', cat.slug)
-    await supabase.from('categories').delete().eq('id', deleteId)
+    await fetch(`/api/haldus/categories/${deleteId}`, { method: 'DELETE' })
 
     setDeleteId(null); load()
   }

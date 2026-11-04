@@ -107,15 +107,16 @@ export default function SeadedPage() {
     e.preventDefault()
     setSaving(true); setError(''); setSaved(false)
 
-    const upserts = Object.entries(settings).map(([key, value]) => ({
-      key, value, updated_at: new Date().toISOString(),
-    }))
+    const res = await fetch('/api/haldus/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ settings }),
+    })
 
-    const { error: err } = await supabase
-      .from('settings')
-      .upsert(upserts, { onConflict: 'key' })
-
-    if (err) { setError(err.message); setSaving(false); return }
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      setError(json.error ?? 'Salvestamine ebaõnnestus'); setSaving(false); return
+    }
     setSaving(false); setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }

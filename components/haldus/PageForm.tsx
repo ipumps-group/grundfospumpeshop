@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ImageIcon, X } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { uploadFile } from '@/lib/upload'
 
 type Template = 'default' | 'contact'
 
@@ -77,17 +77,14 @@ export default function PageForm({ initialData, mode }: { initialData?: PageData
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const ext = file.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error: uploadError } = await supabase.storage
-      .from('pages').upload(filename, file, { cacheControl: '3600', upsert: false })
-    if (uploadError) {
-      setError('Pildi üleslaadimine ebaõnnestus. Kontrolli kas Storage bucket "pages" on loodud.')
+    try {
+      const url = await uploadFile(file, 'pages')
+      setImageUrl(url)
+    } catch {
+      setError('Pildi üleslaadimine ebaõnnestus.')
       setUploading(false)
       return
     }
-    const { data: { publicUrl } } = supabase.storage.from('pages').getPublicUrl(filename)
-    setImageUrl(publicUrl)
     setUploading(false)
   }
 
@@ -115,29 +112,20 @@ export default function PageForm({ initialData, mode }: { initialData?: PageData
 
     let pageId: string | undefined = initialData?.id
 
+    const res = await fetch(mode === 'create' ? '/api/haldus/pages' : `/api/haldus/pages/${initialData!.id}`, {
+      method: mode === 'create' ? 'POST' : 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string; page?: { id: string } }
+      setError(json.error ?? 'Salvestamine ebaõnnestus: tundmatu viga')
+      setSaving(false)
+      return
+    }
     if (mode === 'create') {
-      const { data: created, error: err } = await supabase.from('pages').insert(payload).select('id').single()
-      if (err || !created) {
-        setError(
-          err?.message.includes('unique') || err?.message.includes('duplicate')
-            ? 'See slug on juba kasutusel. Vali teine.'
-            : 'Salvestamine ebaõnnestus: ' + (err?.message ?? 'Tundmatu viga')
-        )
-        setSaving(false)
-        return
-      }
-      pageId = created.id
-    } else {
-      const { error: err } = await supabase.from('pages').update(payload).eq('id', initialData!.id)
-      if (err) {
-        setError(
-          err.message.includes('unique') || err.message.includes('duplicate')
-            ? 'See slug on juba kasutusel. Vali teine.'
-            : 'Salvestamine ebaõnnestus: ' + err.message
-        )
-        setSaving(false)
-        return
-      }
+      const json = await res.json() as { page?: { id: string } }
+      pageId = json.page?.id
     }
 
     // Fire-and-forget auto-translation (non-blocking)

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Package, Tag,
-  ShoppingCart, Users, Settings, Ticket, FileText, Languages, Megaphone, BarChart3,
+  ShoppingCart, Users, Settings, Ticket, FileText, Languages, Megaphone, BarChart3, Inbox,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 
@@ -14,6 +14,7 @@ const NAV = [
   { href: '/haldus/kategooriad',label: 'Kategooriad', icon: Tag,             exact: false, roles: ['superadmin'] },
   { href: '/haldus/tellimused', label: 'Tellimused',  icon: ShoppingCart,    exact: false, roles: ['superadmin', 'manager'] },
   { href: '/haldus/kliendid',   label: 'Kliendid',   icon: Users,           exact: false, roles: ['superadmin', 'manager'] },
+  { href: '/haldus/paeringud',  label: 'Päringud',   icon: Inbox,           exact: false, roles: ['superadmin', 'manager'] },
   { href: '/haldus/lehed',       label: 'Lehed',       icon: FileText,        exact: false, roles: ['superadmin'] },
   { href: '/haldus/soodustused', label: 'Soodustused', icon: Ticket,          exact: false, roles: ['superadmin'] },
   { href: '/haldus/ads',        label: 'Reklaamid',   icon: Megaphone,      exact: false, roles: ['superadmin'] },

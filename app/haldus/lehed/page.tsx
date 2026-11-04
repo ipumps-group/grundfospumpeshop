@@ -88,16 +88,17 @@ export default function HaldusLehedPage() {
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Kustuta leht "${title}"?`)) return
-    await supabase.from('pages').delete().eq('id', id)
+    await fetch(`/api/haldus/pages/${id}`, { method: 'DELETE' })
     await load()
   }
 
   async function handleSaveSettings() {
     setSaving(true)
-    const keys = Object.keys(settings) as (keyof Settings)[]
-    for (const key of keys) {
-      await supabase.from('settings').update({ value: settings[key] }).eq('key', key)
-    }
+    await fetch('/api/haldus/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ settings }),
+    })
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)

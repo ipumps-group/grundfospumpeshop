@@ -5,7 +5,6 @@ import type React from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, ExternalLink, ImageIcon, X } from 'lucide-react'
 import { uploadFile } from '@/lib/upload'
-import { supabase } from '@/lib/supabase'
 import SectionEditor from './SectionEditor'
 import SlugInput from './SlugInput'
 import type { Section, PageFormData } from './types'
@@ -164,27 +163,29 @@ export default function PageBuilderEditor({ mode, initialData }: Props) {
     }
 
     if (mode === 'create') {
-      const { data: created, error: err } = await supabase.from('pages').insert(payload).select('id').single()
-      if (err) {
-        setError(
-          err.message.includes('unique') || err.message.includes('duplicate')
-            ? 'See slug on juba kasutusel.'
-            : 'Salvestamine ebaõnnestus: ' + err.message
-        )
+      const res = await fetch('/api/haldus/pages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json().catch(() => ({})) as { error?: string; page?: { id: string } }
+      if (!res.ok || !json.page) {
+        setError(json.error ?? 'Salvestamine ebaõnnestus: tundmatu viga')
         setSaving(false)
         return
       }
       if (targetStatus) setStatus(targetStatus)
-      router.push(`/haldus/lehed/${created!.id}`)
+      router.push(`/haldus/lehed/${json.page.id}`)
       return
     } else {
-      const { error: err } = await supabase.from('pages').update(payload).eq('id', initialData!.id!)
-      if (err) {
-        setError(
-          err.message.includes('unique') || err.message.includes('duplicate')
-            ? 'See slug on juba kasutusel.'
-            : 'Salvestamine ebaõnnestus: ' + err.message
-        )
+      const res = await fetch(`/api/haldus/pages/${initialData!.id!}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({})) as { error?: string }
+        setError(json.error ?? 'Salvestamine ebaõnnestus: tundmatu viga')
         setSaving(false)
         return
       }
