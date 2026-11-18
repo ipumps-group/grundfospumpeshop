@@ -9,10 +9,10 @@ export const routing = defineRouting({
   // This allows /robots.txt and /sitemap.xml at root without locale.
   // SEO files work at root; locale prefix used for actual content pages.
   localePrefix: 'as-needed',
-  // Detect browser language via Accept-Language header and remember
-  // choice in NEXT_LOCALE cookie. Falls back to defaultLocale if the
-  // browser language is not in the supported locales list.
-  localeDetection: true,
+  // Disable automatic browser-language detection. pumbapood.ee defaults to
+  // Estonian for every URL that has no locale prefix. Other locales are only
+  // served when the user explicitly visits the prefixed path (e.g. /en/...).
+  localeDetection: false,
 })
 
 export type Locale = (typeof routing.locales)[number]

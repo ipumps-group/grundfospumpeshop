@@ -5,25 +5,19 @@ import { routing } from './i18n/routing'
 const intlMiddleware = createMiddleware(routing)
 
 // Estonian-only campaign pages — serve them directly under the 'et' locale via an
-// internal rewrite, so browser language / NEXT_LOCALE cookie never trigger a
-// redirect to /en|ru|lv|lt/<path> (the pages themselves redirect those back).
+// internal rewrite. With localeDetection: false these would already resolve to
+// 'et', but the rewrite keeps them working without the /et/ prefix in the URL.
 const ET_ONLY_PATHS = new Set(['/alpha-go', '/unilift'])
 
 /**
- * Locale resolution uses the Accept-Language header via negotiator +
- * @formatjs/intl-localematcher. The problem is that most browsers include
- * "en" as a secondary/fallback language even when the system is set to a
- * different locale. Since "en" is a supported locale, the "best fit"
- * algorithm matches it — making the first load always English regardless
- * of the user's actual system language.
+ * pumbapood.ee proxy (Next.js 16, formerly middleware.ts).
  *
- * The fix: strip Accept-Language down to only the **primary** (highest
- * quality) language. If that primary language is not supported the
- * library falls back to the defaultLocale ('et'). This makes the site
- * respect the user's actual system/browser language rather than a
- * secondary fallback.
+ * Routing is configured so that URLs without a locale prefix always resolve to
+ * Estonian (defaultLocale). Browser language headers and the NEXT_LOCALE cookie
+ * are ignored for automatic redirects — users must explicitly visit /en/...,
+ * /ru/..., etc. to see another language.
  */
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   if (ET_ONLY_PATHS.has(pathname)) {
@@ -32,23 +26,6 @@ export default function middleware(request: NextRequest) {
     return NextResponse.rewrite(url)
   }
 
-  const acceptLang = request.headers.get('accept-language')
-  if (acceptLang) {
-    // Keep only the first language tag before any comma or quality params.
-    // NextRequest.headers is read-only, so we must clone the request with a
-    // new Headers object — mutating request.headers directly is a no-op.
-    const primary = acceptLang.split(',')[0].split(';')[0].trim()
-    if (primary !== acceptLang) {
-      const newHeaders = new Headers(request.headers)
-      newHeaders.set('accept-language', primary)
-      request = new NextRequest(request.url, {
-        headers: newHeaders,
-        method: request.method,
-        body: request.body ?? undefined,
-        signal: request.signal,
-      })
-    }
-  }
   return intlMiddleware(request)
 }
 

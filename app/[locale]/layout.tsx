@@ -3,7 +3,6 @@ import { SITE_URL, localizedUrl } from '@/lib/config'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import SetHtmlLang from '@/components/SetHtmlLang'
-import LocaleDetector from '@/components/LocaleDetector'
 import JsonLd from '@/components/seo/JsonLd'
 import { AuthProvider } from '@/lib/auth-context'
 import GoogleAdsTracker from '@/components/GoogleAdsTracker'
@@ -131,8 +130,6 @@ export default async function LocaleLayout({
       <OrganizationSchema />
       {/* Updates <html lang="..."> on the client to match the locale */}
       <SetHtmlLang />
-      {/* Detects system language on first visit via navigator.language */}
-      <LocaleDetector />
       <AuthProvider>
         <ConsentTracking />
         <GoogleAdsTracker />
