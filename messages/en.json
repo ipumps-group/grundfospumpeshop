@@ -63,7 +63,8 @@
     "sewage": "Sewage",
     "sewageTitle": "Sewage Pumps",
     "jpWaterAutomatics": "Water automatics",
-    "jpWaterAutomaticsTitle": "Water Automatics & Hydrophores"
+    "jpWaterAutomaticsTitle": "Water Automatics & Hydrophores",
+    "waterPumps": "Water Pumps"
   },
   "featured": {
     "popular": "Heating campaign",

@@ -25,7 +25,7 @@ const NOISE_IMPRESSIONS = 10
 /** Weekly real-order goal (DB, statuses except cancelled/failed). Adjust when the business sets a formal target. */
 const WEEKLY_ORDERS_GOAL = 5
 /** Below this average a weekday is treated as a tracking outage, not a traffic dip. */
-const MIN_WEEKDAY_SESSIONS = 20
+const MIN_WEEKDAY_SESSIONS = 10
 
 const round1 = (n: number) => Math.round(n * 10) / 10
 const fmtPos = (p: number | null | undefined) => (p === null || p === undefined ? "–" : round1(p).toFixed(1).replace(".", ","))
@@ -178,8 +178,8 @@ function ga4Insights(ga4: Ga4Data, period: { start: string; end: string }, out: 
         area: "ga4",
         severity: "negative",
         title: `GA4 mõõtmine ${zeroDays === base.length ? "oli terve nädala katki" : "võib olla katki"} (keskmiselt ${round1(avg)} sessiooni/tööpäevas, ${deadDays} tööpäeva alla ${MIN_WEEKDAY_SESSIONS}${zeroNote})`,
-        detail: `Alla ${MIN_WEEKDAY_SESSIONS} sessiooni/tööpäevas = tracking-tõrge (vt GTM/CSP/consent), mitte liikluse langus. Päevad, mille kohta GA4 ühtki rida ei tagasta, loetakse 0-sessioonilisteks. Nädalavahetused on loomulikult madalad ega lähe arvesse.`,
-        action: "Kontrolli GTM-i laadimist live-is (DevTools → Network: gtm.js), CSP päiseid ja consent-mode'i. Ära tõlgenda selle nädala GA4-numbreid enne taastumist.",
+        detail: `Alla ${MIN_WEEKDAY_SESSIONS} sessiooni/tööpäevas võib tähendada tracking-tõrget (GTM/CSP/consent), aga ka lihtsalt madalat liiklusmahtu. Päevad, mille kohta GA4 ühtki rida ei tagasta, loetakse 0-sessioonilisteks. Nädalavahetused on loomulikult madalad ega lähe arvesse. Kui kanalid (organiline, Google Ads, Meta jne) töötavad normaalselt, on tegu madala liiklusmahuga, mitte mõõtmisveaga.`,
+        action: "Kontrolli kõigepealt kanalite tabelit: kui kanalid näitavad liiklust, on tegu madala mahuga. Alles siis kontrolli GTM-i laadimist live-is (DevTools → Network: gtm.js), CSP päiseid ja consent-mode'i.",
       })
       return // further GA4 conclusions are unreliable
     }

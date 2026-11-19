@@ -15,6 +15,7 @@ const categoryKeys = [
   { nameKey: 'pressure', slug: 'rohutostepumbad' },
   { nameKey: 'drainage', slug: 'drenaazipumbad' },
   { nameKey: 'sewage',   slug: 'reoveepumbad' },
+  { nameKey: 'waterPumps', slug: 'veepumbad' },
 ]
 
 const legalHrefs = [

@@ -1,7 +1,5 @@
-// Nädalaraporti SEO (22.10.2026, raport id=19): „põrandal seisev veeautomaat"
-// pos 4,8 / 18 näitamist / 0 klikki → CTR-probleem. Meta title/description
-// ümber: märksõna „põrandal seisev", laoseis ja tarne-argument snippet'isse.
-// Parandab ka vana „| iPumps" brändijäänuk'i → Pumbapood.ee.
+// SEO november 2026: veeautomaadid title/description rewrite (CTR).
+// Märksõnad: veeautomaat, hüdrofoor, Grundfos. Ei sisalda tarneaega.
 // Kasutus: node scripts/update-veeautomaadid-meta.mjs [--dry-run]
 import { createClient } from '@supabase/supabase-js'
 import { env } from './env.mjs'
@@ -9,9 +7,9 @@ import { env } from './env.mjs'
 const DRY = process.argv.includes('--dry-run')
 const s = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY)
 
-const META_TITLE = 'Veeautomaat: põrandal seisev ja uputatav — laos | Pumbapood.ee'
+const META_TITLE = 'Veeautomaat laos | Grundfos SCALA1, SCALA2 alates 234 € | Pumbapood.ee'
 const META_DESCRIPTION =
-  'Grundfos SCALA1, SCALA2, JP ja SBA laos — tarne 1–3 tööpäeva. Põrandal seisev alates 234,52 €, uputatav alates 574,57 €. Vaata valikut!'
+  'Osta Grundfos veeautomaat või hüdrofoor — garantii ja tasuta nõustamine. SCALA1, SCALA2, JP ja SBA laos. Alates 234,52 €.'
 
 const { data: area, error } = await s.from('activity_areas').select('id, meta_title, meta_description').eq('slug', 'veeautomaadid').single()
 if (error) { console.error(error.message); process.exit(1) }

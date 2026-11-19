@@ -473,6 +473,9 @@ const KUTTEPUMBAD: Record<Locale, CategoryContentSection> = {
         a: "Põrandaküttesüsteemidele, kus pump töötab pidevalt väikese võimsusega, sobib ALPHA2 GO — täpne juhtimine hoiab vooluhulga ühtlasena ja tarbib vähe elektrit. Suuremate põrandaküttesüsteemide ja ärihoonete jaoks on õige valik MAGNA1 või MAGNA3.",
       },
     ],
+    related: { title: "Vaata ka:", links: [
+      { label: "Sooja tarbevee tsirkulatsioonipumbad", href: "/tooted/tsirkulatsioonipumbad-soe-tarbevesi" },
+    ] },
   },
   en: {
     guideTitle: "How to choose a heating circulator pump?",
@@ -1409,9 +1412,11 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     guideTitle: "Kuidas valida salvkaevupump?",
     guideParagraphs: [
       "Salvkaevupump toob vett avatud kaevust või salvkaevust majja, aita või kastmisseadmesse. Õige valik sõltub imusügavusest (põrandal seisev pump imeb kuni 8 m sügavuselt), sellest, kas vaja varustada ka maja, ja soovitud müratasemest.",
+      "Salvkaevupumpa valides mõõda ära kaevu sügavus ja veetaseme kõrgus. Põrandal seisev pump (JP) imeb vett kuni 8 m sügavuselt; kui veetase on madalam või soovid täiesti vaikset lahendust, vali uputatav SB või SBA, mille langetad kaevu sisse.",
       "Grundfos JP on klassikaline ja soodne lahendus — pump koos rõhumahuti ja automaatikaga (hüdrofoor), mis sobib hästi suvilasse ja aeda.",
       "Grundfos SB on uputatav sukelpump, mis langetatakse kaevu või mahutisse — töötab täiesti vaikselt ja sobib kastmiseks ning väiksema maja veevarustuseks, kuid automaatseks tööks vajab välist juhtseadet.",
       "Grundfos SBA on sama sukelpump koos sisseehitatud automaatika ja kuivakäigukaitsega — käivitub ja seiskub veevõtu järgi ning eraldi juhtseadet pole vaja lisada.",
+      "Kõik meie salvkaevupumbad on laos. Täpse tarneaja saad teada tellimuse kinnitamisel. Kui kaev on sügavam kui 8 meetrit või vajad suuremat vooluhulka, sobib paremini puurkaevupump.",
     ],
     priceTitle: "Salvkaevupumba hind",
     priceIntro:
@@ -1419,7 +1424,7 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
     priceTable: {
       head: ["Seeria", "Sobivus", "Hinnavahemik"],
       rows: [
-        ["Grundfos JP", "klassikaline hüdrofoor — suvila ja aed, soodne", "235–553 €"],
+        ["Grundfos JP", "klassikaline hüdrofoor — suvila, aed, veetase kuni 8 m", "235–553 €"],
         ["Grundfos SB", "uputatav sukelpump — vajab välist juhtseadet", "521–602 €"],
         ["Grundfos SBA", "uputatav pump kaevu sisse — täiesti vaikne", "575–716 €"],
       ],
@@ -1450,7 +1455,23 @@ const SALVKAEVUPUMBAD: Record<Locale, CategoryContentSection> = {
         q: "Kas salvkaevupumpa saab kasutada vihmavee pumpamiseks?",
         a: "Jah — JP, SB ja SBA sobivad hästi ka vihmavee kogumismahutist kastmiseks ja majapidamisveeks pumpamiseks.",
       },
+      {
+        q: "Kuidas paigaldada salvkaevupumpa?",
+        a: "Põrandal seisev JP paigaldatakse kuiva ruumi kaevu kõrvale ja ühendatakse imutoruga. Uputatavad SB ja SBA langetatakse kaevu sisse spetsiaalse kõri abil — need ei vaja eraldi ruumi ega tee müra.",
+      },
+      {
+        q: "Kas salvkaevupump sobib ka vihmavee jaoks?",
+        a: "Jah — JP, SB ja SBA sobivad hästi vihmaveemahutist kastmiseks ja majapidamisveeks. Kui peamine kasutus on kastmine, vali SBA automaatika võimalusega, et pump ei käiks tühjalt.",
+      },
+      {
+        q: "Millal valida SB ja millal SBA?",
+        a: "SB on odavam, aga vajab välist juhtseadet automaatseks tööks. SBA-l on automaatika ja kuivakäimise kaitse juba sees — mugavam ja turvalisem valik.",
+      },
     ],
+    related: { title: "Vaata ka:", links: [
+      { label: "Veeautomaadid ja hüdrofoorid", href: "/tooted/veeautomaadid" },
+      { label: "Puurkaevupumbad", href: "/tooted/puurkaevupumbad" },
+    ] },
   },
   en: {
     guideTitle: "How to choose a well pump?",
@@ -1891,8 +1912,9 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
     guideParagraphs: [
       "Sooja tarbevee tsirkulatsioonipump hoiab kuuma vee torustikus ringluses, nii et soe vesi tuleb kraanist kohe — ilma et peaksid vett ja aega raisates ootama. Õige valik sõltub maja suurusest, torustiku pikkusest ja sellest, kas majas on tagasivooluliin (ringlusliin) või mitte.",
       "Eramusse ja korterisse on parim valik COMFORT seeria pump — COMFORT AUTOADAPT-iga õpib sinu majapidamise veetarbimise harjumused ja lülitub sisse ainult siis, kui sooja vett tõenäoliselt vaja on, mis hoiab elektri- ja soojakulu minimaalsena. Kui majas pole tagasivooluliini, lahendab selle COMFORT BX koos termostaatventiiliga, mis paigaldatakse kaugeima veevõtupunkti juurde.",
-      "Klassikalises ringlusliiniga süsteemis töötab roostevaba korpusega UPS(N) — see on mõeldud just sooja tarbevee jaoks, sest tavaline malmpump hakkab joogivees roostetama. Sama N-korpusega on saadaval ka ALPHA1 ja ALPHA2 mudelid, mis reguleerivad võimsust automaatselt ja tarbivad märgatavalt vähem elektrit.",
+      "Klassikalises ringlusliiniga süsteemis töötab roostevaba korpusega UPS(N) — see on mõeldud just sooja tarbevee jaoks, sest tavaline malmpump hakkab joogivees roostetama. Sama N-korpusega on saadaval ka ALPHA1 ja ALPHA2 mudelid, mis reguleerivad võimsust automaatselt ja tarbivad märgatavalt vähem elektrit. Küttepumbana kasutatakse neid keskkütte- ja põrandaküttesüsteemides, kus need hoiavad vee ringluses ja tagavad ühtlase soojuse.",
       "Suurtesse hoonetesse — kortermajadesse, hotellidesse, spordikeskustesse — kus ringlusliinid on pikad ja vooluhulgad suured, on õiged valikud MAGNA1 ja MAGNA3, mis hoiavad rõhu ja temperatuuri ühtlasena kogu hoones. Kui soojal kraanil jääb lihtsalt rõhku vajaka, lisab selle juurde kompaktne UPA rõhutõstepump.",
+      "Kui sul on vaja asendada vana UPS, ALPHA1 või ALPHA2 pump, vaata meie küttepumpade valikut. Sooja tarbevee ringlusesse sobivad roostevaba korpusega COMFORT ja UPS(N) seeriad.",
     ],
     priceTitle: "Sooja tarbevee tsirkulatsioonipumba hind",
     priceIntro:
@@ -1934,6 +1956,14 @@ const TSIRKULATSIOONIPUMBAD: Record<Locale, CategoryContentSection> = {
       {
         q: "Millal tuleks vaadata UPS(N), ALPHA või MAGNA pumpa?",
         a: "Kui majas on juba olemas tagasivooluliin ja soovid lihtsat ning töökindlat lahendust, on UPS(N) hea valik. ALPHA1 N ja ALPHA2 N reguleerivad võimsust automaatselt ja säästavad elektrit. MAGNA1 ja MAGNA3 on mõeldud kortermajadele, hotellidele ja muudesse suurtesse hoonetesse pikkade ringlusliinidega.",
+      },
+      {
+        q: "Kas tsirkulatsioonipumpa saab kasutada ka kütteks?",
+        a: "Jah — sooja tarbevee tsirkulatsioonipumpa EI tohi kasutada küttesüsteemis, aga küttepumba võib paigaldada ringlusliiniga sooja tarbevee süsteemi. Oluline on valida õige korpusega mudel: küttesüsteemi jaoks sobivad malmsed ALPHA ja MAGNA pumbad, joogivee ringlusesse ainult roostevabad N-mudelid.",
+      },
+      {
+        q: "Milline on parim asendus vanale UPS pumbale?",
+        a: "Enamiku vanade UPS, ALPHA1 ja ALPHA1 L pumpade asemele sobivad Grundfos ALPHA1 GO või ALPHA2 GO — samad ühendusmõõtud ja GO äpi tugi. Täpsema soovituse saamiseks vaata meie küttepumpade valikut.",
       },
     ],
     related: { title: "Vaata ka:", links: [

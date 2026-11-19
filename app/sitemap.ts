@@ -68,6 +68,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     }
 
+    // 2b. Static SEO landing page for water pumps - PRIORITY 0.9
+    for (const locale of LOCALES) {
+      entries.push({
+        url: localizedUrl('/tooted/veepumbad', locale),
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.9,
+        alternates: { languages: langEntry('/tooted/veepumbad') },
+      })
+    }
+
     // 3. Activity area (category) pages - PRIORITY 0.9
     try {
       const { data: activityAreas } = await supabaseAdmin
