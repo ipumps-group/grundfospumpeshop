@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload to GitHub Artifacts
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: db-backup-${{ github.run_number }}
           path: backups/
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload to GitHub Artifacts
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: images-backup-${{ github.run_number }}
           path: images_*.tar.gz
