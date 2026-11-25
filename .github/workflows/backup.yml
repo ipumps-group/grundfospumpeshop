@@ -7,7 +7,6 @@ on:
     # Pildid: iga esmaspäev kell 04:00 UTC
     - cron: '0 4 * * 1'
   workflow_dispatch:
-  push:
 
 permissions:
   contents: read
@@ -17,7 +16,7 @@ jobs:
   backup-database:
     name: Backup Supabase Database
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Validate required secrets
@@ -116,7 +115,7 @@ jobs:
   backup-images:
     name: Backup Supabase Storage Images
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 4 * * 1' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: github.event.schedule == '0 4 * * 1' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Validate required secrets
@@ -158,7 +157,8 @@ jobs:
           COUNT=$(jq 'length' /tmp/storage-list.json)
           echo "Found $COUNT objects to download."
 
-          jq -r '.[].name' /tmp/storage-list.json | while read -r file; do
+          # Aida ainult päris faile; jäta välja kaustad/prefixid (id == null).
+          jq -r '.[] | select(.id != null) | .name' /tmp/storage-list.json | while read -r file; do
             mkdir -p "images/$(dirname "$file")"
             echo "Downloading: $file"
             curl -sS -f -o "images/$file" \
