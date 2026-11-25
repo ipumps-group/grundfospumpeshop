@@ -77,30 +77,40 @@ jobs:
           retention-days: 30
 
       - name: Send success email (optional)
-        if: success() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        if: success()
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
-          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
         run: |
           set -euo pipefail
+          if [ -z "${RESEND_API_KEY:-}" ] || [ -z "${RESEND_FROM_EMAIL:-}" ]; then
+            echo "Skipping email notification (Resend secrets not configured)."
+            exit 0
+          fi
+          RECIPIENT="${BACKUP_EMAIL:-${RESEND_FROM_EMAIL}}"
           curl -sS -X POST https://api.resend.com/emails \
             -H "Authorization: Bearer ${RESEND_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"✅ ipumps.ee DB backup õnnestus - ${{ github.run_number }}\",\"text\":\"Andmebaasi backup on salvestatud. Kuupäev: $(date +%Y-%m-%d)\"}"
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${RECIPIENT}\",\"subject\":\"✅ ipumps.ee DB backup õnnestus - ${{ github.run_number }}\",\"text\":\"Andmebaasi backup on salvestatud. Kuupäev: $(date +%Y-%m-%d)\"}"
 
       - name: Send failure email (optional)
-        if: failure() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        if: failure()
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
-          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
         run: |
           set -euo pipefail
+          if [ -z "${RESEND_API_KEY:-}" ] || [ -z "${RESEND_FROM_EMAIL:-}" ]; then
+            echo "Skipping email notification (Resend secrets not configured)."
+            exit 0
+          fi
+          RECIPIENT="${BACKUP_EMAIL:-${RESEND_FROM_EMAIL}}"
           curl -sS -X POST https://api.resend.com/emails \
             -H "Authorization: Bearer ${RESEND_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"❌ ipumps.ee DB backup EBAÕNNESTUS - ${{ github.run_number }}\",\"text\":\"Andmebaasi backup ebaõnnestus! Kontrolli GitHub Actions logi.\"}"
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${RECIPIENT}\",\"subject\":\"❌ ipumps.ee DB backup EBAÕNNESTUS - ${{ github.run_number }}\",\"text\":\"Andmebaasi backup ebaõnnestus! Kontrolli GitHub Actions logi.\"}"
 
   backup-images:
     name: Backup Supabase Storage Images
@@ -168,27 +178,37 @@ jobs:
           retention-days: 30
 
       - name: Send success email (optional)
-        if: success() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        if: success()
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
-          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
         run: |
           set -euo pipefail
+          if [ -z "${RESEND_API_KEY:-}" ] || [ -z "${RESEND_FROM_EMAIL:-}" ]; then
+            echo "Skipping email notification (Resend secrets not configured)."
+            exit 0
+          fi
+          RECIPIENT="${BACKUP_EMAIL:-${RESEND_FROM_EMAIL}}"
           curl -sS -X POST https://api.resend.com/emails \
             -H "Authorization: Bearer ${RESEND_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"✅ ipumps.ee piltide backup õnnestus\",\"text\":\"Piltide backup GitHub Artifacts'i õnnestus. Kuupäev: $(date +%Y-%m-%d)\"}"
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${RECIPIENT}\",\"subject\":\"✅ ipumps.ee piltide backup õnnestus\",\"text\":\"Piltide backup GitHub Artifacts'i õnnestus. Kuupäev: $(date +%Y-%m-%d)\"}"
 
       - name: Send failure email (optional)
-        if: failure() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        if: failure()
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
-          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
         run: |
           set -euo pipefail
+          if [ -z "${RESEND_API_KEY:-}" ] || [ -z "${RESEND_FROM_EMAIL:-}" ]; then
+            echo "Skipping email notification (Resend secrets not configured)."
+            exit 0
+          fi
+          RECIPIENT="${BACKUP_EMAIL:-${RESEND_FROM_EMAIL}}"
           curl -sS -X POST https://api.resend.com/emails \
             -H "Authorization: Bearer ${RESEND_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"❌ ipumps.ee piltide backup EBAÕNNESTUS\",\"text\":\"Piltide backup ebaõnnestus! Kontrolli GitHub Actions logi.\"}"
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${RECIPIENT}\",\"subject\":\"❌ ipumps.ee piltide backup EBAÕNNESTUS\",\"text\":\"Piltide backup ebaõnnestus! Kontrolli GitHub Actions logi.\"}"
