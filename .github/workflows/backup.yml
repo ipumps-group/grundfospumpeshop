@@ -7,7 +7,6 @@ on:
     # Pildid: iga esmaspäev kell 04:00 UTC
     - cron: '0 4 * * 1'
   workflow_dispatch:
-  push:
 
 permissions:
   contents: read
@@ -116,7 +115,7 @@ jobs:
   backup-images:
     name: Backup Supabase Storage Images
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 4 * * 1' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: github.event.schedule == '0 4 * * 1' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Validate required secrets
