@@ -134,37 +134,20 @@ jobs:
           fi
           echo "✅ Supabase secrets are configured."
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
 
       - name: Download images from Supabase Storage
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-          set -euo pipefail
-          mkdir -p images
-
-          echo "Listing objects in Supabase Storage bucket 'products'..."
-          curl -sS -f "${SUPABASE_URL}/storage/v1/object/list/products" \
-            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
-            -H "Content-Type: application/json" \
-            -d '{"prefix": "", "limit": 1000}' \
-            > /tmp/storage-list.json
-
-          COUNT=$(jq 'length' /tmp/storage-list.json)
-          echo "Found $COUNT objects to download."
-
-          # Aida ainult päris faile; jäta välja kaustad/prefixid (id == null).
-          jq -r '.[] | select(.id != null) | .name' /tmp/storage-list.json | while read -r file; do
-            mkdir -p "images/$(dirname "$file")"
-            echo "Downloading: $file"
-            curl -sS -f -o "images/$file" \
-              "${SUPABASE_URL}/storage/v1/object/products/$file" \
-              -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
-          done
+          BACKUP_BUCKETS: products,pages
+        run: node scripts/backup-storage.mjs
 
       - name: Compress images
         if: success()
