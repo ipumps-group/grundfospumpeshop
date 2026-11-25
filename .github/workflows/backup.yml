@@ -22,13 +22,23 @@ jobs:
       - name: Validate required secrets
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
+          BACKUP_EMAIL_PASSWORD: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
         run: |
           set -euo pipefail
           if [ -z "${DATABASE_URL:-}" ]; then
             echo "::error::Secret SUPABASE_DB_URL is not set or empty. Add it in Settings > Secrets and variables > Actions."
             exit 1
           fi
-          echo "✅ SUPABASE_DB_URL is configured."
+          if [ -z "${BACKUP_EMAIL:-}" ]; then
+            echo "::error::Secret BACKUP_EMAIL is not set or empty. Required for success/failure notifications."
+            exit 1
+          fi
+          if [ -z "${BACKUP_EMAIL_PASSWORD:-}" ]; then
+            echo "::error::Secret BACKUP_EMAIL_PASSWORD is not set or empty. Required for success/failure notifications."
+            exit 1
+          fi
+          echo "✅ Required secrets are configured."
 
       - name: Install PostgreSQL client
         run: |
@@ -112,6 +122,8 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
+          BACKUP_EMAIL_PASSWORD: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
         run: |
           set -euo pipefail
           if [ -z "${SUPABASE_URL:-}" ]; then
@@ -122,7 +134,15 @@ jobs:
             echo "::error::Secret SUPABASE_SERVICE_ROLE_KEY is not set or empty."
             exit 1
           fi
-          echo "✅ Supabase secrets are configured."
+          if [ -z "${BACKUP_EMAIL:-}" ]; then
+            echo "::error::Secret BACKUP_EMAIL is not set or empty. Required for success/failure notifications."
+            exit 1
+          fi
+          if [ -z "${BACKUP_EMAIL_PASSWORD:-}" ]; then
+            echo "::error::Secret BACKUP_EMAIL_PASSWORD is not set or empty. Required for success/failure notifications."
+            exit 1
+          fi
+          echo "✅ Required secrets are configured."
 
       - name: Install dependencies
         run: |
