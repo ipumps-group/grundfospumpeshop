@@ -8,6 +8,10 @@ on:
     - cron: '0 4 * * 1'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   backup-database:
     name: Backup Supabase Database
@@ -15,6 +19,17 @@ jobs:
     if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
 
     steps:
+      - name: Validate required secrets
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::Secret SUPABASE_DB_URL is not set or empty. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "✅ SUPABASE_DB_URL is configured."
+
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
@@ -24,17 +39,37 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
+          set -euo pipefail
           mkdir -p backups
-          pg_dump "$DATABASE_URL" \
+
+          # Supabase nõuab krüpteeritud ühendust; veendu, et sslmode=require oleks määratud.
+          DB_URL="$DATABASE_URL"
+          if [[ "$DB_URL" != *"sslmode="* ]]; then
+            if [[ "$DB_URL" == *"?"* ]]; then
+              DB_URL="${DB_URL}&sslmode=require"
+            else
+              DB_URL="${DB_URL}?sslmode=require"
+            fi
+          fi
+
+          echo "Testing database connection..."
+          psql "$DB_URL" -c "SELECT version();" -q -t
+          echo "✅ Database connection OK."
+
+          echo "Running pg_dump..."
+          pg_dump "$DB_URL" \
             --no-owner \
             --no-acl \
             --format=plain \
             --file=backups/db_$(date +%Y%m%d_%H%M%S).sql
+          echo "✅ pg_dump completed."
 
       - name: Compress backup
+        if: success()
         run: gzip backups/*.sql
 
       - name: Upload to GitHub Artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ github.run_number }}
@@ -73,28 +108,59 @@ jobs:
     if: github.event.schedule == '0 4 * * 1' || github.event_name == 'workflow_dispatch'
 
     steps:
+      - name: Validate required secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_URL:-}" ]; then
+            echo "::error::Secret SUPABASE_URL is not set or empty."
+            exit 1
+          fi
+          if [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+            echo "::error::Secret SUPABASE_SERVICE_ROLE_KEY is not set or empty."
+            exit 1
+          fi
+          echo "✅ Supabase secrets are configured."
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
       - name: Download images from Supabase Storage
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
+          set -euo pipefail
           mkdir -p images
-          curl -s "${SUPABASE_URL}/storage/v1/object/list/products" \
+
+          echo "Listing objects in Supabase Storage bucket 'products'..."
+          curl -sS -f "${SUPABASE_URL}/storage/v1/object/list/products" \
             -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
             -H "Content-Type: application/json" \
             -d '{"prefix": "", "limit": 1000}' \
-            | jq -r '.[].name' \
-            | while read -r file; do
-                mkdir -p "images/$(dirname "$file")"
-                curl -s -o "images/$file" \
-                  "${SUPABASE_URL}/storage/v1/object/products/$file" \
-                  -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
-              done
+            > /tmp/storage-list.json
+
+          COUNT=$(jq 'length' /tmp/storage-list.json)
+          echo "Found $COUNT objects to download."
+
+          jq -r '.[].name' /tmp/storage-list.json | while read -r file; do
+            mkdir -p "images/$(dirname "$file")"
+            echo "Downloading: $file"
+            curl -sS -f -o "images/$file" \
+              "${SUPABASE_URL}/storage/v1/object/products/$file" \
+              -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
+          done
 
       - name: Compress images
+        if: success()
         run: tar -czf images_$(date +%Y%m%d).tar.gz images/
 
       - name: Upload to GitHub Artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: images-backup-${{ github.run_number }}
