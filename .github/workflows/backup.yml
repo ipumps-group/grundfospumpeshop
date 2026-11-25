@@ -22,23 +22,13 @@ jobs:
       - name: Validate required secrets
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
-          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
-          BACKUP_EMAIL_PASSWORD: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
         run: |
           set -euo pipefail
           if [ -z "${DATABASE_URL:-}" ]; then
             echo "::error::Secret SUPABASE_DB_URL is not set or empty. Add it in Settings > Secrets and variables > Actions."
             exit 1
           fi
-          if [ -z "${BACKUP_EMAIL:-}" ]; then
-            echo "::error::Secret BACKUP_EMAIL is not set or empty. Required for success/failure notifications."
-            exit 1
-          fi
-          if [ -z "${BACKUP_EMAIL_PASSWORD:-}" ]; then
-            echo "::error::Secret BACKUP_EMAIL_PASSWORD is not set or empty. Required for success/failure notifications."
-            exit 1
-          fi
-          echo "✅ Required secrets are configured."
+          echo "✅ SUPABASE_DB_URL is configured."
 
       - name: Install PostgreSQL client
         run: |
@@ -86,31 +76,31 @@ jobs:
           path: backups/
           retention-days: 30
 
-      - name: Send success email
-        if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.BACKUP_EMAIL }}
-          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
-          subject: "✅ ipumps.ee DB backup õnnestus - ${{ github.run_number }}"
-          body: "Andmebaasi backup on salvestatud. Kuupäev: $(date +%Y-%m-%d)"
-          to: ${{ secrets.BACKUP_EMAIL }}
-          from: ${{ secrets.BACKUP_EMAIL }}
+      - name: Send success email (optional)
+        if: success() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"✅ ipumps.ee DB backup õnnestus - ${{ github.run_number }}\",\"text\":\"Andmebaasi backup on salvestatud. Kuupäev: $(date +%Y-%m-%d)\"}"
 
-      - name: Send failure email
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.BACKUP_EMAIL }}
-          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
-          subject: "❌ ipumps.ee DB backup EBAÕNNESTUS - ${{ github.run_number }}"
-          body: "Andmebaasi backup ebaõnnestus! Kontrolli GitHub Actions logi."
-          to: ${{ secrets.BACKUP_EMAIL }}
-          from: ${{ secrets.BACKUP_EMAIL }}
+      - name: Send failure email (optional)
+        if: failure() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"❌ ipumps.ee DB backup EBAÕNNESTUS - ${{ github.run_number }}\",\"text\":\"Andmebaasi backup ebaõnnestus! Kontrolli GitHub Actions logi.\"}"
 
   backup-images:
     name: Backup Supabase Storage Images
@@ -122,8 +112,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}
-          BACKUP_EMAIL_PASSWORD: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
         run: |
           set -euo pipefail
           if [ -z "${SUPABASE_URL:-}" ]; then
@@ -134,15 +122,7 @@ jobs:
             echo "::error::Secret SUPABASE_SERVICE_ROLE_KEY is not set or empty."
             exit 1
           fi
-          if [ -z "${BACKUP_EMAIL:-}" ]; then
-            echo "::error::Secret BACKUP_EMAIL is not set or empty. Required for success/failure notifications."
-            exit 1
-          fi
-          if [ -z "${BACKUP_EMAIL_PASSWORD:-}" ]; then
-            echo "::error::Secret BACKUP_EMAIL_PASSWORD is not set or empty. Required for success/failure notifications."
-            exit 1
-          fi
-          echo "✅ Required secrets are configured."
+          echo "✅ Supabase secrets are configured."
 
       - name: Install dependencies
         run: |
@@ -187,28 +167,28 @@ jobs:
           path: images_*.tar.gz
           retention-days: 30
 
-      - name: Send success email
-        if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.BACKUP_EMAIL }}
-          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
-          subject: "✅ ipumps.ee piltide backup õnnestus"
-          body: "Piltide backup GitHub Artifacts'i õnnestus. Kuupäev: $(date +%Y-%m-%d)"
-          to: ${{ secrets.BACKUP_EMAIL }}
-          from: ${{ secrets.BACKUP_EMAIL }}
+      - name: Send success email (optional)
+        if: success() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"✅ ipumps.ee piltide backup õnnestus\",\"text\":\"Piltide backup GitHub Artifacts'i õnnestus. Kuupäev: $(date +%Y-%m-%d)\"}"
 
-      - name: Send failure email
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.BACKUP_EMAIL }}
-          password: ${{ secrets.BACKUP_EMAIL_PASSWORD }}
-          subject: "❌ ipumps.ee piltide backup EBAÕNNESTUS"
-          body: "Piltide backup ebaõnnestus! Kontrolli GitHub Actions logi."
-          to: ${{ secrets.BACKUP_EMAIL }}
-          from: ${{ secrets.BACKUP_EMAIL }}
+      - name: Send failure email (optional)
+        if: failure() && secrets.RESEND_API_KEY != '' && secrets.RESEND_FROM_EMAIL != ''
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL != '' && secrets.BACKUP_EMAIL || secrets.RESEND_FROM_EMAIL }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST https://api.resend.com/emails \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"from\":\"${RESEND_FROM_EMAIL}\",\"to\":\"${BACKUP_EMAIL}\",\"subject\":\"❌ ipumps.ee piltide backup EBAÕNNESTUS\",\"text\":\"Piltide backup ebaõnnestus! Kontrolli GitHub Actions logi.\"}"
